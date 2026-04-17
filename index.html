@@ -175,10 +175,16 @@
       </div>
       <div style="font-weight:600;font-size:16px;color:#1a2744;margin-bottom:.5rem">Fetch live DSE data &amp; generate email</div>
       <div style="font-size:13px;color:#6b7280;max-width:460px;margin:0 auto 1.75rem">Claude will fetch live equity prices from dse.co.tz, search the past 5 trading days to compute weekly performance, then generate your branded email.</div>
-      <button class="btn btn-primary" id="genBtn" onclick="runFetch()" style="padding:12px 36px">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8l6-6 6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Fetch from dse.co.tz + generate
-      </button>
+      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:.5rem">
+        <button class="btn btn-outline" id="testApiBtn" onclick="testAnthropicKey()" style="padding:10px 20px">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#374151" stroke-width="1.5"/><path d="M7 4v3l2 1.5" stroke="#374151" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Test API key first
+        </button>
+        <button class="btn btn-primary" id="genBtn" onclick="runFetch()" style="padding:12px 28px">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8l6-6 6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Fetch from dse.co.tz + generate
+        </button>
+      </div>
       <div class="status-box" id="statusBox">
         <div class="status-row"><div class="spin"></div><span id="statusMsg">Starting...</span></div>
         <div class="prog-wrap">
@@ -187,6 +193,7 @@
         </div>
       </div>
       <div class="err" id="genErr"></div>
+      <div id="apiDebugBox" style="display:none;margin-top:.875rem;background:#1e293b;color:#e2e8f0;border-radius:8px;padding:1rem;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;text-align:left;max-height:200px;overflow-y:auto"></div>
     </div>
     <button class="back-btn" onclick="goScreen(1)">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 7H4M6 4L3 7l3 3" stroke="#6b7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -242,14 +249,21 @@
         <div class="review-row"><span class="review-lbl">Reply-to</span><span class="review-val" id="rvReply"></span></div>
         <div class="review-row"><span class="review-lbl">Audience ID</span><span class="review-val" id="rvList"></span></div>
       </div>
-      <button class="btn btn-primary btn-block" id="sendBtn" onclick="doSend()">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 6-12 6V9l8-1-8-1V2z" fill="#fff"/></svg>
-        Send campaign now
-      </button>
+      <div style="display:flex;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap">
+        <button class="btn btn-outline" onclick="testMailchimp()" id="testBtn" style="flex:0 0 auto">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#374151" stroke-width="1.5"/><path d="M7 4v3l2 1.5" stroke="#374151" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Test connection
+        </button>
+        <button class="btn btn-primary" style="flex:1" id="sendBtn" onclick="doSend()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 6-12 6V9l8-1-8-1V2z" fill="#fff"/></svg>
+          Send campaign now
+        </button>
+      </div>
       <div class="status-box" id="sendStatusBox" style="flex-direction:row;padding:1rem 0">
         <div class="spin"></div><span id="sendMsg" style="font-size:13px;color:#6b7280"></span>
       </div>
       <div class="err" id="sendErr"></div>
+      <div id="debugBox" style="display:none;margin-top:.875rem;background:#1e293b;color:#e2e8f0;border-radius:8px;padding:1rem;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:260px;overflow-y:auto"></div>
     </div>
 
     <div id="successBox" style="display:none" class="success">
@@ -305,7 +319,7 @@ async function claudeCall(system, user, useSearch) {
   const key = document.getElementById('anthroKey').value.trim();
   if (!key) throw new Error('Anthropic API key is missing — please enter it in step 1.');
   const body = {
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-6',
     max_tokens: 4000,
     system,
     messages: [{ role: 'user', content: user }]
@@ -328,6 +342,72 @@ async function claudeCall(system, user, useSearch) {
   const data = await resp.json();
   if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
   return data;
+}
+
+async function testAnthropicKey() {
+  const key = document.getElementById('anthroKey').value.trim();
+  if (!key) {
+    const e = document.getElementById('genErr');
+    e.style.display = 'block';
+    e.textContent = 'Enter your Anthropic API key in step 1 first.';
+    return;
+  }
+  document.getElementById('testApiBtn').style.display = 'none';
+  document.getElementById('genErr').style.display = 'none';
+  document.getElementById('apiDebugBox').style.display = 'none';
+  document.getElementById('apiDebugBox').textContent = '';
+  document.getElementById('statusBox').style.display = 'flex';
+  document.getElementById('statusMsg').textContent = 'Testing Anthropic API key...';
+
+  const box = document.getElementById('apiDebugBox');
+  const log = (msg, data) => {
+    box.style.display = 'block';
+    box.textContent += '[' + new Date().toLocaleTimeString() + '] ' + msg + (data ? '\n' + JSON.stringify(data, null, 2) : '') + '\n\n';
+  };
+
+  try {
+    log('Sending test request to Anthropic API...\nModel: claude-sonnet-4-6');
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 20,
+        messages: [{ role: 'user', content: 'Say OK' }]
+      })
+    });
+    const data = await resp.json().catch(() => ({}));
+    log('HTTP ' + resp.status + ' response:', data);
+    document.getElementById('statusBox').style.display = 'none';
+    document.getElementById('testApiBtn').style.display = 'inline-flex';
+    if (resp.ok && data.content) {
+      const e = document.getElementById('genErr');
+      e.style.display = 'block';
+      e.style.background = '#f0fdf4';
+      e.style.color = '#166534';
+      e.style.borderColor = '#86efac';
+      e.textContent = 'API key is valid! Claude responded successfully. You can now fetch DSE data.';
+    } else {
+      const e = document.getElementById('genErr');
+      e.style.display = 'block';
+      e.style.background = '';
+      e.style.color = '';
+      e.style.borderColor = '';
+      e.textContent = 'API error ' + resp.status + ': ' + (data.error?.message || JSON.stringify(data));
+    }
+  } catch (err) {
+    document.getElementById('statusBox').style.display = 'none';
+    document.getElementById('testApiBtn').style.display = 'inline-flex';
+    const e = document.getElementById('genErr');
+    e.style.display = 'block';
+    e.textContent = 'Network error: ' + err.message + '. Make sure you are using Chrome and this file is opened from your local disk (not inside a zip or cloud drive).';
+    log('Network error:', { message: err.message });
+  }
 }
 
 async function runFetch() {
@@ -540,77 +620,155 @@ function renderPreview() {
   document.getElementById('previewFrame').srcdoc = emailHtml;
 }
 
-async function doSend() {
+function mcCreds() {
   const key = document.getElementById('mcKey').value.trim();
   const list = document.getElementById('mcList').value.trim();
   const from = document.getElementById('fromName').value.trim();
   const reply = document.getElementById('replyTo').value.trim();
-  const subject = document.getElementById('subjectInput').value.trim();
-
-  if (!key || !list) {
-    const e = document.getElementById('sendErr');
-    e.style.display = 'block';
-    e.textContent = 'Please enter your Mailchimp API key and Audience ID in step 1.';
-    return;
-  }
-
-  document.getElementById('sendBtn').style.display = 'none';
-  document.getElementById('sendErr').style.display = 'none';
-  const statusBox = document.getElementById('sendStatusBox');
-  statusBox.style.display = 'flex';
-
   const dc = key.split('-').pop() || 'us1';
   const base = `https://${dc}.api.mailchimp.com/3.0`;
   const auth = 'Basic ' + btoa('anystring:' + key);
+  return { key, list, from, reply, dc, base, auth };
+}
+
+function debugLog(msg, data) {
+  const box = document.getElementById('debugBox');
+  box.style.display = 'block';
+  const ts = new Date().toLocaleTimeString();
+  box.textContent += `\n[${ts}] ${msg}\n${data ? JSON.stringify(data, null, 2) : ''}\n`;
+  box.scrollTop = box.scrollHeight;
+}
+
+function showSendErr(msg) {
+  document.getElementById('sendStatusBox').style.display = 'none';
+  document.getElementById('sendBtn').style.display = 'inline-flex';
+  document.getElementById('testBtn').style.display = 'inline-flex';
+  const e = document.getElementById('sendErr');
+  e.style.display = 'block';
+  e.textContent = msg;
+}
+
+async function testMailchimp() {
+  const { key, list, base, auth } = mcCreds();
+  if (!key) { showSendErr('Enter your Mailchimp API key in step 1 first.'); return; }
+
+  document.getElementById('testBtn').style.display = 'none';
+  document.getElementById('sendErr').style.display = 'none';
+  document.getElementById('debugBox').style.display = 'none';
+  document.getElementById('debugBox').textContent = '';
+  document.getElementById('sendStatusBox').style.display = 'flex';
+  document.getElementById('sendMsg').textContent = 'Testing Mailchimp connection...';
+
+  try {
+    debugLog('Step 1 — checking API key via /ping');
+    const p = await fetch(`${base}/ping`, { headers: { 'Authorization': auth } });
+    const pj = await p.json();
+    debugLog(`/ping → HTTP ${p.status}`, pj);
+    if (p.status === 401) { showSendErr('API key rejected (401). Double-check your Mailchimp API key.'); return; }
+    if (!pj.health_status) { showSendErr('Ping failed — unexpected response from Mailchimp.'); return; }
+
+    if (list) {
+      debugLog(`Step 2 — checking audience list ID: ${list}`);
+      const lr = await fetch(`${base}/lists/${list}`, { headers: { 'Authorization': auth } });
+      const lj = await lr.json();
+      debugLog(`/lists/${list} → HTTP ${lr.status}`, lj);
+      if (lr.status === 404) { showSendErr(`Audience ID "${list}" not found. Check it in Mailchimp → Audience → Settings.`); return; }
+      if (lr.status !== 200) { showSendErr(`List error ${lr.status}: ${lj.detail || lj.title || 'Unknown error'}`); return; }
+      debugLog('Audience found: ' + lj.name);
+    }
+
+    debugLog('Step 3 — checking verified sender domains');
+    const dr = await fetch(`${base}/verified-domains`, { headers: { 'Authorization': auth } });
+    const dj = await dr.json();
+    debugLog(`/verified-domains → HTTP ${dr.status}`, dj);
+
+    document.getElementById('sendStatusBox').style.display = 'none';
+    document.getElementById('testBtn').style.display = 'inline-flex';
+    const e = document.getElementById('sendErr');
+    e.style.display = 'block';
+    e.style.background = '#f0fdf4';
+    e.style.color = '#166534';
+    e.style.borderColor = '#86efac';
+    e.textContent = 'Connection OK! API key and audience ID are valid. See debug log below for domain info.';
+  } catch (err) {
+    showSendErr('Network error: ' + err.message + '. Make sure you are opening this file in Chrome (not Safari or Firefox) and check your internet connection.');
+  }
+}
+
+async function doSend() {
+  const { key, list, from, reply, base, auth } = mcCreds();
+  const subject = document.getElementById('subjectInput').value.trim();
+
+  if (!key || !list) { showSendErr('Enter your Mailchimp API key and Audience ID in step 1.'); return; }
+
+  document.getElementById('sendBtn').style.display = 'none';
+  document.getElementById('testBtn').style.display = 'none';
+  document.getElementById('sendErr').style.display = 'none';
+  document.getElementById('debugBox').style.display = 'none';
+  document.getElementById('debugBox').textContent = '';
+  document.getElementById('sendStatusBox').style.display = 'flex';
 
   try {
     document.getElementById('sendMsg').textContent = 'Creating Mailchimp campaign...';
+    const campaignBody = {
+      type: 'regular',
+      recipients: { list_id: list },
+      settings: {
+        subject_line: subject,
+        preview_text: 'Your DSE weekly market summary from Sokoview',
+        from_name: from,
+        reply_to: reply,
+        title: 'Sokoview Weekly Recap – ' + (mkt.weekEnding || new Date().toLocaleDateString())
+      }
+    };
+    debugLog('POST /campaigns', campaignBody);
     const cr = await fetch(`${base}/campaigns`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': auth },
-      body: JSON.stringify({
-        type: 'regular',
-        recipients: { list_id: list },
-        settings: {
-          subject_line: subject,
-          preview_text: 'Your DSE weekly market summary from Sokoview',
-          from_name: from,
-          reply_to: reply,
-          title: 'Sokoview Weekly Recap – ' + (mkt.weekEnding || new Date().toLocaleDateString())
-        }
-      })
+      body: JSON.stringify(campaignBody)
     });
     const camp = await cr.json();
-    if (!camp.id) throw new Error(camp.detail || 'Could not create campaign. Check your Mailchimp API key and Audience ID.');
+    debugLog(`POST /campaigns → HTTP ${cr.status}`, camp);
+
+    if (!camp.id) {
+      const detail = camp.detail || camp.title || JSON.stringify(camp);
+      const errors = camp.errors ? '\nErrors: ' + JSON.stringify(camp.errors) : '';
+      showSendErr(`Campaign creation failed (${cr.status}): ${detail}${errors}`);
+      return;
+    }
 
     document.getElementById('sendMsg').textContent = 'Uploading email content...';
-    await fetch(`${base}/campaigns/${camp.id}/content`, {
+    const contentResp = await fetch(`${base}/campaigns/${camp.id}/content`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': auth },
       body: JSON.stringify({ html: emailHtml })
     });
+    const contentJson = await contentResp.json().catch(() => ({}));
+    debugLog(`PUT /campaigns/${camp.id}/content → HTTP ${contentResp.status}`, contentJson);
+    if (contentResp.status !== 200) {
+      showSendErr(`Content upload failed (${contentResp.status}): ${contentJson.detail || contentJson.title || 'Unknown error'}`);
+      return;
+    }
 
     document.getElementById('sendMsg').textContent = 'Sending to your audience...';
     const sr = await fetch(`${base}/campaigns/${camp.id}/actions/send`, {
       method: 'POST',
       headers: { 'Authorization': auth }
     });
+    debugLog(`POST /campaigns/${camp.id}/actions/send → HTTP ${sr.status}`);
 
     if (sr.status === 204) {
-      statusBox.style.display = 'none';
+      document.getElementById('sendStatusBox').style.display = 'none';
       document.getElementById('sendCard').style.display = 'none';
       document.getElementById('successBox').style.display = 'block';
       document.getElementById('backFromSend').style.display = 'none';
     } else {
-      const se = await sr.json();
-      throw new Error(se.detail || 'Campaign send failed. Check Mailchimp for details.');
+      const se = await sr.json().catch(() => ({}));
+      debugLog('Send error response', se);
+      showSendErr(`Send failed (${sr.status}): ${se.detail || se.title || JSON.stringify(se)}`);
     }
   } catch (e) {
-    statusBox.style.display = 'none';
-    document.getElementById('sendBtn').style.display = 'inline-flex';
-    const err = document.getElementById('sendErr');
-    err.style.display = 'block';
-    err.textContent = 'Mailchimp error: ' + e.message;
+    showSendErr('Unexpected error: ' + e.message);
   }
 }
 
