@@ -3,80 +3,72 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sokoview — DSE Weekly Email Automator</title>
+<title>Sokoview — DSE Daily Email</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;color:#111;font-size:14px;min-height:100vh;padding:2rem 1rem}
-  .wrap{max-width:720px;margin:0 auto}
-  .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-  label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin-bottom:5px}
-  input{width:100%;padding:10px 12px;font-size:14px;font-family:inherit;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:#111;outline:none;margin-bottom:4px;transition:border-color .15s,box-shadow .15s}
-  input:focus{border-color:#1a2744;box-shadow:0 0 0 3px rgba(26,39,68,.1)}
-  .hint{font-size:12px;color:#9ca3af;margin-bottom:14px}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  @media(max-width:500px){.row2{grid-template-columns:1fr}}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;font-size:14px;font-family:inherit;border-radius:8px;cursor:pointer;font-weight:500;transition:all .15s;border:none}
-  .btn-block{width:100%}
-  .btn-primary{background:#1a2744;color:#fff}
-  .btn-primary:hover{background:#253460}
-  .btn-primary:disabled{opacity:.45;cursor:not-allowed}
-  .btn-outline{background:#fff;border:1px solid #d1d5db;color:#374151}
-  .btn-outline:hover{background:#f9fafb}
-  .steps{display:flex;margin-bottom:2rem;position:relative}
-  .steps::before{content:'';position:absolute;top:14px;left:10%;right:10%;height:1px;background:#e5e7eb}
-  .step{flex:1;text-align:center;position:relative;z-index:1}
-  .dot{width:28px;height:28px;border-radius:50%;margin:0 auto 6px;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #d1d5db;color:#9ca3af;transition:all .2s}
-  .dot.active{background:#1a2744;color:#fff;border-color:#1a2744}
-  .dot.done{background:#22c55e;color:#fff;border-color:#22c55e}
-  .step-name{font-size:11px;color:#9ca3af;font-weight:500}
-  .step-name.active{color:#1a2744}
-  .divider{border:none;border-top:1px solid #f3f4f6;margin:1.25rem 0}
-  .err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-top:.875rem;display:none}
-  .info-row{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start}
-  .num{width:22px;height:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-weight:600}
-  .spin{width:20px;height:20px;border:2.5px solid rgba(26,39,68,.15);border-top-color:#1a2744;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .status-box{display:none;flex-direction:column;align-items:center;gap:12px;padding:1.5rem}
-  .status-row{display:flex;align-items:center;gap:10px;font-size:13px;color:#6b7280}
-  .prog-wrap{width:100%;max-width:380px}
-  .prog-bar{height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden;margin-bottom:6px}
-  .prog-fill{height:100%;background:#1a2744;border-radius:2px;transition:width .5s ease}
-  .prog-lbl{font-size:11px;color:#9ca3af;text-align:center}
-  .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:1rem 0}
-  @media(max-width:500px){.metric-grid{grid-template-columns:1fr 1fr}}
-  .metric{background:#f9fafb;border-radius:8px;padding:.875rem}
-  .m-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;margin-bottom:4px}
-  .m-val{font-size:15px;font-weight:600;color:#111}
-  .m-val.up{color:#16a34a}
-  .m-val.dn{color:#dc2626}
-  .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
-  .badge-bull{background:#dcfce7;color:#166534}
-  .badge-bear{background:#fee2e2;color:#991b1b}
-  .badge-neu{background:#fef9c3;color:#713f12}
-  .badge-blue{background:#dbeafe;color:#1e40af}
-  .tbl-wrap{overflow-x:auto;margin:.75rem 0}
-  table{width:100%;border-collapse:collapse;font-size:13px;min-width:400px}
-  th{text-align:left;padding:8px 12px;background:#f9fafb;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb}
-  td{padding:9px 12px;border-bottom:1px solid #f3f4f6;color:#374151}
-  td.up{color:#16a34a;font-weight:600}
-  td.dn{color:#dc2626;font-weight:600}
-  td.bold{font-weight:600;color:#111}
-  .breadth-bar{display:flex;border-radius:4px;overflow:hidden;height:10px;margin:8px 0}
-  .breadth-legend{display:flex;gap:1.25rem;font-size:12px;color:#6b7280;margin-bottom:1rem}
-  .preview-wrap{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:1rem}
-  iframe{width:100%;min-height:560px;border:none;display:block}
-  .review-box{background:#f9fafb;border-radius:8px;padding:1rem;margin:1rem 0;font-size:13px}
-  .review-row{display:flex;justify-content:space-between;gap:1rem;padding:5px 0;border-bottom:1px solid #e5e7eb}
-  .review-row:last-child{border:none}
-  .review-lbl{color:#6b7280}
-  .review-val{font-weight:600;text-align:right}
-  .success{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:2.5rem;text-align:center}
-  .back-btn{background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0;margin-top:.875rem;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
-  .back-btn:hover{color:#374151}
-  .section-title{font-weight:600;font-size:13px;margin:1.25rem 0 .5rem;color:#374151}
-  .section-title.up{color:#16a34a}
-  .section-title.dn{color:#dc2626}
-  .tag{display:inline-block;background:#eff6ff;color:#1e40af;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;margin-left:6px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;color:#111;font-size:14px;min-height:100vh;padding:2rem 1rem}
+.wrap{max-width:700px;margin:0 auto}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin-bottom:5px}
+input{width:100%;padding:10px 12px;font-size:14px;font-family:inherit;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:#111;outline:none;margin-bottom:4px;transition:border-color .15s,box-shadow .15s}
+input:focus{border-color:#1a2744;box-shadow:0 0 0 3px rgba(26,39,68,.1)}
+.hint{font-size:12px;color:#9ca3af;margin-bottom:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;font-size:14px;font-family:inherit;border-radius:8px;cursor:pointer;font-weight:500;transition:all .15s;border:none}
+.btn-block{width:100%}
+.btn-primary{background:#1a2744;color:#fff}
+.btn-primary:hover{background:#253460}
+.btn-outline{background:#fff;border:1px solid #d1d5db;color:#374151}
+.btn-outline:hover{background:#f9fafb}
+.steps{display:flex;margin-bottom:2rem;position:relative}
+.steps::before{content:'';position:absolute;top:14px;left:10%;right:10%;height:1px;background:#e5e7eb}
+.step{flex:1;text-align:center;position:relative;z-index:1}
+.dot{width:28px;height:28px;border-radius:50%;margin:0 auto 6px;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #d1d5db;color:#9ca3af;transition:all .2s}
+.dot.active{background:#1a2744;color:#fff;border-color:#1a2744}
+.dot.done{background:#22c55e;color:#fff;border-color:#22c55e}
+.step-lbl{font-size:11px;color:#9ca3af;font-weight:500}
+.step-lbl.active{color:#1a2744}
+.divider{border:none;border-top:1px solid #f3f4f6;margin:1.25rem 0}
+.err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-top:.875rem;display:none}
+.ok{background:#f0fdf4;color:#166534;border:1px solid #86efac;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-top:.875rem;display:none}
+.spin{width:20px;height:20px;border:2.5px solid rgba(26,39,68,.15);border-top-color:#1a2744;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status-box{display:none;align-items:center;gap:10px;padding:1.25rem;justify-content:center;font-size:13px;color:#6b7280}
+.prog-bar{height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden;margin:.5rem 0 .25rem}
+.prog-fill{height:100%;background:#1a2744;border-radius:2px;transition:width .5s ease}
+.prog-lbl{font-size:11px;color:#9ca3af;text-align:center}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:1rem 0}
+@media(max-width:520px){.metric-grid{grid-template-columns:1fr 1fr}}
+.metric{background:#f9fafb;border-radius:8px;padding:.75rem .875rem}
+.m-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;margin-bottom:3px}
+.m-val{font-size:15px;font-weight:600;color:#111}
+.m-val.up{color:#16a34a}
+.m-val.dn{color:#dc2626}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.b-bull{background:#dcfce7;color:#166534}
+.b-bear{background:#fee2e2;color:#991b1b}
+.b-neu{background:#fef9c3;color:#713f12}
+.b-blue{background:#dbeafe;color:#1e40af}
+.tbl-wrap{overflow-x:auto;margin:.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:360px}
+th{text-align:left;padding:7px 10px;background:#f9fafb;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb}
+td{padding:8px 10px;border-bottom:1px solid #f3f4f6}
+td.bold{font-weight:600;color:#111}
+td.up{color:#16a34a;font-weight:600}
+td.dn{color:#dc2626;font-weight:600}
+td.muted{color:#6b7280}
+.preview-wrap{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:1rem}
+iframe{width:100%;min-height:540px;border:none;display:block}
+.review-box{background:#f9fafb;border-radius:8px;padding:1rem;margin:1rem 0;font-size:13px}
+.review-row{display:flex;justify-content:space-between;gap:1rem;padding:5px 0;border-bottom:1px solid #e5e7eb}
+.review-row:last-child{border:none}
+.review-lbl{color:#6b7280}
+.review-val{font-weight:600;text-align:right;max-width:60%}
+.success{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:2.5rem;text-align:center}
+.back-btn{background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0;margin-top:.875rem;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
+.back-btn:hover{color:#374151}
+.debug{display:none;margin-top:.875rem;background:#1e293b;color:#e2e8f0;border-radius:8px;padding:1rem;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:220px;overflow-y:auto}
 </style>
 </head>
 <body>
@@ -84,139 +76,132 @@
 
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:10px">
     <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:40px;height:40px;background:#1a2744;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <div style="width:40px;height:40px;background:#1a2744;border-radius:10px;display:flex;align-items:center;justify-content:center">
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
           <polyline points="1,17 6,9 11,13 16,5 21,8" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div>
-        <div style="font-weight:700;font-size:18px;line-height:1.2;color:#1a2744">Sokoview</div>
-        <div style="font-size:12px;color:#6b7280">Weekly Email Automator · Live DSE + Mailchimp</div>
+        <div style="font-weight:700;font-size:18px;color:#1a2744">Sokoview</div>
+        <div style="font-size:12px;color:#6b7280">Daily Market Email · DSE + Mailchimp</div>
       </div>
     </div>
-    <span class="badge badge-blue">dse.co.tz live data</span>
+    <span class="badge b-blue">dse.co.tz</span>
   </div>
 
-  <div class="steps" id="stepBar">
-    <div class="step">
-      <div class="dot active" id="d1">1</div>
-      <div class="step-name active" id="sn1">Configure</div>
-    </div>
-    <div class="step">
-      <div class="dot" id="d2">2</div>
-      <div class="step-name" id="sn2">Fetch DSE</div>
-    </div>
-    <div class="step">
-      <div class="dot" id="d3">3</div>
-      <div class="step-name" id="sn3">Preview</div>
-    </div>
-    <div class="step">
-      <div class="dot" id="d4">4</div>
-      <div class="step-name" id="sn4">Send</div>
-    </div>
+  <div class="steps">
+    <div class="step"><div class="dot active" id="d1">1</div><div class="step-lbl active" id="sl1">Configure</div></div>
+    <div class="step"><div class="dot" id="d2">2</div><div class="step-lbl" id="sl2">Generate</div></div>
+    <div class="step"><div class="dot" id="d3">3</div><div class="step-lbl" id="sl3">Preview</div></div>
+    <div class="step"><div class="dot" id="d4">4</div><div class="step-lbl" id="sl4">Send</div></div>
   </div>
 
-  <!-- SCREEN 1: CONFIGURE -->
-  <div id="screen1">
+  <!-- S1: CONFIGURE -->
+  <div id="s1">
     <div class="card">
       <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:1rem">API keys</div>
       <label>Anthropic API key</label>
       <input id="anthroKey" type="password" placeholder="sk-ant-api03-..."/>
-      <div class="hint">Get it at console.anthropic.com → API Keys → Create Key</div>
+      <div class="hint">console.anthropic.com → API Keys → Create Key</div>
       <hr class="divider"/>
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin:1rem 0 1rem">Mailchimp</div>
+      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:1rem">Mailchimp</div>
       <label>Mailchimp API key</label>
       <input id="mcKey" type="password" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1"/>
       <div class="hint">Mailchimp → Account → Extras → API keys</div>
       <label>Audience / List ID</label>
       <input id="mcList" placeholder="e.g. a1b2c3d4e5"/>
-      <div class="hint">Mailchimp → Audience → Settings → Audience name and defaults → scroll to "Audience ID"</div>
+      <div class="hint">Mailchimp → Audience → Settings → Audience name and defaults → "Audience ID"</div>
       <div class="row2">
         <div>
           <label>From name</label>
           <input id="fromName" value="Sokoview"/>
-          <div class="hint" style="margin-bottom:0"></div>
         </div>
         <div>
-          <label>Reply-to email</label>
-          <input id="replyTo" value="noreply@sokoview.co.tz"/>
-          <div class="hint" style="margin-bottom:0"></div>
+          <label>Verified reply-to email</label>
+          <input id="replyTo" placeholder="you@yourdomain.com"/>
+          <div class="hint">Must be verified in Mailchimp</div>
         </div>
       </div>
     </div>
 
     <div class="card" style="background:#f8fafc;border-color:#e2e8f0">
-      <div style="font-weight:600;font-size:13px;color:#374151;margin-bottom:.875rem">How it works</div>
-      <div class="info-row">
-        <div class="num">1</div>
-        <div style="font-size:13px;color:#6b7280">Fetches <strong>live equity prices</strong> for all DSE-listed stocks directly from dse.co.tz</div>
-      </div>
-      <div class="info-row">
-        <div class="num">2</div>
-        <div style="font-size:13px;color:#6b7280">Searches across the past <strong>5 trading days</strong> to compute weekly gainers, losers, DSEI change and market breadth</div>
-      </div>
-      <div class="info-row">
-        <div class="num">3</div>
-        <div style="font-size:13px;color:#6b7280">Generates a <strong>branded HTML email</strong> and sends it via Mailchimp to your full audience in one click</div>
+      <div style="font-weight:600;font-size:13px;color:#374151;margin-bottom:.75rem">How it works</div>
+      <div style="display:grid;gap:8px">
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:22px;height:22px;min-width:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px">1</div>
+          <span style="font-size:13px;color:#6b7280">Searches for today's DSE equity prices, top movers and market summary</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:22px;height:22px;min-width:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px">2</div>
+          <span style="font-size:13px;color:#6b7280">Claude generates a clean branded HTML email with gainers, losers and market insight</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:22px;height:22px;min-width:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px">3</div>
+          <span style="font-size:13px;color:#6b7280">Sends via Mailchimp to your audience — run it every day after market close</span>
+        </div>
       </div>
     </div>
 
-    <button class="btn btn-primary btn-block" onclick="goScreen(2)">
-      Continue to generate
+    <button class="btn btn-primary btn-block" onclick="goS(2)">
+      Continue
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
 
-  <!-- SCREEN 2: FETCH -->
-  <div id="screen2" style="display:none">
-    <div class="card" style="text-align:center;padding:2.5rem 2rem">
-      <div style="width:52px;height:52px;background:#eff6ff;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem">
-        <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="11" stroke="#1a2744" stroke-width="2"/><polyline points="8,13 11,16 18,9" stroke="#1a2744" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <!-- S2: GENERATE -->
+  <div id="s2" style="display:none">
+    <div class="card" style="text-align:center;padding:2.5rem 1.5rem">
+      <div style="width:52px;height:52px;background:#eff6ff;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <polyline points="2,18 7,10 12,14 17,6 22,9" stroke="#1a2744" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
-      <div style="font-weight:600;font-size:16px;color:#1a2744;margin-bottom:.5rem">Fetch live DSE data &amp; generate email</div>
-      <div style="font-size:13px;color:#6b7280;max-width:460px;margin:0 auto 1.75rem">Claude will fetch live equity prices from dse.co.tz, search the past 5 trading days to compute weekly performance, then generate your branded email.</div>
-      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:.5rem">
-        <button class="btn btn-outline" id="testApiBtn" onclick="testAnthropicKey()" style="padding:10px 20px">
+      <div style="font-weight:600;font-size:16px;color:#1a2744;margin-bottom:.5rem">Generate today's DSE market email</div>
+      <div style="font-size:13px;color:#6b7280;max-width:420px;margin:0 auto 1.75rem">
+        Fetches today's DSE market data and generates your daily briefing email. Run this after 3pm EAT when the market closes.
+      </div>
+      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-outline" id="testBtn" onclick="testKey()">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#374151" stroke-width="1.5"/><path d="M7 4v3l2 1.5" stroke="#374151" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Test API key first
+          Test API key
         </button>
-        <button class="btn btn-primary" id="genBtn" onclick="runFetch()" style="padding:12px 28px">
+        <button class="btn btn-primary" id="genBtn" onclick="generate()">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8l6-6 6 6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Fetch from dse.co.tz + generate
+          Generate daily email
         </button>
       </div>
       <div class="status-box" id="statusBox">
-        <div class="status-row"><div class="spin"></div><span id="statusMsg">Starting...</span></div>
-        <div class="prog-wrap">
-          <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        <div class="spin"></div>
+        <div>
+          <div id="statusMsg" style="font-weight:500"></div>
+          <div class="prog-bar" style="width:280px"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
           <div class="prog-lbl" id="progLbl"></div>
         </div>
       </div>
       <div class="err" id="genErr"></div>
-      <div id="apiDebugBox" style="display:none;margin-top:.875rem;background:#1e293b;color:#e2e8f0;border-radius:8px;padding:1rem;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;text-align:left;max-height:200px;overflow-y:auto"></div>
+      <div class="ok" id="genOk"></div>
+      <div class="debug" id="genDebug"></div>
     </div>
-    <button class="back-btn" onclick="goScreen(1)">
+    <button class="back-btn" onclick="goS(1)">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 7H4M6 4L3 7l3 3" stroke="#6b7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Back to configuration
     </button>
   </div>
 
-  <!-- SCREEN 3: PREVIEW -->
-  <div id="screen3" style="display:none">
+  <!-- S3: PREVIEW -->
+  <div id="s3" style="display:none">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
         <div>
-          <div style="font-weight:600;font-size:15px;color:#1a2744">Live DSE data</div>
-          <div style="font-size:12px;color:#9ca3af;margin-top:2px" id="dataRange"></div>
+          <div style="font-weight:600;font-size:15px;color:#1a2744">Market data</div>
+          <div style="font-size:12px;color:#9ca3af" id="dataDate"></div>
         </div>
-        <span id="sentBadge" class="badge badge-neu">—</span>
+        <span class="badge b-neu" id="sentBadge">—</span>
       </div>
       <div class="metric-grid" id="metrics"></div>
-      <div id="breadthSection"></div>
       <div id="gainTable"></div>
       <div id="lossTable"></div>
     </div>
-
     <div class="card">
       <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.875rem">Email preview</div>
       <label>Subject line</label>
@@ -225,9 +210,8 @@
         <iframe id="previewFrame" sandbox="allow-same-origin" title="Email preview"></iframe>
       </div>
     </div>
-
     <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-      <button class="btn btn-outline" onclick="goScreen(2);runFetch()">
+      <button class="btn btn-outline" onclick="goS(2);generate()">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 2v4H8M2 12a6 6 0 100-8.485" stroke="#374151" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Regenerate
       </button>
@@ -238,62 +222,60 @@
     </div>
   </div>
 
-  <!-- SCREEN 4: SEND -->
-  <div id="screen4" style="display:none">
+  <!-- S4: SEND -->
+  <div id="s4" style="display:none">
     <div id="sendCard" class="card">
       <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.25rem">Ready to send</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:1rem">Creates a Mailchimp campaign and immediately delivers it to your full audience.</div>
+      <div style="font-size:13px;color:#6b7280;margin-bottom:1rem">Creates a Mailchimp campaign and sends it to your full audience.</div>
       <div class="review-box">
-        <div class="review-row"><span class="review-lbl">Subject</span><span class="review-val" id="rvSubj" style="max-width:60%"></span></div>
+        <div class="review-row"><span class="review-lbl">Subject</span><span class="review-val" id="rvSubj"></span></div>
         <div class="review-row"><span class="review-lbl">From name</span><span class="review-val" id="rvFrom"></span></div>
         <div class="review-row"><span class="review-lbl">Reply-to</span><span class="review-val" id="rvReply"></span></div>
         <div class="review-row"><span class="review-lbl">Audience ID</span><span class="review-val" id="rvList"></span></div>
       </div>
-      <div style="display:flex;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap">
-        <button class="btn btn-outline" onclick="testMailchimp()" id="testBtn" style="flex:0 0 auto">
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+        <button class="btn btn-outline" id="testMcBtn" onclick="testMailchimp()">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#374151" stroke-width="1.5"/><path d="M7 4v3l2 1.5" stroke="#374151" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Test connection
+          Test Mailchimp
         </button>
         <button class="btn btn-primary" style="flex:1" id="sendBtn" onclick="doSend()">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 6-12 6V9l8-1-8-1V2z" fill="#fff"/></svg>
           Send campaign now
         </button>
       </div>
-      <div class="status-box" id="sendStatusBox" style="flex-direction:row;padding:1rem 0">
+      <div class="status-box" id="sendStatusBox">
         <div class="spin"></div><span id="sendMsg" style="font-size:13px;color:#6b7280"></span>
       </div>
       <div class="err" id="sendErr"></div>
-      <div id="debugBox" style="display:none;margin-top:.875rem;background:#1e293b;color:#e2e8f0;border-radius:8px;padding:1rem;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:260px;overflow-y:auto"></div>
+      <div class="ok" id="sendOk"></div>
+      <div class="debug" id="sendDebug"></div>
     </div>
-
     <div id="successBox" style="display:none" class="success">
       <div style="width:56px;height:56px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .875rem">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><polyline points="5,14 11,20 23,8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <div style="font-weight:700;font-size:18px;color:#166534;margin-bottom:.25rem">Campaign sent!</div>
-      <div style="color:#15803d;font-size:13px;margin-bottom:1.5rem">Your weekly DSE recap is on its way to your Sokoview audience.</div>
-      <button class="btn btn-primary" style="margin:0 auto" onclick="resetApp()">Generate next week's recap</button>
+      <div style="font-weight:700;font-size:18px;color:#166534;margin-bottom:.25rem">Sent!</div>
+      <div style="color:#15803d;font-size:13px;margin-bottom:1.5rem">Today's DSE market briefing is on its way to your Sokoview audience.</div>
+      <button class="btn btn-primary" style="margin:0 auto" onclick="resetApp()">Send tomorrow's email</button>
     </div>
-
-    <button class="back-btn" id="backFromSend" onclick="goScreen(3)">
+    <button class="back-btn" id="backBtn" onclick="goS(3)">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 7H4M6 4L3 7l3 3" stroke="#6b7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Back to preview
     </button>
   </div>
 
 </div>
-
 <script>
 let mkt = {}, emailHtml = '', emailSubject = '';
 
-function goScreen(n) {
+function goS(n) {
   for (let i = 1; i <= 4; i++) {
-    document.getElementById('screen' + i).style.display = i === n ? 'block' : 'none';
+    document.getElementById('s' + i).style.display = i === n ? 'block' : 'none';
     const dot = document.getElementById('d' + i);
-    const lbl = document.getElementById('sn' + i);
+    const lbl = document.getElementById('sl' + i);
     dot.className = 'dot' + (i < n ? ' done' : i === n ? ' active' : '');
     dot.textContent = i < n ? '✓' : i;
-    lbl.className = 'step-name' + (i === n ? ' active' : '');
+    if (lbl) lbl.className = 'step-lbl' + (i === n ? ' active' : '');
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -305,27 +287,49 @@ function goSend() {
   document.getElementById('rvList').textContent = document.getElementById('mcList').value;
   document.getElementById('sendCard').style.display = 'block';
   document.getElementById('successBox').style.display = 'none';
-  document.getElementById('backFromSend').style.display = 'inline-flex';
-  goScreen(4);
+  document.getElementById('backBtn').style.display = 'inline-flex';
+  goS(4);
 }
 
-function setProgress(pct, msg) {
-  document.getElementById('progFill').style.width = pct + '%';
-  document.getElementById('progLbl').textContent = msg;
+function setStatus(msg, pct) {
   document.getElementById('statusMsg').textContent = msg;
+  document.getElementById('progFill').style.width = (pct || 0) + '%';
+  document.getElementById('progLbl').textContent = pct + '%';
 }
 
-async function claudeCall(system, user, useSearch) {
+function showErr(id, msg) {
+  const e = document.getElementById(id);
+  e.style.display = 'block';
+  e.style.background = '';
+  e.style.color = '';
+  e.style.borderColor = '';
+  e.textContent = msg;
+}
+
+function showOk(id, msg) {
+  const e = document.getElementById(id);
+  e.style.display = 'block';
+  e.textContent = msg;
+}
+
+function dbg(boxId, msg, data) {
+  const b = document.getElementById(boxId);
+  b.style.display = 'block';
+  b.textContent += '[' + new Date().toLocaleTimeString() + '] ' + msg + (data ? '\n' + JSON.stringify(data, null, 2) : '') + '\n\n';
+  b.scrollTop = b.scrollHeight;
+}
+
+async function apiCall(system, user, useSearch) {
   const key = document.getElementById('anthroKey').value.trim();
-  if (!key) throw new Error('Anthropic API key is missing — please enter it in step 1.');
+  if (!key) throw new Error('Anthropic API key missing — go back to step 1.');
   const body = {
     model: 'claude-sonnet-4-6',
-    max_tokens: 4000,
+    max_tokens: 3000,
     system,
     messages: [{ role: 'user', content: user }]
   };
   if (useSearch) body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -335,386 +339,247 @@ async function claudeCall(system, user, useSearch) {
     },
     body: JSON.stringify(body)
   });
-  if (!resp.ok) {
-    const err = await resp.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API error ${resp.status}`);
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || d.error) {
+    const m = d.error?.message || JSON.stringify(d);
+    const hint = r.status === 401 ? ' — invalid API key' : r.status === 429 ? ' — rate limit, wait 60s and retry' : '';
+    throw new Error('HTTP ' + r.status + hint + ': ' + m);
   }
-  const data = await resp.json();
-  if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
-  return data;
+  return d;
 }
 
-async function testAnthropicKey() {
+async function testKey() {
   const key = document.getElementById('anthroKey').value.trim();
-  if (!key) {
-    const e = document.getElementById('genErr');
-    e.style.display = 'block';
-    e.textContent = 'Enter your Anthropic API key in step 1 first.';
-    return;
-  }
-  document.getElementById('testApiBtn').style.display = 'none';
+  if (!key) { showErr('genErr', 'Enter your Anthropic API key in step 1 first.'); return; }
+  document.getElementById('testBtn').disabled = true;
   document.getElementById('genErr').style.display = 'none';
-  document.getElementById('apiDebugBox').style.display = 'none';
-  document.getElementById('apiDebugBox').textContent = '';
+  document.getElementById('genOk').style.display = 'none';
+  document.getElementById('genDebug').style.display = 'none';
+  document.getElementById('genDebug').textContent = '';
   document.getElementById('statusBox').style.display = 'flex';
-  document.getElementById('statusMsg').textContent = 'Testing Anthropic API key...';
-
-  const box = document.getElementById('apiDebugBox');
-  const log = (msg, data) => {
-    box.style.display = 'block';
-    box.textContent += '[' + new Date().toLocaleTimeString() + '] ' + msg + (data ? '\n' + JSON.stringify(data, null, 2) : '') + '\n\n';
-  };
-
+  setStatus('Testing API key...', 10);
   try {
-    log('Sending test request to Anthropic API...\nModel: claude-sonnet-4-6');
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    dbg('genDebug', 'POST /v1/messages — model: claude-sonnet-4-6, tokens: 10');
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 20,
-        messages: [{ role: 'user', content: 'Say OK' }]
-      })
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 10, messages: [{ role: 'user', content: 'Hi' }] })
     });
-    const data = await resp.json().catch(() => ({}));
-    log('HTTP ' + resp.status + ' response:', data);
+    const d = await r.json().catch(() => ({}));
+    dbg('genDebug', 'Response HTTP ' + r.status, d);
     document.getElementById('statusBox').style.display = 'none';
-    document.getElementById('testApiBtn').style.display = 'inline-flex';
-    if (resp.ok && data.content) {
-      const e = document.getElementById('genErr');
-      e.style.display = 'block';
-      e.style.background = '#f0fdf4';
-      e.style.color = '#166534';
-      e.style.borderColor = '#86efac';
-      e.textContent = 'API key is valid! Claude responded successfully. You can now fetch DSE data.';
+    document.getElementById('testBtn').disabled = false;
+    if (r.ok && d.content) {
+      showOk('genOk', '✓ API key is valid! Ready to generate.');
     } else {
-      const e = document.getElementById('genErr');
-      e.style.display = 'block';
-      e.style.background = '';
-      e.style.color = '';
-      e.style.borderColor = '';
-      e.textContent = 'API error ' + resp.status + ': ' + (data.error?.message || JSON.stringify(data));
+      showErr('genErr', 'API error ' + r.status + ': ' + (d.error?.message || JSON.stringify(d)));
     }
-  } catch (err) {
+  } catch (e) {
     document.getElementById('statusBox').style.display = 'none';
-    document.getElementById('testApiBtn').style.display = 'inline-flex';
-    const e = document.getElementById('genErr');
-    e.style.display = 'block';
-    e.textContent = 'Network error: ' + err.message + '. Make sure you are using Chrome and this file is opened from your local disk (not inside a zip or cloud drive).';
-    log('Network error:', { message: err.message });
+    document.getElementById('testBtn').disabled = false;
+    showErr('genErr', 'Network error: ' + e.message);
+    dbg('genDebug', 'Error', { message: e.message });
   }
 }
 
-async function runFetch() {
-  document.getElementById('genBtn').style.display = 'none';
+async function generate() {
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('testBtn').disabled = true;
   document.getElementById('genErr').style.display = 'none';
-  const statusBox = document.getElementById('statusBox');
-  statusBox.style.display = 'flex';
+  document.getElementById('genOk').style.display = 'none';
+  document.getElementById('genDebug').style.display = 'none';
+  document.getElementById('genDebug').textContent = '';
+  document.getElementById('statusBox').style.display = 'flex';
+
+  const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  const dateShort = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
   try {
-    const now = new Date();
-    const fmt = d => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
-    const days = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(now); d.setDate(now.getDate() - i);
-      if (d.getDay() > 0 && d.getDay() < 6) days.push(fmt(d));
-    }
-    const weekStart = days[0], weekEnd = days[days.length - 1];
-    const todayFull = now.toLocaleDateString('en-GB', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+    setStatus('Searching for today\'s DSE data...', 15);
+    dbg('genDebug', 'Call 1 — fetch DSE daily data');
 
-    setProgress(10, 'Connecting to dse.co.tz...');
-
-    const d1 = await claudeCall(
-      `DSE market analyst. Today: ${todayFull}. Fetch https://dse.co.tz/ for live equity prices. Search "DSE Tanzania weekly market ${weekStart} ${weekEnd}" for weekly data. Return ONLY JSON, no markdown:
-{"weekEnding":"${weekEnd}","weekRange":"${weekStart} – ${weekEnd}","sentiment":"Bullish|Bearish|Neutral","dsei":"0","dseiWeeklyChange":"+0%","totalMarketCap":"TZS 0T","weeklyTurnover":"TZS 0B","totalDeals":"0","advancers":0,"decliners":0,"unchanged":0,"gainers":[{"ticker":"","name":"","close":"TZS 0","weeklyChange":"+0%","volume":"0","mcap":"TZS 0bn"}],"losers":[{"ticker":"","name":"","close":"TZS 0","weeklyChange":"-0%","volume":"0","mcap":"TZS 0bn"}],"highlights":["h1","h2","h3"],"insight":"commentary"}
-Rules: 5 gainers, 5 losers sorted by weekly % change. Sentiment: Bullish if advancers>decliners else Bearish else Neutral.`,
-      `Fetch https://dse.co.tz/ and search for DSE week of ${weekStart} to ${weekEnd}. Return only the JSON.`,
+    const r1 = await apiCall(
+      'You are a DSE market analyst. Return ONLY valid JSON, no markdown.',
+      `Search for "DSE Tanzania equity prices ${dateShort}" and "site:dse.co.tz market report ${dateShort}". Extract today's DSE market data and return this JSON:
+{"date":"${dateShort}","sentiment":"Bullish|Bearish|Neutral","dsei":"0","dailyChange":"+0%","marketCap":"TZS 0T","turnover":"TZS 0B","deals":"0","volume":"0","advancers":0,"decliners":0,"unchanged":0,"gainers":[{"ticker":"","name":"","close":"TZS 0","change":"+0%","volume":"0"}],"losers":[{"ticker":"","name":"","close":"TZS 0","change":"-0%","volume":"0"}],"highlights":["h1","h2","h3"],"insight":"1-2 sentence commentary."}
+Include top 5 gainers and top 5 losers by daily % change.`,
       true
     );
 
-    setProgress(55, 'Calculating weekly performance metrics...');
-
-    const raw1 = d1.content?.find(b => b.type === 'text')?.text || '{}';
+    setStatus('Processing market data...', 50);
+    const t1 = r1.content?.find(b => b.type === 'text')?.text || '{}';
+    dbg('genDebug', 'Raw response:', t1.substring(0, 300));
     try {
-      mkt = JSON.parse(raw1.replace(/```json|```/g, '').trim());
+      mkt = JSON.parse(t1.replace(/```json|```/g, '').trim());
     } catch {
-      mkt = {
-        weekEnding: fmt(now), weekRange: `${weekStart} – ${weekEnd}`,
-        sentiment: 'Neutral', dsei: 'N/A', dseiWeeklyChange: 'N/A',
-        totalMarketCap: 'N/A', weeklyTurnover: 'N/A', totalDeals: 'N/A',
-        advancers: 0, decliners: 0, unchanged: 0,
-        gainers: [], losers: [],
-        highlights: ['Data parsing error — visit dse.co.tz for full data'],
-        insight: 'Unable to parse market data. Please try again.'
-      };
+      mkt = { date: dateShort, sentiment: 'Neutral', dsei: 'N/A', dailyChange: 'N/A', marketCap: 'N/A', turnover: 'N/A', deals: 'N/A', volume: 'N/A', advancers: 0, decliners: 0, unchanged: 0, gainers: [], losers: [], highlights: ['Visit dse.co.tz for full data'], insight: 'Data unavailable. Check dse.co.tz.' };
     }
 
-    setProgress(68, 'Designing branded email...');
+    setStatus('Generating email...', 65);
+    dbg('genDebug', 'Call 2 — generate email HTML');
 
-    const d2 = await claudeCall(
-      `Email designer for Sokoview (sokoview.co.tz). Create a professional mobile-responsive HTML email for the Weekly DSE Market Recap. Inline CSS only, max-width 600px. Colors: header #1a2744 navy, accent #f59e0b amber, gains #16a34a, losses #dc2626, body bg #f0f4f8. Sections: 1) Navy header with SOKOVIEW in amber + week range. 2) 4 KPI boxes: Sentiment, DSEI+change, Market Cap, Turnover. 3) Breadth bar (advancers green / decliners red / unchanged grey). 4) Top gainers table (green header). 5) Top losers table (red header). 6) Highlights box with navy left border. 7) Analyst insight box with amber left border. 8) Footer with sokoview.co.tz and unsubscribe link. Return ONLY JSON: {"subject":"...","html":"..."}`,
-      `Generate the Sokoview weekly email from this DSE data: ${JSON.stringify(mkt)}`,
+    const r2 = await apiCall(
+      'HTML email designer for Sokoview. Inline CSS only, max-width 600px. Colors: header #1a2744, accent #f59e0b, gains #16a34a, losses #dc2626, bg #f0f4f8. Return ONLY JSON: {"subject":"...","html":"..."}',
+      `Create Sokoview daily DSE market email. Sections: 1) Navy header "SOKOVIEW" in amber + "DSE Daily Market Briefing · ${dateShort}" 2) 4 KPI boxes: Sentiment, DSEI+change, Market Cap, Turnover 3) Breadth row: advancers/decliners/unchanged 4) Top gainers table (green) 5) Top losers table (red) 6) Highlights box navy left border 7) Analyst insight amber left border 8) Footer with sokoview.co.tz + unsubscribe. Data: ${JSON.stringify(mkt)}`,
       false
     );
 
-    setProgress(92, 'Finalising email...');
-
-    const raw2 = d2.content?.find(b => b.type === 'text')?.text || '{}';
+    setStatus('Finalising...', 90);
+    const t2 = r2.content?.find(b => b.type === 'text')?.text || '{}';
     let ep = {};
-    try {
-      ep = JSON.parse(raw2.replace(/```json|```/g, '').trim());
-    } catch {
-      ep = { subject: `DSE Weekly Market Recap – Week ending ${mkt.weekEnding || ''}`, html: raw2 };
-    }
+    try { ep = JSON.parse(t2.replace(/```json|```/g, '').trim()); }
+    catch { ep = { subject: `DSE Daily Briefing – ${mkt.date || dateShort}`, html: t2 }; }
 
-    emailSubject = ep.subject || `DSE Weekly Recap – ${mkt.weekEnding || ''}`;
-    emailHtml = ep.html || '<p style="padding:2rem;font-family:sans-serif">Email generation failed. Please try again.</p>';
+    emailSubject = ep.subject || `DSE Daily Briefing – ${dateShort}`;
+    emailHtml = ep.html || '<p style="padding:2rem">Generation failed. Try again.</p>';
 
-    setProgress(100, 'Done!');
-    setTimeout(() => {
-      renderPreview();
-      goScreen(3);
-    }, 400);
+    setStatus('Done!', 100);
+    setTimeout(() => { renderPreview(); goS(3); }, 400);
 
   } catch (e) {
-    statusBox.style.display = 'none';
-    const el = document.getElementById('genErr');
-    el.style.display = 'block';
-    el.textContent = 'Error: ' + e.message;
-    document.getElementById('genBtn').style.display = 'inline-flex';
+    document.getElementById('statusBox').style.display = 'none';
+    document.getElementById('genBtn').disabled = false;
+    document.getElementById('testBtn').disabled = false;
+    showErr('genErr', e.message);
+    dbg('genDebug', 'Error', { message: e.message });
   }
 }
 
 function renderPreview() {
   const s = mkt.sentiment || 'Neutral';
-  const badge = document.getElementById('sentBadge');
-  badge.textContent = s;
-  badge.className = 'badge ' + (s === 'Bullish' ? 'badge-bull' : s === 'Bearish' ? 'badge-bear' : 'badge-neu');
-  document.getElementById('dataRange').textContent = mkt.weekRange || '';
+  const b = document.getElementById('sentBadge');
+  b.textContent = s;
+  b.className = 'badge ' + (s === 'Bullish' ? 'b-bull' : s === 'Bearish' ? 'b-bear' : 'b-neu');
+  document.getElementById('dataDate').textContent = mkt.date || '';
 
-  const isUp = v => v && (v.includes('+') || (!v.includes('-') && parseFloat(v) > 0));
-  const isDn = v => v && v.includes('-');
+  const isUp = v => v && v.toString().includes('+');
+  const isDn = v => v && v.toString().includes('-');
 
   document.getElementById('metrics').innerHTML = [
-    ['DSEI', mkt.dsei || '—'],
-    ['Weekly change', mkt.dseiWeeklyChange || '—'],
-    ['Market cap', mkt.totalMarketCap || '—'],
-    ['Turnover', mkt.weeklyTurnover || '—']
-  ].map(([l, v]) => `
-    <div class="metric">
-      <div class="m-lbl">${l}</div>
-      <div class="m-val ${isUp(v) ? 'up' : isDn(v) ? 'dn' : ''}">${v}</div>
-    </div>`).join('');
+    ['DSEI', mkt.dsei], ['Change', mkt.dailyChange], ['Market cap', mkt.marketCap], ['Turnover', mkt.turnover]
+  ].map(([l, v]) => `<div class="metric"><div class="m-lbl">${l}</div><div class="m-val ${isUp(v) ? 'up' : isDn(v) ? 'dn' : ''}">${v || '—'}</div></div>`).join('');
 
-  const tot = (mkt.advancers || 0) + (mkt.decliners || 0) + (mkt.unchanged || 0);
-  if (tot > 0) {
-    const ap = Math.round((mkt.advancers / tot) * 100);
-    const dp = Math.round((mkt.decliners / tot) * 100);
-    const up = 100 - ap - dp;
-    document.getElementById('breadthSection').innerHTML = `
-      <div class="section-title">Market breadth</div>
-      <div class="breadth-bar">
-        <div style="width:${ap}%;background:#22c55e"></div>
-        <div style="width:${dp}%;background:#ef4444"></div>
-        <div style="width:${up}%;background:#e5e7eb"></div>
-      </div>
-      <div class="breadth-legend">
-        <span><strong style="color:#16a34a">${mkt.advancers}</strong> advancers</span>
-        <span><strong style="color:#dc2626">${mkt.decliners}</strong> decliners</span>
-        <span><strong style="color:#6b7280">${mkt.unchanged}</strong> unchanged</span>
-      </div>`;
-  }
+  const tbl = (rows, isGain) => !rows?.length ? '' : `
+    <div style="font-weight:600;font-size:13px;margin:1rem 0 .4rem;color:${isGain ? '#16a34a' : '#dc2626'}">${isGain ? '▲ Top gainers' : '▼ Top losers'}</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Ticker</th><th>Name</th><th>Close</th><th>Change</th><th>Volume</th></tr></thead>
+      <tbody>${rows.slice(0, 5).map(r => `<tr>
+        <td class="bold">${r.ticker || ''}</td>
+        <td class="muted">${r.name || ''}</td>
+        <td>${r.close || ''}</td>
+        <td class="${isGain ? 'up' : 'dn'}">${r.change || ''}</td>
+        <td class="muted">${r.volume || ''}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
 
-  const buildTable = (rows, isGain) => {
-    if (!rows || !rows.length) return '';
-    return `
-      <div class="section-title ${isGain ? 'up' : 'dn'}">${isGain ? '▲ Top 5 weekly gainers' : '▼ Top 5 weekly losers'}</div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>Ticker</th><th>Company</th><th>Close</th><th>Weekly %</th><th>Volume</th></tr></thead>
-          <tbody>
-            ${rows.slice(0, 5).map(r => `
-              <tr>
-                <td class="bold">${r.ticker || ''}</td>
-                <td style="color:#6b7280;max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name || ''}</td>
-                <td>${r.close || ''}</td>
-                <td class="${isGain ? 'up' : 'dn'}">${r.weeklyChange || ''}</td>
-                <td style="color:#6b7280">${r.volume || ''}</td>
-              </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>`;
-  };
-
-  document.getElementById('gainTable').innerHTML = buildTable(mkt.gainers, true);
-  document.getElementById('lossTable').innerHTML = buildTable(mkt.losers, false);
+  document.getElementById('gainTable').innerHTML = tbl(mkt.gainers, true);
+  document.getElementById('lossTable').innerHTML = tbl(mkt.losers, false);
   document.getElementById('subjectInput').value = emailSubject;
   document.getElementById('previewFrame').srcdoc = emailHtml;
 }
 
-function mcCreds() {
-  const key = document.getElementById('mcKey').value.trim();
-  const list = document.getElementById('mcList').value.trim();
-  const from = document.getElementById('fromName').value.trim();
-  const reply = document.getElementById('replyTo').value.trim();
-  const dc = key.split('-').pop() || 'us1';
-  const base = `https://${dc}.api.mailchimp.com/3.0`;
-  const auth = 'Basic ' + btoa('anystring:' + key);
-  return { key, list, from, reply, dc, base, auth };
-}
-
-function debugLog(msg, data) {
-  const box = document.getElementById('debugBox');
-  box.style.display = 'block';
-  const ts = new Date().toLocaleTimeString();
-  box.textContent += `\n[${ts}] ${msg}\n${data ? JSON.stringify(data, null, 2) : ''}\n`;
-  box.scrollTop = box.scrollHeight;
-}
-
-function showSendErr(msg) {
-  document.getElementById('sendStatusBox').style.display = 'none';
-  document.getElementById('sendBtn').style.display = 'inline-flex';
-  document.getElementById('testBtn').style.display = 'inline-flex';
-  const e = document.getElementById('sendErr');
-  e.style.display = 'block';
-  e.textContent = msg;
+function mcInfo() {
+  const k = document.getElementById('mcKey').value.trim();
+  const dc = k.split('-').pop() || 'us1';
+  return {
+    key: k, list: document.getElementById('mcList').value.trim(),
+    from: document.getElementById('fromName').value.trim(),
+    reply: document.getElementById('replyTo').value.trim(),
+    base: `https://${dc}.api.mailchimp.com/3.0`,
+    auth: 'Basic ' + btoa('anystring:' + k)
+  };
 }
 
 async function testMailchimp() {
-  const { key, list, base, auth } = mcCreds();
-  if (!key) { showSendErr('Enter your Mailchimp API key in step 1 first.'); return; }
-
-  document.getElementById('testBtn').style.display = 'none';
+  const { key, list, base, auth } = mcInfo();
+  if (!key) { showErr('sendErr', 'Enter Mailchimp API key in step 1.'); return; }
+  document.getElementById('testMcBtn').disabled = true;
   document.getElementById('sendErr').style.display = 'none';
-  document.getElementById('debugBox').style.display = 'none';
-  document.getElementById('debugBox').textContent = '';
+  document.getElementById('sendOk').style.display = 'none';
+  document.getElementById('sendDebug').style.display = 'none';
+  document.getElementById('sendDebug').textContent = '';
   document.getElementById('sendStatusBox').style.display = 'flex';
-  document.getElementById('sendMsg').textContent = 'Testing Mailchimp connection...';
-
+  document.getElementById('sendMsg').textContent = 'Testing Mailchimp...';
   try {
-    debugLog('Step 1 — checking API key via /ping');
-    const p = await fetch(`${base}/ping`, { headers: { 'Authorization': auth } });
-    const pj = await p.json();
-    debugLog(`/ping → HTTP ${p.status}`, pj);
-    if (p.status === 401) { showSendErr('API key rejected (401). Double-check your Mailchimp API key.'); return; }
-    if (!pj.health_status) { showSendErr('Ping failed — unexpected response from Mailchimp.'); return; }
-
+    dbg('sendDebug', 'GET /ping');
+    const p = await fetch(`${base}/ping`, { headers: { Authorization: auth } });
+    const pj = await p.json().catch(() => ({}));
+    dbg('sendDebug', 'Ping HTTP ' + p.status, pj);
+    if (p.status === 401) throw new Error('API key invalid (401).');
     if (list) {
-      debugLog(`Step 2 — checking audience list ID: ${list}`);
-      const lr = await fetch(`${base}/lists/${list}`, { headers: { 'Authorization': auth } });
-      const lj = await lr.json();
-      debugLog(`/lists/${list} → HTTP ${lr.status}`, lj);
-      if (lr.status === 404) { showSendErr(`Audience ID "${list}" not found. Check it in Mailchimp → Audience → Settings.`); return; }
-      if (lr.status !== 200) { showSendErr(`List error ${lr.status}: ${lj.detail || lj.title || 'Unknown error'}`); return; }
-      debugLog('Audience found: ' + lj.name);
+      dbg('sendDebug', 'GET /lists/' + list);
+      const lr = await fetch(`${base}/lists/${list}`, { headers: { Authorization: auth } });
+      const lj = await lr.json().catch(() => ({}));
+      dbg('sendDebug', 'List HTTP ' + lr.status, { name: lj.name, id: lj.id, status: lj.status });
+      if (lr.status === 404) throw new Error(`Audience ID "${list}" not found.`);
+      if (!lr.ok) throw new Error(`List error ${lr.status}: ${lj.detail || lj.title}`);
     }
-
-    debugLog('Step 3 — checking verified sender domains');
-    const dr = await fetch(`${base}/verified-domains`, { headers: { 'Authorization': auth } });
-    const dj = await dr.json();
-    debugLog(`/verified-domains → HTTP ${dr.status}`, dj);
-
     document.getElementById('sendStatusBox').style.display = 'none';
-    document.getElementById('testBtn').style.display = 'inline-flex';
-    const e = document.getElementById('sendErr');
-    e.style.display = 'block';
-    e.style.background = '#f0fdf4';
-    e.style.color = '#166534';
-    e.style.borderColor = '#86efac';
-    e.textContent = 'Connection OK! API key and audience ID are valid. See debug log below for domain info.';
-  } catch (err) {
-    showSendErr('Network error: ' + err.message + '. Make sure you are opening this file in Chrome (not Safari or Firefox) and check your internet connection.');
+    document.getElementById('testMcBtn').disabled = false;
+    showOk('sendOk', '✓ Mailchimp connection OK. Ready to send.');
+  } catch (e) {
+    document.getElementById('sendStatusBox').style.display = 'none';
+    document.getElementById('testMcBtn').disabled = false;
+    showErr('sendErr', e.message);
   }
 }
 
 async function doSend() {
-  const { key, list, from, reply, base, auth } = mcCreds();
+  const { key, list, from, reply, base, auth } = mcInfo();
   const subject = document.getElementById('subjectInput').value.trim();
-
-  if (!key || !list) { showSendErr('Enter your Mailchimp API key and Audience ID in step 1.'); return; }
-
-  document.getElementById('sendBtn').style.display = 'none';
-  document.getElementById('testBtn').style.display = 'none';
+  if (!key || !list) { showErr('sendErr', 'Enter Mailchimp API key and Audience ID in step 1.'); return; }
+  document.getElementById('sendBtn').disabled = true;
+  document.getElementById('testMcBtn').disabled = true;
   document.getElementById('sendErr').style.display = 'none';
-  document.getElementById('debugBox').style.display = 'none';
-  document.getElementById('debugBox').textContent = '';
+  document.getElementById('sendOk').style.display = 'none';
+  document.getElementById('sendDebug').style.display = 'none';
+  document.getElementById('sendDebug').textContent = '';
   document.getElementById('sendStatusBox').style.display = 'flex';
-
   try {
-    document.getElementById('sendMsg').textContent = 'Creating Mailchimp campaign...';
-    const campaignBody = {
-      type: 'regular',
-      recipients: { list_id: list },
-      settings: {
-        subject_line: subject,
-        preview_text: 'Your DSE weekly market summary from Sokoview',
-        from_name: from,
-        reply_to: reply,
-        title: 'Sokoview Weekly Recap – ' + (mkt.weekEnding || new Date().toLocaleDateString())
-      }
-    };
-    debugLog('POST /campaigns', campaignBody);
-    const cr = await fetch(`${base}/campaigns`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': auth },
-      body: JSON.stringify(campaignBody)
-    });
-    const camp = await cr.json();
-    debugLog(`POST /campaigns → HTTP ${cr.status}`, camp);
+    document.getElementById('sendMsg').textContent = 'Creating campaign...';
+    const payload = { type: 'regular', recipients: { list_id: list }, settings: { subject_line: subject, preview_text: 'Your DSE daily market briefing from Sokoview', from_name: from, reply_to: reply, title: 'Sokoview DSE Daily – ' + (mkt.date || '') } };
+    dbg('sendDebug', 'POST /campaigns', payload);
+    const cr = await fetch(`${base}/campaigns`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: auth }, body: JSON.stringify(payload) });
+    const camp = await cr.json().catch(() => ({}));
+    dbg('sendDebug', 'Create campaign HTTP ' + cr.status, { id: camp.id, status: camp.status, errors: camp.errors, detail: camp.detail });
+    if (!camp.id) throw new Error(`Campaign creation failed (${cr.status}): ${camp.detail || camp.title || JSON.stringify(camp.errors || camp)}`);
 
-    if (!camp.id) {
-      const detail = camp.detail || camp.title || JSON.stringify(camp);
-      const errors = camp.errors ? '\nErrors: ' + JSON.stringify(camp.errors) : '';
-      showSendErr(`Campaign creation failed (${cr.status}): ${detail}${errors}`);
-      return;
-    }
+    document.getElementById('sendMsg').textContent = 'Uploading content...';
+    const up = await fetch(`${base}/campaigns/${camp.id}/content`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: auth }, body: JSON.stringify({ html: emailHtml }) });
+    const upj = await up.json().catch(() => ({}));
+    dbg('sendDebug', 'Upload content HTTP ' + up.status, { id: upj.id });
+    if (!up.ok) throw new Error(`Content upload failed (${up.status}): ${upj.detail || upj.title}`);
 
-    document.getElementById('sendMsg').textContent = 'Uploading email content...';
-    const contentResp = await fetch(`${base}/campaigns/${camp.id}/content`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': auth },
-      body: JSON.stringify({ html: emailHtml })
-    });
-    const contentJson = await contentResp.json().catch(() => ({}));
-    debugLog(`PUT /campaigns/${camp.id}/content → HTTP ${contentResp.status}`, contentJson);
-    if (contentResp.status !== 200) {
-      showSendErr(`Content upload failed (${contentResp.status}): ${contentJson.detail || contentJson.title || 'Unknown error'}`);
-      return;
-    }
-
-    document.getElementById('sendMsg').textContent = 'Sending to your audience...';
-    const sr = await fetch(`${base}/campaigns/${camp.id}/actions/send`, {
-      method: 'POST',
-      headers: { 'Authorization': auth }
-    });
-    debugLog(`POST /campaigns/${camp.id}/actions/send → HTTP ${sr.status}`);
-
+    document.getElementById('sendMsg').textContent = 'Sending...';
+    const sr = await fetch(`${base}/campaigns/${camp.id}/actions/send`, { method: 'POST', headers: { Authorization: auth } });
+    dbg('sendDebug', 'Send HTTP ' + sr.status);
     if (sr.status === 204) {
       document.getElementById('sendStatusBox').style.display = 'none';
       document.getElementById('sendCard').style.display = 'none';
       document.getElementById('successBox').style.display = 'block';
-      document.getElementById('backFromSend').style.display = 'none';
+      document.getElementById('backBtn').style.display = 'none';
     } else {
       const se = await sr.json().catch(() => ({}));
-      debugLog('Send error response', se);
-      showSendErr(`Send failed (${sr.status}): ${se.detail || se.title || JSON.stringify(se)}`);
+      dbg('sendDebug', 'Send error', se);
+      throw new Error(`Send failed (${sr.status}): ${se.detail || se.title || JSON.stringify(se)}`);
     }
   } catch (e) {
-    showSendErr('Unexpected error: ' + e.message);
+    document.getElementById('sendStatusBox').style.display = 'none';
+    document.getElementById('sendBtn').disabled = false;
+    document.getElementById('testMcBtn').disabled = false;
+    showErr('sendErr', e.message);
   }
 }
 
 function resetApp() {
   mkt = {}; emailHtml = ''; emailSubject = '';
-  document.getElementById('genBtn').style.display = 'inline-flex';
+  document.getElementById('genBtn').disabled = false;
+  document.getElementById('testBtn').disabled = false;
   document.getElementById('statusBox').style.display = 'none';
   document.getElementById('genErr').style.display = 'none';
-  goScreen(2);
+  document.getElementById('genOk').style.display = 'none';
+  document.getElementById('genDebug').style.display = 'none';
+  goS(2);
 }
 </script>
 </body>
