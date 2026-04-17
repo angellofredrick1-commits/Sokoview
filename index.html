@@ -430,53 +430,10 @@ async function runFetch() {
     setProgress(10, 'Connecting to dse.co.tz...');
 
     const d1 = await claudeCall(
-      `You are a DSE market data analyst. Today is ${todayFull}.
-
-Your task: fetch live data from dse.co.tz and compile a complete weekly DSE market summary.
-
-STEP 1 — fetch today's equity table:
-Fetch https://dse.co.tz/ and extract the full equity price table. For every listed stock get: Symbol, Open, Prev Close, Close, High, Low, Change (%), Turnover (TZS), Deals, Volume, Market Cap (TZS billions).
-
-STEP 2 — get start-of-week prices:
-Search for "DSE Tanzania market report ${weekStart}" and "DSE dse.co.tz daily prices ${weekStart}" to find Monday's closing prices so you can compute 5-day (weekly) price changes per stock.
-
-STEP 3 — get DSEI index data:
-Search for "DSE Tanzania DSEI all share index ${weekStart} ${weekEnd}" to find the week's opening and closing index values.
-
-STEP 4 — compute the following:
-- Weekly change per stock = (Friday close − Monday close) / Monday close × 100. If Monday data is unavailable use the earliest available data this week.
-- Top 5 weekly gainers (sorted by weekly % change descending)
-- Top 5 weekly losers (sorted by weekly % change ascending)
-- Count advancers (weekly change > 0), decliners (< 0), unchanged (= 0)
-- Total weekly turnover (sum across 5 days where possible)
-- Overall market sentiment: Bullish if advancers > decliners, Bearish if decliners > advancers, else Neutral
-- 3 notable highlights from the week (biggest movers, high-volume counters, corporate actions, index milestones)
-- 1–2 sentence analyst insight on what to watch next week
-
-Return ONLY a JSON object with no markdown fences, no backticks, no extra text:
-{
-  "weekEnding": "DD Month YYYY",
-  "weekRange": "${weekStart} – ${weekEnd}",
-  "sentiment": "Bullish|Bearish|Neutral",
-  "dsei": "XXXX.XX",
-  "dseiWeeklyChange": "+X.X%",
-  "dseiOpen": "XXXX.XX",
-  "totalMarketCap": "TZS XX.X trillion",
-  "weeklyTurnover": "TZS X.X billion",
-  "totalDeals": "X,XXX",
-  "advancers": 0,
-  "decliners": 0,
-  "unchanged": 0,
-  "gainers": [
-    { "ticker": "", "name": "", "close": "TZS X,XXX", "weeklyChange": "+X.X%", "volume": "X,XXX", "mcap": "TZS XX.Xbn" }
-  ],
-  "losers": [
-    { "ticker": "", "name": "", "close": "TZS X,XXX", "weeklyChange": "-X.X%", "volume": "X,XXX", "mcap": "TZS XX.Xbn" }
-  ],
-  "highlights": ["highlight 1", "highlight 2", "highlight 3"],
-  "insight": "Forward-looking analyst commentary here."
-}`,
-      `Fetch https://dse.co.tz/ for the live equity price table. Then search for DSE market data for the week of ${weekStart} to ${weekEnd} to calculate weekly performance. Return only the JSON.`,
+      `DSE market analyst. Today: ${todayFull}. Fetch https://dse.co.tz/ for live equity prices. Search "DSE Tanzania weekly market ${weekStart} ${weekEnd}" for weekly data. Return ONLY JSON, no markdown:
+{"weekEnding":"${weekEnd}","weekRange":"${weekStart} – ${weekEnd}","sentiment":"Bullish|Bearish|Neutral","dsei":"0","dseiWeeklyChange":"+0%","totalMarketCap":"TZS 0T","weeklyTurnover":"TZS 0B","totalDeals":"0","advancers":0,"decliners":0,"unchanged":0,"gainers":[{"ticker":"","name":"","close":"TZS 0","weeklyChange":"+0%","volume":"0","mcap":"TZS 0bn"}],"losers":[{"ticker":"","name":"","close":"TZS 0","weeklyChange":"-0%","volume":"0","mcap":"TZS 0bn"}],"highlights":["h1","h2","h3"],"insight":"commentary"}
+Rules: 5 gainers, 5 losers sorted by weekly % change. Sentiment: Bullish if advancers>decliners else Bearish else Neutral.`,
+      `Fetch https://dse.co.tz/ and search for DSE week of ${weekStart} to ${weekEnd}. Return only the JSON.`,
       true
     );
 
@@ -500,28 +457,8 @@ Return ONLY a JSON object with no markdown fences, no backticks, no extra text:
     setProgress(68, 'Designing branded email...');
 
     const d2 = await claudeCall(
-      `You are an expert HTML email designer for Sokoview (sokoview.co.tz), a Dar es Salaam Stock Exchange market intelligence platform.
-
-Create a professional, mobile-responsive HTML email for the Sokoview Weekly DSE Market Recap.
-
-Design rules:
-- Inline CSS ONLY — no <style> tags, no external stylesheets
-- Max-width 600px, centred with auto margins
-- Colour scheme: header bg #1a2744 (dark navy), amber accent #f59e0b, gainers #16a34a, losers #dc2626, body bg #f0f4f8, white cards with 1px #e2e8f0 border and 8px border-radius
-- Mobile-first: use table-based layout for email clients, percentage widths
-
-Email sections in order:
-1. HEADER: Large "SOKOVIEW" text in #f59e0b on #1a2744 background. Subline "Dar es Salaam Stock Exchange · Weekly Market Recap" in white. Week range line. Tagline: "Market intelligence powered by dse.co.tz"
-2. MARKET PULSE: A 2×2 table of KPI cards (white bg, subtle border) — Sentiment (colour-coded green/red/yellow), DSEI index with weekly change, Total Market Cap, Weekly Turnover.
-3. MARKET BREADTH: A thin horizontal bar showing Advancers (green), Decliners (red), Unchanged (grey) as proportional segments, with counts below.
-4. TOP 5 WEEKLY GAINERS: Table with columns Ticker | Company | Close Price | Weekly Change | Volume. Green header row. Alternate row shading.
-5. TOP 5 WEEKLY LOSERS: Same table structure, red header row.
-6. WEEKLY HIGHLIGHTS: 3 bullet points in a box with 4px #1a2744 left border, light blue background.
-7. ANALYST INSIGHT: Callout box with 4px #f59e0b left border, italic text, light amber background.
-8. FOOTER: Dark #1a2744 background. "© Sokoview · sokoview.co.tz". "Data source: dse.co.tz". Unsubscribe link placeholder in small muted text.
-
-Return ONLY valid JSON with no markdown: {"subject":"...","html":"..."}`,
-      `Generate the complete Sokoview weekly email from this live DSE market data: ${JSON.stringify(mkt)}`,
+      `Email designer for Sokoview (sokoview.co.tz). Create a professional mobile-responsive HTML email for the Weekly DSE Market Recap. Inline CSS only, max-width 600px. Colors: header #1a2744 navy, accent #f59e0b amber, gains #16a34a, losses #dc2626, body bg #f0f4f8. Sections: 1) Navy header with SOKOVIEW in amber + week range. 2) 4 KPI boxes: Sentiment, DSEI+change, Market Cap, Turnover. 3) Breadth bar (advancers green / decliners red / unchanged grey). 4) Top gainers table (green header). 5) Top losers table (red header). 6) Highlights box with navy left border. 7) Analyst insight box with amber left border. 8) Footer with sokoview.co.tz and unsubscribe link. Return ONLY JSON: {"subject":"...","html":"..."}`,
+      `Generate the Sokoview weekly email from this DSE data: ${JSON.stringify(mkt)}`,
       false
     );
 
