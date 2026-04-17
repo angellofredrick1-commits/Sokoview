@@ -534,7 +534,7 @@ async function testMailchimp() {
 }
 
 async function doSend() {
-  const { key, list, from, reply, base, auth } = mcInfo();
+  const { key, list, from, reply } = mcInfo();
   const subject = document.getElementById('subjectInput').value.trim();
   if (!key || !list) { showMsg('sendErr', 'Enter Mailchimp API key and Audience ID in step 1.'); return; }
   document.getElementById('sendBtn').disabled = true;
