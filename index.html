@@ -420,40 +420,58 @@ function buildEmail(m) {
   var up   = 100-ap-dp;
 
   var h = '';
-  h += '<!DOCTYPE html><html><head><meta charset="UTF-8"/></head>';
+  h += '<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>';
+  h += '<style>';
+  h += '@media only screen and (max-width:600px){';
+  h += '.wrap{padding:12px 8px!important}';
+  h += '.header-td{padding:20px 16px!important}';
+  h += '.logo{font-size:20px!important}';
+  h += '.kpi-table{display:block!important}';
+  h += '.kpi-td{display:inline-block!important;width:48%!important;border-right:none!important;border-bottom:1px solid #f1f5f9!important;vertical-align:top}';
+  h += '.kpi-val{font-size:15px!important}';
+  h += '.sal-td{padding:16px!important}';
+  h += '.sal-name{font-size:15px!important}';
+  h += '.sal-body{font-size:13px!important}';
+  h += 'table{min-width:unset!important}';
+  h += 'td,th{padding:6px 8px!important;font-size:12px!important}';
+  h += '.section-title{font-size:11px!important}';
+  h += '.insight-box{padding:10px 12px!important}';
+  h += '.footer-td{padding:14px 16px!important}';
+  h += '}';
+  h += '</style></head>';
   h += '<body style="margin:0;padding:0;background:#f0f4f8;font-family:Arial,Helvetica,sans-serif">';
-  h += '<div style="max-width:600px;margin:0 auto;padding:20px 12px">';
+  h += '<div class="wrap" style="max-width:600px;margin:0 auto;padding:20px 12px">';
 
   // HEADER
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:12px 12px 0 0"><tr><td style="padding:26px 28px">';
-  h += '<div style="font-size:26px;font-weight:900;color:#f59e0b;letter-spacing:2px">SOKOVIEW</div>';
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:12px 12px 0 0"><tr><td class="header-td" style="padding:26px 28px">';
+  h += '<div class="logo" style="font-size:26px;font-weight:900;color:#f59e0b;letter-spacing:2px">SOKOVIEW</div>';
   h += '<div style="font-size:12px;color:#94a3b8;margin-top:3px">Dar es Salaam Stock Exchange &middot; Daily Market Briefing</div>';
   h += '<div style="font-size:15px;color:#ffffff;margin-top:6px;font-weight:600">'+esc(m.date||'')+'</div>';
   h += '<div style="font-size:11px;color:#64748b;margin-top:3px">Data prepared by Sokoview Analytics &middot; <a href="https://sokoview.co.tz" style="color:#64748b">sokoview.co.tz</a></div>';
   h += '</td></tr></table>';
 
   // SALUTATION
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0"><tr><td style="padding:22px 24px">';
-  h += '<div style="font-size:16px;color:#111111;margin-bottom:12px">Hi <strong>*|FNAME|*</strong>,</div>';
-  h += '<div style="font-size:14px;color:#374151;line-height:1.8">'+esc(m.insight||'Here is your daily DSE market briefing.')+'</div>';
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0"><tr><td class="sal-td" style="padding:22px 24px">';
+  h += '<div class="sal-name" style="font-size:16px;color:#111111;margin-bottom:12px">Hi <strong>*|FNAME|*</strong>,</div>';
+  h += '<div class="sal-body" style="font-size:14px;color:#374151;line-height:1.8">'+esc(m.insight||'Here is your daily DSE market briefing.')+'</div>';
   h += '</td></tr></table>';
 
   // KPI BOXES
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr>';
-  h += '<td style="padding:14px 8px 14px 16px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
+  h += '<table class="kpi-table" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr>';
+  h += '<td class="kpi-td" style="padding:14px 8px 14px 16px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
   h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:6px">Sentiment</div>';
   h += '<div style="font-size:13px;font-weight:700;background:'+sentBg+';color:'+sentClr+';padding:4px 12px;border-radius:20px;display:inline-block">'+esc(s)+'</div>';
   h += '</td>';
-  h += '<td style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
   h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">DSEI Index</div>';
-  h += '<div style="font-size:18px;font-weight:700;color:#111111">'+esc(m.dsei||'—')+'</div>';
+  h += '<div class="kpi-val" style="font-size:18px;font-weight:700;color:#111111">'+esc(m.dsei||'—')+'</div>';
   h += '<div style="font-size:12px;font-weight:600;'+clr(m.dseiChangePct)+'">'+esc(m.dseiChangePct)+'</div>';
   h += '</td>';
-  h += '<td style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
   h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Market Cap</div>';
   h += '<div style="font-size:16px;font-weight:700;color:#111111">'+esc(m.marketCap)+'</div>';
   h += '</td>';
-  h += '<td style="padding:14px 8px;width:25%;vertical-align:top">';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;vertical-align:top">';
   h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Turnover</div>';
   h += '<div style="font-size:16px;font-weight:700;color:#111111">'+esc(m.turnover)+'</div>';
   h += '<div style="font-size:11px;color:#6b7280">Vol: '+esc(m.volume)+'</div>';
@@ -477,7 +495,7 @@ function buildEmail(m) {
   if (m.indices && m.indices.length) {
     h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
     h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a2744;margin-bottom:8px">Market Indices</div>';
-    h += '<table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f9fafb">';
+    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f9fafb">';
     h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Index</th>';
     h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Points</th>';
     h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Daily</th>';
@@ -493,14 +511,14 @@ function buildEmail(m) {
       h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;'+clr(r.ytd)+'">'+esc(r.ytd||'—')+'</td>';
       h += '</tr>';
     });
-    h += '</tbody></table></td></tr></table>';
+    h += '</tbody></table></div></td></tr></table>';
   }
 
   // GAINERS
   if (m.gainers && m.gainers.length) {
     h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
     h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#16a34a;margin-bottom:8px">&#9650; Gainers</div>';
-    h += '<table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f0fdf4">';
+    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f0fdf4">';
     h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Ticker</th>';
     h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Company</th>';
     h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Price</th>';
@@ -516,14 +534,14 @@ function buildEmail(m) {
       h += '<td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;text-align:right;font-size:13px;'+clr(r.ytd)+'">'+esc(r.ytd||'—')+'</td>';
       h += '</tr>';
     });
-    h += '</tbody></table></td></tr></table>';
+    h += '</tbody></table></div></td></tr></table>';
   }
 
   // LOSERS
   if (m.losers && m.losers.length) {
     h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
     h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#dc2626;margin-bottom:8px">&#9660; Losers</div>';
-    h += '<table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#fef2f2">';
+    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#fef2f2">';
     h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Ticker</th>';
     h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Company</th>';
     h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Price</th>';
@@ -539,14 +557,14 @@ function buildEmail(m) {
       h += '<td style="padding:7px 10px;border-bottom:1px solid #fff1f2;text-align:right;font-size:13px;'+clr(r.ytd)+'">'+esc(r.ytd||'—')+'</td>';
       h += '</tr>';
     });
-    h += '</tbody></table></td></tr></table>';
+    h += '</tbody></table></div></td></tr></table>';
   }
 
   // TOP MOVERS
   if (m.movers && m.movers.length) {
     h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
     h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a2744;margin-bottom:8px">Top Movers by Turnover</div>';
-    h += '<table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f9fafb">';
+    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f9fafb">';
     h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Ticker</th>';
     h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Company</th>';
     h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Price</th>';
@@ -562,12 +580,12 @@ function buildEmail(m) {
       h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;font-weight:600;color:#1a2744">'+esc(r.turnover)+'</td>';
       h += '</tr>';
     });
-    h += '</tbody></table></td></tr></table>';
+    h += '</tbody></table></div></td></tr></table>';
   }
 
   // SOKOVIEW INSIGHTS
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px">';
-  h += '<div style="border-left:4px solid #f59e0b;padding:14px 16px;background:#fffbeb;border-radius:0 8px 8px 0">';
+  h += '<div class="insight-box" style="border-left:4px solid #f59e0b;padding:14px 16px;background:#fffbeb;border-radius:0 8px 8px 0">';
   h += '<div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Sokoview Insights</div>';
   h += '<div style="font-size:13px;color:#78350f;line-height:1.8">'+esc(m.insight||'')+'</div>';
   h += '</div></td></tr></table>';
@@ -603,7 +621,7 @@ function buildEmail(m) {
   h += '</td></tr></table>';
 
   // FOOTER
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:0 0 12px 12px"><tr><td style="padding:18px 24px;text-align:center">';
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:0 0 12px 12px"><tr><td class="footer-td" style="padding:18px 24px;text-align:center">';
   h += '<div style="font-size:15px;font-weight:700;color:#f59e0b;margin-bottom:4px">SOKOVIEW</div>';
   h += '<div style="font-size:12px;color:#94a3b8"><a href="https://sokoview.co.tz" style="color:#94a3b8;text-decoration:none">sokoview.co.tz</a> &nbsp;&middot;&nbsp; Data prepared by Sokoview Analytics</div>';
   h += '<div style="font-size:11px;color:#475569;margin-top:8px">You received this because you subscribed to Sokoview market updates. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
