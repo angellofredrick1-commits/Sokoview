@@ -448,6 +448,9 @@ function buildEmail(m) {
   h += '<div style="font-size:12px;color:#94a3b8;margin-top:3px">Dar es Salaam Stock Exchange &middot; Daily Market Briefing</div>';
   h += '<div style="font-size:15px;color:#ffffff;margin-top:6px;font-weight:600">'+esc(m.date||'')+'</div>';
   h += '<div style="font-size:11px;color:#64748b;margin-top:3px">Data prepared by Sokoview Analytics &middot; <a href="https://sokoview.co.tz" style="color:#64748b">sokoview.co.tz</a></div>';
+  h += '<div style="margin-top:16px">';
+  h += '<a href="https://sokoview.co.tz" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 24px;border-radius:6px;text-decoration:none;letter-spacing:0.03em">View Full Market Dashboard &rarr;</a>';
+  h += '</div>';
   h += '</td></tr></table>';
 
   // SALUTATION
@@ -624,7 +627,10 @@ function buildEmail(m) {
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:0 0 12px 12px"><tr><td class="footer-td" style="padding:18px 24px;text-align:center">';
   h += '<div style="font-size:15px;font-weight:700;color:#f59e0b;margin-bottom:4px">SOKOVIEW</div>';
   h += '<div style="font-size:12px;color:#94a3b8"><a href="https://sokoview.co.tz" style="color:#94a3b8;text-decoration:none">sokoview.co.tz</a> &nbsp;&middot;&nbsp; Data prepared by Sokoview Analytics</div>';
-  h += '<div style="font-size:11px;color:#475569;margin-top:8px">You received this because you subscribed to Sokoview market updates. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
+  h += '<div style="margin:16px 0">';
+  h += '<a href="https://sokoview.co.tz" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:11px 28px;border-radius:6px;text-decoration:none;letter-spacing:0.03em">Track Your Portfolio on Sokoview &rarr;</a>';
+  h += '</div>';
+  h += '<div style="font-size:11px;color:#475569;margin-top:4px">You received this because you subscribed to Sokoview market updates. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
   h += '</td></tr></table>';
 
   h += '</div></body></html>';
