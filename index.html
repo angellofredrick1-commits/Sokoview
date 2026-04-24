@@ -1250,9 +1250,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // ── NAVIGATION ──
 function m_goS(n) {
   for (let i = 1; i <= 4; i++) {
-    document.getElementById('s' + i).style.display = i === n ? 'block' : 'none';
-    const dot = document.getElementById('d' + i);
-    const lbl = document.getElementById('sl' + i);
+    document.getElementById('m-s' + i).style.display = i === n ? 'block' : 'none';
+    const dot = document.getElementById('m-d' + i);
+    const lbl = document.getElementById('m-sl' + i);
     dot.className = 'dot' + (i < n ? ' done' : i === n ? ' active' : '');
     dot.textContent = i < n ? '✓' : i;
     if (lbl) lbl.className = 'step-lbl' + (i === n ? ' active' : '');
