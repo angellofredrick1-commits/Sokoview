@@ -2,83 +2,110 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sokoview — DSE Daily Email Automator</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Sokoview Email Suite</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;color:#111;font-size:14px;min-height:100vh;padding:2rem 1rem}
-.wrap{max-width:700px;margin:0 auto}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;color:#111;font-size:14px;min-height:100vh}
+.app-header{background:#1a2744;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.app-header-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.875rem 1rem;gap:1rem;flex-wrap:wrap}
+.app-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.app-logo-mark{width:34px;height:34px;background:rgba(245,158,11,.15);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.app-logo-name{font-weight:700;font-size:16px;color:#fff;line-height:1.2}
+.app-logo-sub{font-size:11px;color:#64748b}
+.tab-bar{display:flex;gap:2px;background:rgba(255,255,255,.08);border-radius:8px;padding:3px}
+.tab-btn{padding:7px 16px;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:#94a3b8;transition:all .15s;font-family:inherit;white-space:nowrap}
+.tab-btn.active{background:#fff;color:#1a2744;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.tab-btn:hover:not(.active){color:#e2e8f0}
+.tab-pane{display:none;padding:1.5rem 1rem;max-width:760px;margin:0 auto}
+.tab-pane.active{display:block}
 .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin-bottom:5px}
-input[type=text],input[type=password]{width:100%;padding:10px 12px;font-size:14px;font-family:inherit;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:#111;outline:none;margin-bottom:4px;transition:border-color .15s,box-shadow .15s}
-input:focus{border-color:#1a2744;box-shadow:0 0 0 3px rgba(26,39,68,.1)}
+input[type=text],input[type=password],input[type=email]{width:100%;padding:10px 12px;font-size:14px;font-family:inherit;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:#111;outline:none;margin-bottom:4px;transition:border-color .15s}
+input:focus{border-color:#1a2744;box-shadow:0 0 0 3px rgba(26,39,68,.08)}
 .hint{font-size:12px;color:#9ca3af;margin-bottom:14px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:520px){.row2{grid-template-columns:1fr}}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;font-size:14px;font-family:inherit;border-radius:8px;cursor:pointer;font-weight:500;transition:all .15s;border:none}
 .btn-block{width:100%}
-.btn-primary{background:#1a2744;color:#fff}
-.btn-primary:hover{background:#253460}
-.btn-primary:disabled{opacity:.45;cursor:not-allowed}
-.btn-outline{background:#fff;border:1px solid #d1d5db;color:#374151}
-.btn-outline:hover{background:#f9fafb}
-.btn-outline:disabled{opacity:.45;cursor:not-allowed}
+.btn-primary{background:#1a2744;color:#fff}.btn-primary:hover{background:#253460}.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-outline{background:#fff;border:1px solid #d1d5db;color:#374151}.btn-outline:hover{background:#f9fafb}.btn-outline:disabled{opacity:.45;cursor:not-allowed}
+.btn-amber{background:#f59e0b;color:#1a2744;font-weight:700}.btn-amber:hover{background:#d97706}
+.divider{border:none;border-top:1px solid #f3f4f6;margin:1.25rem 0}
+.err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-top:.875rem;display:none}
+.ok{background:#f0fdf4;color:#166534;border:1px solid #86efac;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-top:.875rem;display:none}
+.warn{background:#fefce8;color:#713f12;border:1px solid #fde047;border-radius:8px;padding:.875rem 1rem;font-size:13px}
+.spin{width:18px;height:18px;border:2.5px solid rgba(26,39,68,.15);border-top-color:#1a2744;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status-box{display:none;align-items:center;gap:10px;padding:1.25rem 0;justify-content:center;font-size:13px;color:#6b7280}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.b-blue{background:#dbeafe;color:#1e40af}.b-green{background:#dcfce7;color:#166534}
+.b-amber{background:#fef3c7;color:#92400e}.b-red{background:#fee2e2;color:#991b1b}
+.success{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:2.5rem;text-align:center}
+.back-btn{background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0;margin-top:.875rem;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
+.back-btn:hover{color:#374151}
+.debug{display:none;margin-top:.875rem;background:#1e293b;color:#e2e8f0;border-radius:8px;padding:1rem;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto}
 .steps{display:flex;margin-bottom:2rem;position:relative}
 .steps::before{content:'';position:absolute;top:14px;left:10%;right:10%;height:1px;background:#e5e7eb}
 .step{flex:1;text-align:center;position:relative;z-index:1}
 .dot{width:28px;height:28px;border-radius:50%;margin:0 auto 6px;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #d1d5db;color:#9ca3af;transition:all .2s}
-.dot.active{background:#1a2744;color:#fff;border-color:#1a2744}
-.dot.done{background:#22c55e;color:#fff;border-color:#22c55e}
-.step-lbl{font-size:11px;color:#9ca3af;font-weight:500}
-.step-lbl.active{color:#1a2744}
-.divider{border:none;border-top:1px solid #f3f4f6;margin:1.25rem 0}
-.err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-top:.875rem;display:none}
-.ok{background:#f0fdf4;color:#166534;border:1px solid #86efac;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-top:.875rem;display:none}
-.spin{width:20px;height:20px;border:2.5px solid rgba(26,39,68,.15);border-top-color:#1a2744;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
-.status-box{display:none;align-items:center;gap:10px;padding:1.25rem 0;justify-content:center;font-size:13px;color:#6b7280}
+.dot.active{background:#1a2744;color:#fff;border-color:#1a2744}.dot.done{background:#22c55e;color:#fff;border-color:#22c55e}
+.step-lbl{font-size:11px;color:#9ca3af;font-weight:500}.step-lbl.active{color:#1a2744;font-weight:600}
+.preview-wrap{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:1rem}
+iframe{width:100%;min-height:560px;border:none;display:block}
+.review-box{background:#f9fafb;border-radius:8px;padding:1rem;margin:1rem 0;font-size:13px}
+.review-row{display:flex;justify-content:space-between;gap:1rem;padding:5px 0;border-bottom:1px solid #e5e7eb}
+.review-row:last-child{border:none}
 .prog-bar{height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden;margin:.5rem 0 .25rem}
 .prog-fill{height:100%;background:#1a2744;border-radius:2px;transition:width .5s ease}
 .prog-lbl{font-size:11px;color:#9ca3af;text-align:center}
 .drop-zone{border:2px dashed #d1d5db;border-radius:12px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .2s;background:#fafafa}
 .drop-zone:hover,.drop-zone.dragover{border-color:#1a2744;background:#f0f4ff}
 .drop-zone.has-file{border-color:#22c55e;background:#f0fdf4;border-style:solid}
-.file-icon{width:48px;height:48px;background:#fee2e2;border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto .875rem}
-.file-icon.ok{background:#dcfce7}
 .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:1rem 0}
 @media(max-width:520px){.metric-grid{grid-template-columns:1fr 1fr}}
 .metric{background:#f9fafb;border-radius:8px;padding:.75rem .875rem}
 .m-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;margin-bottom:3px}
-.m-val{font-size:15px;font-weight:600;color:#111}
-.m-val.up{color:#16a34a}
-.m-val.dn{color:#dc2626}
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.b-bull{background:#dcfce7;color:#166534}
-.b-bear{background:#fee2e2;color:#991b1b}
-.b-neu{background:#fef9c3;color:#713f12}
-.b-blue{background:#dbeafe;color:#1e40af}
+.m-val{font-size:15px;font-weight:600;color:#111}.m-val.up{color:#16a34a}.m-val.dn{color:#dc2626}
 .tbl-wrap{overflow-x:auto;margin:.5rem 0}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:340px}
+table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:7px 10px;background:#f9fafb;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb}
 td{padding:8px 10px;border-bottom:1px solid #f3f4f6}
-td.bold{font-weight:600;color:#111}
-td.up{color:#16a34a;font-weight:600}
-td.dn{color:#dc2626;font-weight:600}
-td.muted{color:#6b7280}
-.preview-wrap{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:1rem}
-iframe{width:100%;min-height:560px;border:none;display:block}
-.review-box{background:#f9fafb;border-radius:8px;padding:1rem;margin:1rem 0;font-size:13px}
-.review-row{display:flex;justify-content:space-between;gap:1rem;padding:5px 0;border-bottom:1px solid #e5e7eb}
-.review-row:last-child{border:none}
-.review-lbl{color:#6b7280}
-.review-val{font-weight:600;text-align:right;max-width:60%}
-.success{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:2.5rem;text-align:center}
-.back-btn{background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0;margin-top:.875rem;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
-.back-btn:hover{color:#374151}
-.debug{display:none;margin-top:.875rem;background:#1e293b;color:#e2e8f0;border-radius:8px;padding:1rem;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:220px;overflow-y:auto}
+td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{color:#dc2626;font-weight:600}td.muted{color:#6b7280}
+.mode-toggle{display:flex;gap:.5rem;margin-bottom:1rem;background:#f3f4f6;padding:4px;border-radius:8px}
+.mode-btn{flex:1;padding:8px;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:#6b7280;transition:all .15s;font-family:inherit}
+.mode-btn.active{background:#fff;color:#1a2744;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.portfolio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:.875rem 0}
+.portfolio-card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:.875rem;font-size:13px;cursor:pointer;transition:border-color .15s}
+.portfolio-card:hover{border-color:#1a2744}
+.portfolio-card .p-name{font-weight:600;color:#111;margin-bottom:2px}
+.portfolio-card .p-email{color:#6b7280;font-size:12px;margin-bottom:.5rem;word-break:break-all}
+.portfolio-card .p-value{font-size:15px;font-weight:700;color:#111}
+.portfolio-card .p-gain{font-size:12px;font-weight:600}
+.portfolio-card .p-gain.up{color:#16a34a}.portfolio-card .p-gain.dn{color:#dc2626}
+.nav-row{display:flex;align-items:center;justify-content:space-between;margin:.75rem 0}
+.nav-row button{padding:7px 16px;font-size:13px;border-radius:6px;cursor:pointer;border:1px solid #d1d5db;background:#fff;font-family:inherit}
+.nav-row button:disabled{opacity:.4;cursor:not-allowed}
+.progress-bar-wrap{width:100%;background:#e5e7eb;border-radius:4px;height:6px;margin:.5rem 0;overflow:hidden}
+.progress-bar-fill{height:100%;background:#1a2744;border-radius:4px;transition:width .3s ease}
 </style>
 </head>
 <body>
+
+<div class="app-header">
+  <div class="app-header-inner">
+    <div class="app-logo">
+      <div class="app-logo-mark"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="1,14 5,8 9,11 13,4 17,7" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div><div class="app-logo-name">Sokoview</div><div class="app-logo-sub">Email Suite</div></div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('daily')" id="tab-daily">📈 Daily Market</button>
+      <button class="tab-btn" onclick="switchTab('monthly')" id="tab-monthly">📊 Monthly Portfolio</button>
+    </div>
+  </div>
+</div>
+
+<div class="tab-pane active" id="pane-daily">
 <div class="wrap">
 
   <!-- HEADER -->
@@ -265,7 +292,253 @@ iframe{width:100%;min-height:560px;border:none;display:block}
   </div>
 
 </div>
+</div>
+
+<div class="tab-pane" id="pane-monthly">
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:10px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:40px;height:40px;background:#1a2744;border-radius:10px;display:flex;align-items:center;justify-content:center">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><polyline points="1,17 6,9 11,13 16,5 21,8" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div style="font-weight:700;font-size:18px;color:#1a2744">Sokoview</div>
+        <div style="font-size:12px;color:#6b7280">Monthly Portfolio Performance Emailer</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="badge b-amber" id="m-modeBadge">TEST MODE</span>
+      <span class="badge b-blue">Mailchimp</span>
+    </div>
+  </div>
+
+  <!-- STEPS -->
+  <div class="steps">
+    <div class="step"><div class="dot active" id="m-d1">1</div><div class="step-lbl active" id="m-sl1">Configure</div></div>
+    <div class="step"><div class="dot" id="m-d2">2</div><div class="step-lbl" id="m-sl2">Collect Data</div></div>
+    <div class="step"><div class="dot" id="m-d3">3</div><div class="step-lbl" id="m-sl3">Preview</div></div>
+    <div class="step"><div class="dot" id="m-d4">4</div><div class="step-lbl" id="m-sl4">Send</div></div>
+  </div>
+
+  <!-- S1: CONFIGURE -->
+  <div id="m-s1">
+    <div class="card">
+      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:1rem">API keys</div>
+      <label>Anthropic API key</label>
+      <input type="password" id="m-anthroKey" placeholder="sk-ant-api03-..."/>
+      <div class="hint">console.anthropic.com → API Keys</div>
+      <hr class="divider"/>
+      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:1rem">Mailchimp</div>
+      <label>Mailchimp API key</label>
+      <input type="password" id="m-mcKey" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1"/>
+      <div class="hint">Mailchimp → Account → Extras → API keys</div>
+      <label>Audience / List ID</label>
+      <input type="text" id="m-mcList" placeholder="e.g. a1b2c3d4e5"/>
+      <div class="hint">Mailchimp → Audience → Settings → Audience name and defaults</div>
+      <div class="row2">
+        <div>
+          <label>From name</label>
+          <input type="text" id="m-fromName" value="Sokoview Analytics"/>
+        </div>
+        <div>
+          <label>Verified reply-to email</label>
+          <input type="text" id="m-replyTo" placeholder="you@yourdomain.com"/>
+        </div>
+      </div>
+      <hr class="divider"/>
+      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Test mode</div>
+      <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">In test mode, emails are sent only to your address — not to subscribers. Always test before going live.</div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="m-modeTestBtn" onclick="m_setMode('test')">🔒 Test mode — send to me only</button>
+        <button class="mode-btn" id="m-modeLiveBtn" onclick="m_setMode('live')">🚀 Live mode — send to all subscribers</button>
+      </div>
+      <div id="m-testEmailWrap">
+        <label>Your test email address</label>
+        <input type="email" id="m-testEmail" placeholder="your@email.com"/>
+        <div class="hint">Emails will only go here during test mode</div>
+      </div>
+      <div id="m-liveWarning" style="display:none" class="warn">
+        ⚠️ Live mode will send personalised emails to ALL subscribers in your Mailchimp audience. Make sure you have previewed and approved emails first.
+      </div>
+    </div>
+
+    <div class="card" style="background:#f8fafc;border-color:#e2e8f0">
+      <div style="font-weight:600;font-size:13px;color:#1a2744;margin-bottom:.75rem">What this tool does</div>
+      <div style="display:grid;gap:8px">
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="min-width:22px;height:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">1</div><span style="font-size:13px;color:#6b7280">You run a bookmarklet on your Sokoview admin to collect all portfolio data</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="min-width:22px;height:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">2</div><span style="font-size:13px;color:#6b7280">Claude generates a personalised monthly performance email for each subscriber</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><div style="min-width:22px;height:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">3</div><span style="font-size:13px;color:#6b7280">Preview each email, test with your own address, then send to all subscribers</span></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" onclick="m_goS(2)">
+      Continue → Set up data collection
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <!-- S2: COLLECT DATA -->
+  <div id="m-s2" style="display:none">
+    <div class="card">
+      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 1 — Install the bookmarklet</div>
+      <div style="font-size:13px;color:#6b7280;margin-bottom:1rem">Drag the button below to your browser bookmarks bar. You only need to do this once.</div>
+      <div style="text-align:center;margin:1rem 0">
+        <a id="m-bookmarkletLink" href="#" class="btn btn-amber" style="text-decoration:none;display:inline-flex" draggable="true">
+          📊 Sokoview — Collect Portfolios
+        </a>
+        <div style="font-size:12px;color:#9ca3af;margin-top:.5rem">← Drag this to your bookmarks bar</div>
+      </div>
+      <hr class="divider"/>
+      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 2 — Run it on your admin panel</div>
+      <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">
+        <ol style="margin-left:1.25rem;display:grid;gap:5px">
+          <li>Open <strong>sokoview.co.tz/admin/portfolios</strong> in your browser (make sure you're logged in)</li>
+          <li>Click the <strong>📊 Sokoview — Collect Portfolios</strong> bookmark you just added</li>
+          <li>A panel will appear — click <strong>"Collect all portfolios"</strong> and wait for it to finish</li>
+          <li>Click <strong>"Download JSON"</strong> — this saves <code>sokoview-portfolios.json</code></li>
+        </ol>
+      </div>
+      <hr class="divider"/>
+      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 3 — Upload the JSON file</div>
+      <div style="border:2px dashed #d1d5db;border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:all .2s;background:#fafafa" id="m-dropZone" onclick="document.getElementById('jsonInput').click()">
+        <input type="file" id="m-jsonInput" accept=".json,application/json" style="display:none" onchange="m_handleJson(this.files[0])"/>
+        <div style="font-size:36px;margin-bottom:.5rem">📂</div>
+        <div style="font-weight:600;color:#374151;margin-bottom:4px" id="m-dropText">Click to upload sokoview-portfolios.json</div>
+        <div style="font-size:12px;color:#9ca3af">or drag and drop</div>
+      </div>
+      <div class="err" id="m-jsonErr"></div>
+      <div class="ok" id="m-jsonOk"></div>
+    </div>
+    <button class="back-btn" onclick="m_goS(1)">← Back to configuration</button>
+  </div>
+
+  <!-- S3: PREVIEW -->
+  <div id="m-s3" style="display:none">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:1rem">
+        <div>
+          <div style="font-weight:600;font-size:15px;color:#1a2744">Portfolio data loaded</div>
+          <div style="font-size:12px;color:#9ca3af" id="m-dataInfo"></div>
+        </div>
+        <span class="badge b-amber" id="m-modeLabel">TEST MODE</span>
+      </div>
+      <div id="m-portfolioGrid" class="portfolio-grid"></div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Email preview</div>
+      <div style="font-size:13px;color:#6b7280;margin-bottom:1rem">Browse through personalised emails — each one is unique to that subscriber's portfolio.</div>
+
+      <div class="nav-row">
+        <button id="m-prevBtn" onclick="m_navigate(-1)" disabled>← Previous</button>
+        <span class="counter" id="m-navCounter">1 of 0</span>
+        <button id="m-nextBtn" onclick="m_navigate(1)">Next →</button>
+      </div>
+
+      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:.875rem;margin-bottom:.875rem;font-size:13px">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+          <span><strong id="m-previewName">—</strong> <span id="m-previewEmail" style="color:#6b7280"></span></span>
+          <span>Portfolio: <strong id="m-previewValue" style="color:#1a2744">—</strong> &nbsp; Gain: <strong id="m-previewGain">—</strong></span>
+        </div>
+      </div>
+
+      <div id="m-genStatus" style="display:none;text-align:center;padding:1rem">
+        <div class="status-row" style="justify-content:center">
+          <div class="spin"></div>
+          <span id="m-genMsg">Generating personalised email...</span>
+        </div>
+        <div class="progress-bar-wrap" style="max-width:300px;margin:.5rem auto"><div class="progress-bar-fill" id="m-genProgress" style="width:0%"></div></div>
+      </div>
+
+      <div class="preview-wrap" id="m-previewWrap">
+        <iframe id="m-previewFrame" sandbox="allow-same-origin" title="Email preview"></iframe>
+      </div>
+
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+        <button class="btn btn-outline" onclick="m_regenerateCurrent()">↻ Regenerate this email</button>
+        <button class="btn btn-primary" style="flex:1" onclick="m_goSend()">
+          Ready to send →
+        </button>
+      </div>
+    </div>
+    <button class="back-btn" onclick="m_goS(2)">← Back to data collection</button>
+  </div>
+
+  <!-- S4: SEND -->
+  <div id="m-s4" style="display:none">
+    <div id="m-sendCard" class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+        <div style="font-weight:600;font-size:15px;color:#1a2744">Ready to send</div>
+        <span class="badge" id="m-sendModeBadge">TEST MODE</span>
+      </div>
+
+      <div id="m-testModeInfo" class="warn" style="margin-bottom:1rem">
+        🔒 <strong>Test mode:</strong> Only 1 email will be sent — to <strong id="m-testEmailDisplay"></strong>. It will show Nyemo's portfolio as a sample.
+      </div>
+      <div id="m-liveModeInfo" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-bottom:1rem;color:#991b1b">
+        🚀 <strong>Live mode:</strong> <strong id="m-liveCount">0</strong> personalised emails will be sent — one per subscriber.
+      </div>
+
+      <div class="review-box">
+        <div class="review-row"><span style="color:#6b7280">From name</span><span style="font-weight:600" id="m-rvFrom"></span></div>
+        <div class="review-row"><span style="color:#6b7280">Reply-to</span><span style="font-weight:600" id="m-rvReply"></span></div>
+        <div class="review-row"><span style="color:#6b7280">Subject</span><span style="font-weight:600" id="m-rvSubject"></span></div>
+        <div class="review-row"><span style="color:#6b7280">Portfolios</span><span style="font-weight:600" id="m-rvCount"></span></div>
+        <div class="review-row"><span style="color:#6b7280">Month</span><span style="font-weight:600" id="m-rvMonth"></span></div>
+      </div>
+
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.75rem">
+        <button class="btn btn-outline" id="m-testMcBtn" onclick="m_testMailchimp()">Test Mailchimp connection</button>
+        <button class="btn btn-primary" style="flex:1" id="m-sendBtn" onclick="m_doSend()">
+          Send now
+        </button>
+      </div>
+
+      <div class="status-row" id="m-sendStatusRow">
+        <div class="spin"></div><span id="m-sendMsg"></span>
+      </div>
+      <div class="progress-bar-wrap" id="m-sendProgressWrap" style="display:none">
+        <div class="progress-bar-fill" id="m-sendProgress" style="width:0%"></div>
+      </div>
+      <div style="font-size:12px;color:#9ca3af;text-align:center" id="m-sendDetail"></div>
+
+      <div class="err" id="m-sendErr"></div>
+      <div class="ok" id="m-sendOk"></div>
+      <div class="debug" id="m-sendDebug"></div>
+    </div>
+
+    <div id="m-successBox" style="display:none" class="success">
+      <div style="width:56px;height:56px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .875rem">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><polyline points="5,14 11,20 23,8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="font-weight:700;font-size:18px;color:#166534;margin-bottom:.25rem" id="m-successTitle">Emails sent!</div>
+      <div style="color:#15803d;font-size:13px;margin-bottom:1.5rem" id="m-successMsg"></div>
+      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="m_setMode('live');m_goS(4)">Switch to live mode & send</button>
+        <button class="btn btn-outline" onclick="m_resetSend()">Back to preview</button>
+      </div>
+    </div>
+
+    <button class="back-btn" id="m-backToPreview" onclick="m_goS(3)">← Back to preview</button>
+  </div>
+
+</div>
+</div>
+
 <script>
+// ── TAB SWITCHER ──
+function switchTab(t){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pane-'+t).classList.add('active');
+  document.getElementById('tab-'+t).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── TAB 1: DAILY MARKET EMAIL ──
+
 let mkt = {}, emailHtml = '', emailSubject = '', pdfB64 = '';
 
 function goS(n) {
@@ -869,6 +1142,512 @@ function resetAll() {
   document.getElementById('sendDebug').style.display = 'none';
   goS(2);
 }
+
+
+// ── TAB 2: MONTHLY PORTFOLIO ──
+
+// ── STATE ──
+let mode = 'test';
+let portfolios = [];     // [{firstName,lastName,email,totalValue,invested,gainPct,holdingsCount,portfolioId}]
+let emails = {};         // { email: { subject, html } }
+let currentIdx = 0;
+let monthLabel = '';
+
+const MONTH = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+
+// ── BOOKMARKLET ──
+function m_buildBookmarklet() {
+  const code = `(function(){
+if(document.getElementById('skv-collector')){return;}
+var d=document.createElement('div');
+d.id='skv-collector';
+d.style='position:fixed;top:20px;right:20px;z-index:999999;background:#1a2744;color:#fff;border-radius:12px;padding:1.25rem 1.5rem;width:320px;font-family:system-ui,sans-serif;font-size:14px;box-shadow:0 8px 32px rgba(0,0,0,.4)';
+d.innerHTML='<div style="font-weight:700;font-size:16px;color:#f59e0b;margin-bottom:.5rem">📊 Sokoview Collector</div><div id="skv-status" style="font-size:13px;color:#94a3b8;margin-bottom:1rem">Ready to collect all portfolios</div><div id="skv-progress" style="height:4px;background:#334155;border-radius:2px;margin-bottom:1rem;display:none"><div id="skv-bar" style="height:100%;background:#f59e0b;border-radius:2px;width:0%;transition:width .3s"></div></div><button id="skv-start" onclick="m_skvCollect()" style="background:#f59e0b;color:#1a2744;border:none;padding:9px 18px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;margin-bottom:8px">Collect all portfolios</button><button id="skv-download" onclick="skvDownload()" disabled style="background:#22c55e;color:#fff;border:none;padding:9px 18px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;display:none">Download JSON</button><button onclick="document.getElementById(\'skv-collector\').remove()" style="background:transparent;color:#64748b;border:none;cursor:pointer;font-size:12px;margin-top:8px;width:100%">Close</button>';
+document.body.appendChild(d);
+
+window._skvData=[];
+
+async function m_skvCollect(){
+  document.getElementById('skv-start').disabled=true;
+  document.getElementById('skv-progress').style.display='block';
+  var s=document.getElementById('skv-status');
+  var bar=document.getElementById('skv-bar');
+
+  function m_extractRows(){
+    var rows=document.querySelectorAll('table tbody tr');
+    var items=[];
+    rows.forEach(function(row){
+      var nameEl=row.querySelector('td:first-child');
+      if(!nameEl) return;
+      var lines=nameEl.innerText.trim().split('\\n').map(function(l){return l.trim();}).filter(Boolean);
+      var fullName=lines[0]||'';
+      var email=lines[1]||'';
+      if(!email||!email.includes('@')) return;
+      var nameParts=fullName.trim().split(/\\s+/);
+      var cells=row.querySelectorAll('td');
+      var eyeLink=row.querySelector('a[href*="/portfolios/"]');
+      var portfolioId=(eyeLink?eyeLink.href:'').split('/portfolios/')[1]||'';
+      items.push({firstName:nameParts[0]||'',lastName:nameParts.slice(1).join(' ')||'',email:email.toLowerCase(),totalValue:cells[1]?cells[1].innerText.trim():'',invested:cells[2]?cells[2].innerText.trim():'',gainPct:cells[3]?cells[3].innerText.trim():'',holdingsCount:cells[4]?cells[4].innerText.trim():'',portfolioId:portfolioId});
+    });
+    return items;
+  }
+
+  function m_sleep(ms){return new Promise(function(r){setTimeout(r,ms)});}
+  function m_getPage(){var m=document.body.innerText.match(/Page (\\d+) of (\\d+)/);return m?{cur:parseInt(m[1]),total:parseInt(m[2])}:{cur:1,total:1};}
+  function m_clickNext(){var btns=Array.from(document.querySelectorAll('button'));var nb=btns.find(function(b){return b.innerText.trim()==='Next';});if(nb&&!nb.disabled){nb.click();return true;}return false;}
+
+  // Set 50 rows per page
+  var rppBtns=Array.from(document.querySelectorAll('button,div,span')).find(function(el){return el.innerText.trim()==='50';});
+  if(rppBtns) rppBtns.click();
+  await m_sleep(1200);
+
+  var pg=m_getPage();
+  s.textContent='Collecting page 1 of '+pg.total+'...';
+  window._skvData=m_extractRows();
+  var lastPage=1;
+
+  for(var p=2;p<=pg.total+1;p++){
+    if(!m_clickNext()) break;
+    await m_sleep(1000);
+    var info=m_getPage();
+    if(info.cur===lastPage) break;
+    lastPage=info.cur;
+    var newRows=m_extractRows();
+    var existing=new Set(window._skvData.map(function(u){return u.email;}));
+    newRows.filter(function(u){return !existing.has(u.email);}).forEach(function(u){window._skvData.push(u);});
+    s.textContent='Collecting page '+info.cur+' of '+info.total+'... ('+window._skvData.length+' portfolios)';
+    bar.style.width=Math.round((info.cur/info.total)*100)+'%';
+  }
+
+  bar.style.width='100%';
+  s.innerHTML='<span style="color:#4ade80">✓ Collected '+window._skvData.length+' portfolios!</span>';
+  var dl=document.getElementById('skv-download');
+  dl.style.display='block';
+  dl.disabled=false;
+}
+
+window.m_skvCollect=m_skvCollect;
+window.skvDownload=function(){
+  var json=JSON.stringify({collectedAt:new Date().toISOString(),month:'${MONTH}',portfolios:window._skvData},null,2);
+  var blob=new Blob([json],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='sokoview-portfolios.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+})();`;
+  return 'javascript:' + encodeURIComponent(code);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  monthLabel = MONTH;
+  const link = document.getElementById('m-bookmarkletLink');
+  link.href = m_buildBookmarklet();
+  link.setAttribute('href', m_buildBookmarklet());
+});
+
+// ── NAVIGATION ──
+function m_goS(n) {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('s' + i).style.display = i === n ? 'block' : 'none';
+    const dot = document.getElementById('d' + i);
+    const lbl = document.getElementById('sl' + i);
+    dot.className = 'dot' + (i < n ? ' done' : i === n ? ' active' : '');
+    dot.textContent = i < n ? '✓' : i;
+    if (lbl) lbl.className = 'step-lbl' + (i === n ? ' active' : '');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function m_setMode(m) {
+  mode = m;
+  document.getElementById('m-modeTestBtn').className = 'mode-btn' + (m === 'test' ? ' active' : '');
+  document.getElementById('m-modeLiveBtn').className = 'mode-btn' + (m === 'live' ? ' active' : '');
+  document.getElementById('m-testEmailWrap').style.display = m === 'test' ? 'block' : 'none';
+  document.getElementById('m-liveWarning').style.display = m === 'live' ? 'block' : 'none';
+  document.getElementById('m-modeBadge').textContent = m === 'test' ? 'TEST MODE' : 'LIVE MODE';
+  document.getElementById('m-modeBadge').className = 'badge ' + (m === 'test' ? 'b-amber' : 'b-red');
+}
+
+// Drag and drop for JSON
+const dz = document.getElementById('m-dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor = '#1a2744'; });
+dz.addEventListener('dragleave', () => { dz.style.borderColor = '#d1d5db'; });
+dz.addEventListener('drop', e => { e.preventDefault(); dz.style.borderColor = '#d1d5db'; m_handleJson(e.dataTransfer.files[0]); });
+
+function m_handleJson(file) {
+  if (!file || !file.name.endsWith('.json')) { m_showMsg('jsonErr', 'Please upload a .json file'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      portfolios = data.portfolios || data;
+      if (!Array.isArray(portfolios) || !portfolios.length) throw new Error('No portfolio data found');
+      monthLabel = data.month || MONTH;
+
+      // Dedupe by email
+      const seen = new Set();
+      portfolios = portfolios.filter(p => {
+        if (seen.has(p.email)) return false;
+        seen.add(p.email); return true;
+      });
+
+      document.getElementById('m-jsonErr').style.display = 'none';
+      m_showOk('jsonOk', '✓ Loaded ' + portfolios.length + ' portfolios from ' + (data.month || MONTH));
+      dz.style.borderColor = '#22c55e';
+      document.getElementById('m-dropText').textContent = '✓ ' + file.name + ' (' + portfolios.length + ' portfolios)';
+      setTimeout(() => { m_renderPreview(); m_goS(3); }, 600);
+    } catch(err) {
+      m_showMsg('jsonErr', 'Error reading file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── PREVIEW ──
+function m_renderPreview() {
+  const mo = monthLabel || MONTH;
+  document.getElementById('m-dataInfo').textContent = portfolios.length + ' portfolios · ' + mo;
+  document.getElementById('m-liveCount').textContent = portfolios.length;
+  document.getElementById('m-rvCount').textContent = portfolios.length + ' portfolios';
+  document.getElementById('m-rvMonth').textContent = mo;
+  document.getElementById('m-modeLabel').textContent = mode === 'test' ? 'TEST MODE' : 'LIVE MODE';
+  document.getElementById('m-modeLabel').className = 'badge ' + (mode === 'test' ? 'b-amber' : 'b-red');
+
+  // Portfolio grid (show first 6)
+  const grid = document.getElementById('m-portfolioGrid');
+  const show = portfolios.slice(0, 6);
+  grid.innerHTML = show.map((p, i) => {
+    const up = p.gainPct && p.gainPct.includes('+');
+    const dn = p.gainPct && p.gainPct.includes('-');
+    return `<div class="portfolio-card" onclick="m_jumpTo(${i})" style="cursor:pointer">
+      <div class="name">${p.firstName} ${p.lastName}</div>
+      <div class="email">${p.email}</div>
+      <div class="value">${p.totalValue || '—'}</div>
+      <div class="gain ${up?'up':dn?'dn':''}">${p.gainPct || '—'} since inception</div>
+    </div>`;
+  }).join('') + (portfolios.length > 6 ? `<div class="portfolio-card" style="display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:13px">+${portfolios.length-6} more</div>` : '');
+
+  currentIdx = 0;
+  m_showEmailForIdx(0);
+}
+
+function m_jumpTo(i) { currentIdx = i; m_showEmailForIdx(i); }
+function m_navigate(dir) {
+  currentIdx = Math.max(0, Math.min(portfolios.length - 1, currentIdx + dir));
+  m_showEmailForIdx(currentIdx);
+}
+
+async function m_showEmailForIdx(idx) {
+  const p = portfolios[idx];
+  if (!p) return;
+  m_updateNav(idx);
+  document.getElementById('m-previewName').textContent = p.firstName + ' ' + p.lastName;
+  document.getElementById('m-previewEmail').textContent = '· ' + p.email;
+  document.getElementById('m-previewValue').textContent = p.totalValue || '—';
+  document.getElementById('m-previewGain').textContent = p.gainPct || '—';
+  const gainEl = document.getElementById('m-previewGain');
+  gainEl.style.color = p.gainPct?.includes('+') ? '#16a34a' : p.gainPct?.includes('-') ? '#dc2626' : '#111';
+
+  if (emails[p.email]) {
+    document.getElementById('m-previewFrame').srcdoc = emails[p.email].html;
+    return;
+  }
+  await m_generateEmail(p, idx);
+}
+
+function m_updateNav(idx) {
+  document.getElementById('m-navCounter').textContent = (idx + 1) + ' of ' + portfolios.length;
+  document.getElementById('m-prevBtn').disabled = idx === 0;
+  document.getElementById('m-nextBtn').disabled = idx === portfolios.length - 1;
+}
+
+async function m_generateEmail(p, idx) {
+  const key = document.getElementById('m-anthroKey').value.trim();
+  if (!key) { document.getElementById('m-previewFrame').srcdoc = '<p style="padding:2rem;font-family:sans-serif;color:#dc2626">Enter your Anthropic API key in step 1 first.</p>'; return; }
+
+  document.getElementById('m-genStatus').style.display = 'block';
+  document.getElementById('m-previewWrap').style.opacity = '.4';
+  const pct = Math.round(((idx + 1) / portfolios.length) * 100);
+  document.getElementById('m-genProgress').style.width = pct + '%';
+  document.getElementById('m-genMsg').textContent = 'Generating email for ' + p.firstName + '...';
+
+  const mo = monthLabel || MONTH;
+  const isUp = p.gainPct && p.gainPct.includes('+');
+  const isDn = p.gainPct && p.gainPct.includes('-');
+  const gainNum = parseFloat(p.gainPct) || 0;
+  const gainAbs = Math.abs(gainNum);
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 200,
+        system: 'DSE investment analyst. Write a warm, personalised 2-sentence monthly portfolio commentary. Be specific to their numbers. No bullet points. Friendly but professional.',
+        messages: [{ role: 'user', content: `Write commentary for ${p.firstName}'s portfolio for ${mo}: Total value ${p.totalValue}, invested ${p.invested}, overall gain ${p.gainPct}, ${p.holdingsCount} holdings. ${isUp ? 'Portfolio is in profit.' : isDn ? 'Portfolio is below cost.' : 'Portfolio is near breakeven.'}` }]
+      })
+    });
+    const d = await r.json();
+    const insight = d.content?.[0]?.text || `Your portfolio currently stands at ${p.totalValue} with a total return of ${p.gainPct} since inception.`;
+
+    emails[p.email] = { subject: `Your Sokoview Portfolio Update — ${mo}`, html: m_buildPortfolioEmail(p, insight, mo) };
+    document.getElementById('m-previewFrame').srcdoc = emails[p.email].html;
+  } catch(e) {
+    const insight = `Your portfolio currently stands at ${p.totalValue} with a total return of ${p.gainPct} since inception. You have ${p.holdingsCount} active holdings on the DSE.`;
+    emails[p.email] = { subject: `Your Sokoview Portfolio Update — ${mo}`, html: m_buildPortfolioEmail(p, insight, mo) };
+    document.getElementById('m-previewFrame').srcdoc = emails[p.email].html;
+  }
+
+  document.getElementById('m-genStatus').style.display = 'none';
+  document.getElementById('m-previewWrap').style.opacity = '1';
+}
+
+async function m_regenerateCurrent() {
+  const p = portfolios[currentIdx];
+  if (!p) return;
+  delete emails[p.email];
+  await m_showEmailForIdx(currentIdx);
+}
+
+// ── EMAIL BUILDER ──
+function m_buildPortfolioEmail(p, insight, mo) {
+  const isUp = p.gainPct && p.gainPct.includes('+');
+  const isDn = p.gainPct && p.gainPct.includes('-');
+  const gainClr = isUp ? '#16a34a' : isDn ? '#dc2626' : '#6b7280';
+  const gainBg = isUp ? '#dcfce7' : isDn ? '#fee2e2' : '#f3f4f6';
+  const gainTxt = isUp ? 'Gain' : isDn ? 'Loss' : 'Return';
+  const gainVal = p.gainPct || '—';
+
+  var h = '';
+  h += '<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>';
+  h += '<style>@media only screen and (max-width:600px){.wrap{padding:12px 8px!important}.header-td{padding:20px 16px!important}.kpi-table{display:block!important}.kpi-td{display:inline-block!important;width:48%!important;border-right:none!important;border-bottom:1px solid #f1f5f9!important}table{min-width:unset!important}td,th{padding:6px 8px!important;font-size:12px!important}}</style></head>';
+  h += '<body style="margin:0;padding:0;background:#f0f4f8;font-family:Arial,Helvetica,sans-serif">';
+  h += '<div class="wrap" style="max-width:600px;margin:0 auto;padding:20px 12px">';
+
+  // Header
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:12px 12px 0 0"><tr><td class="header-td" style="padding:26px 28px">';
+  h += '<div style="font-size:26px;font-weight:900;color:#f59e0b;letter-spacing:2px">SOKOVIEW</div>';
+  h += '<div style="font-size:12px;color:#94a3b8;margin-top:3px">Monthly Portfolio Performance &middot; ' + mo + '</div>';
+  h += '<div style="margin-top:16px"><a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 22px;border-radius:6px;text-decoration:none">View Live Portfolio &rarr;</a></div>';
+  h += '</td></tr></table>';
+
+  // Salutation + insight
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0"><tr><td style="padding:22px 24px">';
+  h += '<div style="font-size:16px;color:#111;margin-bottom:12px">Hi <strong>' + (p.firstName || '*|FNAME|*') + '</strong>,</div>';
+  h += '<div style="font-size:14px;color:#374151;line-height:1.8">' + insight + '</div>';
+  h += '</td></tr></table>';
+
+  // KPI Boxes
+  h += '<table class="kpi-table" width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr>';
+  h += '<td class="kpi-td" style="padding:14px 8px 14px 16px;width:33%;border-right:1px solid #f1f5f9;vertical-align:top">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Portfolio value</div>';
+  h += '<div style="font-size:16px;font-weight:700;color:#111">' + (p.totalValue || '—') + '</div>';
+  h += '</td>';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:33%;border-right:1px solid #f1f5f9;vertical-align:top">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Amount invested</div>';
+  h += '<div style="font-size:16px;font-weight:700;color:#111">' + (p.invested || '—') + '</div>';
+  h += '</td>';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:33%;vertical-align:top">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Total ' + gainTxt.toLowerCase() + '</div>';
+  h += '<div style="font-size:16px;font-weight:700;background:' + gainBg + ';color:' + gainClr + ';padding:4px 10px;border-radius:20px;display:inline-block">' + gainVal + '</div>';
+  h += '</td></tr></table>';
+
+  // Holdings count
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:14px 16px">';
+  h += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">';
+  h += '<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:3px">Active holdings</div>';
+  h += '<div style="font-size:20px;font-weight:700;color:#1a2744">' + (p.holdingsCount || '—') + ' <span style="font-size:13px;font-weight:400;color:#6b7280">stocks on the DSE</span></div></div>';
+  h += '<a href="https://sokoview.co.tz/dashboard/market" style="background:#f0f4ff;color:#1a2744;font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;text-decoration:none;white-space:nowrap">View all holdings &rarr;</a>';
+  h += '</div></td></tr></table>';
+
+  // Sokoview Insights
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px">';
+  h += '<div style="border-left:4px solid #f59e0b;padding:14px 16px;background:#fffbeb;border-radius:0 8px 8px 0">';
+  h += '<div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Sokoview Insights</div>';
+  h += '<div style="font-size:13px;color:#78350f;line-height:1.8">' + insight + '</div>';
+  h += '</div></td></tr></table>';
+
+  // CTA
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:20px 24px;text-align:center">';
+  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px">Ready to take action on your portfolio?</div>';
+  h += '<a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#1a2744;color:#fff;font-size:14px;font-weight:700;padding:13px 32px;border-radius:8px;text-decoration:none;letter-spacing:.03em">Open My Portfolio on Sokoview &rarr;</a>';
+  h += '</td></tr></table>';
+
+  // Sign off
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px 24px">';
+  h += '<div style="font-size:14px;color:#374151;margin-bottom:4px">Happy investing,</div>';
+  h += '<div style="font-size:14px;font-weight:700;color:#1a2744">The Sokoview Analytics Team</div>';
+  h += '</td></tr></table>';
+
+  // Footer
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:0 0 12px 12px"><tr><td style="padding:18px 24px;text-align:center">';
+  h += '<div style="font-size:15px;font-weight:700;color:#f59e0b;margin-bottom:4px">SOKOVIEW</div>';
+  h += '<div style="margin:12px 0"><a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 24px;border-radius:6px;text-decoration:none">Track Your Portfolio &rarr;</a></div>';
+  h += '<div style="font-size:12px;color:#94a3b8"><a href="https://sokoview.co.tz" style="color:#94a3b8;text-decoration:none">sokoview.co.tz</a> &nbsp;&middot;&nbsp; Data prepared by Sokoview Analytics</div>';
+  h += '<div style="font-size:11px;color:#475569;margin-top:8px">You received this because you have a Sokoview account. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
+  h += '</td></tr></table>';
+
+  h += '</div></body></html>';
+  return h;
+}
+
+// ── SEND ──
+function m_goSend() {
+  const mo = monthLabel || MONTH;
+  const te = document.getElementById('m-testEmail').value.trim();
+  document.getElementById('m-rvFrom').textContent = document.getElementById('m-fromName').value;
+  document.getElementById('m-rvReply').textContent = document.getElementById('m-replyTo').value;
+  document.getElementById('m-rvSubject').textContent = 'Your Sokoview Portfolio Update — ' + mo;
+  document.getElementById('m-sendModeBadge').textContent = mode === 'test' ? 'TEST MODE' : 'LIVE MODE';
+  document.getElementById('m-sendModeBadge').className = 'badge ' + (mode === 'test' ? 'b-amber' : 'b-red');
+  document.getElementById('m-testModeInfo').style.display = mode === 'test' ? 'block' : 'none';
+  document.getElementById('m-liveModeInfo').style.display = mode === 'live' ? 'block' : 'none';
+  document.getElementById('m-testEmailDisplay').textContent = te || '(no test email set)';
+  m_goS(4);
+}
+
+function m_mcInfo() {
+  const k = document.getElementById('m-mcKey').value.trim();
+  const dcM = k.match(/-([a-z]+[0-9]+)$/);
+  const dc = dcM ? dcM[1] : 'us1';
+  return { key: k, list: document.getElementById('m-mcList').value.trim(), from: document.getElementById('m-fromName').value.trim(), reply: document.getElementById('m-replyTo').value.trim(), base: `https://${dc}.api.mailchimp.com/3.0`, auth: 'Basic ' + btoa('anystring:' + k) };
+}
+
+async function m_mcCall(action, data) {
+  const r = await fetch('/.netlify/functions/mc', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mcKey: m_mcInfo().key, action, data: data || {} }) });
+  let json = {}; try { json = await r.json(); } catch {}
+  return { status: r.status, ok: r.ok, json };
+}
+
+async function m_testMailchimp() {
+  const { key, list } = m_mcInfo();
+  if (!key) { m_showMsg('sendErr', 'Enter your Mailchimp API key in step 1.'); return; }
+  document.getElementById('m-testMcBtn').disabled = true;
+  document.getElementById('m-sendErr').style.display = 'none';
+  document.getElementById('m-sendOk').style.display = 'none';
+  document.getElementById('m-sendStatusRow').style.display = 'flex';
+  document.getElementById('m-sendMsg').textContent = 'Testing Mailchimp...';
+  try {
+    const ping = await m_mcCall('ping');
+    if (ping.status === 401) throw new Error('Invalid API key (401).');
+    if (!ping.ok) throw new Error('Ping failed: ' + (ping.json.detail || ping.status));
+    if (list) {
+      const lr = await m_mcCall('getList', { listId: list });
+      if (!lr.ok) throw new Error('Audience "' + list + '" not found.');
+      m_showOk('sendOk', '✓ Connected to Mailchimp — Audience: "' + (lr.json.name || list) + '" · ' + (lr.json.stats?.member_count || '?') + ' subscribers');
+    } else {
+      m_showOk('sendOk', '✓ API key valid. Enter your Audience ID to continue.');
+    }
+  } catch(e) {
+    m_showMsg('sendErr', e.message);
+  }
+  document.getElementById('m-sendStatusRow').style.display = 'none';
+  document.getElementById('m-testMcBtn').disabled = false;
+}
+
+async function m_doSend() {
+  const { from, reply } = m_mcInfo();
+  const te = document.getElementById('m-testEmail').value.trim();
+  const mo = monthLabel || MONTH;
+
+  if (mode === 'test' && !te) { m_showMsg('sendErr', 'Enter a test email address in step 1.'); return; }
+
+  document.getElementById('m-sendBtn').disabled = true;
+  document.getElementById('m-testMcBtn').disabled = true;
+  document.getElementById('m-sendErr').style.display = 'none';
+  document.getElementById('m-sendOk').style.display = 'none';
+  document.getElementById('m-sendStatusRow').style.display = 'flex';
+  document.getElementById('m-sendProgressWrap').style.display = 'block';
+
+  const toSend = mode === 'test' ? [portfolios[0]] : portfolios;
+  let sent = 0, failed = 0;
+
+  for (let i = 0; i < toSend.length; i++) {
+    const p = toSend[i];
+    const pct = Math.round(((i + 1) / toSend.length) * 100);
+    document.getElementById('m-sendProgress').style.width = pct + '%';
+    document.getElementById('m-sendMsg').textContent = mode === 'test' ? 'Sending test email...' : `Sending ${i + 1} of ${toSend.length}...`;
+    document.getElementById('m-sendDetail').textContent = mode === 'test' ? te : p.email;
+
+    // Build email if not already generated
+    if (!emails[p.email]) {
+      const insight = `Your portfolio stands at ${p.totalValue} with a total return of ${p.gainPct} since inception. You have ${p.holdingsCount} active holdings on the DSE.`;
+      emails[p.email] = { subject: `Your Sokoview Portfolio Update — ${mo}`, html: m_buildPortfolioEmail(p, insight, mo) };
+    }
+
+    const recipient = mode === 'test' ? te : p.email;
+    const firstName = mode === 'test' ? (p.firstName || 'Subscriber') : (p.firstName || 'Subscriber');
+
+    try {
+      // Create campaign
+      const cr = await m_mcCall('createCampaign', {
+        payload: {
+          type: 'regular',
+          recipients: { list_id: m_mcInfo().list, segment_opts: mode === 'test' ? undefined : { saved_segment_id: undefined } },
+          settings: { subject_line: emails[p.email].subject, preview_text: 'Your personalised monthly portfolio update from Sokoview Analytics', from_name: from, reply_to: reply, title: 'Portfolio — ' + p.email + ' — ' + mo }
+        }
+      });
+      if (!cr.json.id) throw new Error(cr.json.detail || 'Campaign creation failed');
+
+      // Upload content
+      await m_mcCall('setContent', { campaignId: cr.json.id, content: { html: emails[p.email].html.replace('*|FNAME|*', firstName) } });
+
+      // For test mode — send to test email via segment
+      // For live mode — we need to target specific subscriber
+      // Both modes: send the campaign
+      const sr = await m_mcCall('sendCampaign', { campaignId: cr.json.id });
+      if (sr.status === 204) sent++;
+      else throw new Error(sr.json.detail || 'Send failed');
+
+      // Small delay to avoid rate limiting
+      if (i < toSend.length - 1) await new Promise(r => setTimeout(r, 800));
+    } catch(e) {
+      failed++;
+      console.error('Failed for', p.email, e.message);
+    }
+  }
+
+  document.getElementById('m-sendStatusRow').style.display = 'none';
+  document.getElementById('m-sendProgressWrap').style.display = 'none';
+  document.getElementById('m-sendBtn').disabled = false;
+  document.getElementById('m-testMcBtn').disabled = false;
+  document.getElementById('m-sendDetail').textContent = '';
+
+  if (mode === 'test') {
+    document.getElementById('m-sendCard').style.display = 'none';
+    document.getElementById('m-successBox').style.display = 'block';
+    document.getElementById('m-backToPreview').style.display = 'none';
+    document.getElementById('m-successTitle').textContent = 'Test email sent!';
+    document.getElementById('m-successMsg').textContent = `A sample portfolio email was sent to ${te}. Check your inbox, then switch to live mode to send to all ${portfolios.length} subscribers.`;
+  } else {
+    document.getElementById('m-sendCard').style.display = 'none';
+    document.getElementById('m-successBox').style.display = 'block';
+    document.getElementById('m-backToPreview').style.display = 'none';
+    document.getElementById('m-successTitle').textContent = `${sent} emails sent!`;
+    document.getElementById('m-successMsg').textContent = `Monthly portfolio updates sent to ${sent} subscribers.${failed > 0 ? ` ${failed} failed.` : ''}`;
+    // Hide the "switch to live" button since we're already live
+    document.querySelector('#successBox button').style.display = 'none';
+  }
+}
+
+function m_resetSend() {
+  document.getElementById('m-sendCard').style.display = 'block';
+  document.getElementById('m-successBox').style.display = 'none';
+  document.getElementById('m-backToPreview').style.display = 'inline-flex';
+  m_goS(3);
+}
+
+function m_showMsg(id, msg) { const e = document.getElementById(id); e.style.display = 'block'; e.textContent = msg; }
+function m_showOk(id, msg) { const e = document.getElementById(id); e.style.display = 'block'; e.textContent = msg; }
+
+
+window.addEventListener('load',function(){
+  var l=document.getElementById('m-bookmarkletLink');
+  if(l) l.href=m_buildBookmarklet();
+});
 </script>
 </body>
 </html>
