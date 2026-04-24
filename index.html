@@ -1153,7 +1153,7 @@ let emails = {};         // { email: { subject, html } }
 let currentIdx = 0;
 let monthLabel = '';
 
-const MONTH = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+const m_MONTH = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
 // ── BOOKMARKLET ──
 function m_buildBookmarklet() {
@@ -1228,7 +1228,7 @@ async function m_skvCollect(){
 
 window.m_skvCollect=m_skvCollect;
 window.skvDownload=function(){
-  var json=JSON.stringify({collectedAt:new Date().toISOString(),month:'${MONTH}',portfolios:window._skvData},null,2);
+  var json=JSON.stringify({collectedAt:new Date().toISOString(),month:'${m_MONTH}',portfolios:window._skvData},null,2);
   var blob=new Blob([json],{type:'application/json'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
@@ -1241,7 +1241,7 @@ window.skvDownload=function(){
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  monthLabel = MONTH;
+  monthLabel = m_MONTH;
   const link = document.getElementById('m-bookmarkletLink');
   link.href = m_buildBookmarklet();
   link.setAttribute('href', m_buildBookmarklet());
@@ -1271,10 +1271,10 @@ function m_setMode(m) {
 }
 
 // Drag and drop for JSON
-const dz = document.getElementById('m-dropZone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor = '#1a2744'; });
-dz.addEventListener('dragleave', () => { dz.style.borderColor = '#d1d5db'; });
-dz.addEventListener('drop', e => { e.preventDefault(); dz.style.borderColor = '#d1d5db'; m_handleJson(e.dataTransfer.files[0]); });
+const mDz = document.getElementById('m-dropZone');
+mDz.addEventListener('dragover', e => { e.preventDefault(); mDz.style.borderColor = '#1a2744'; });
+mDz.addEventListener('dragleave', () => { mDz.style.borderColor = '#d1d5db'; });
+mDz.addEventListener('drop', e => { e.preventDefault(); mDz.style.borderColor = '#d1d5db'; m_handleJson(e.dataTransfer.files[0]); });
 
 function m_handleJson(file) {
   if (!file || !file.name.endsWith('.json')) { m_showMsg('jsonErr', 'Please upload a .json file'); return; }
@@ -1284,7 +1284,7 @@ function m_handleJson(file) {
       const data = JSON.parse(e.target.result);
       portfolios = data.portfolios || data;
       if (!Array.isArray(portfolios) || !portfolios.length) throw new Error('No portfolio data found');
-      monthLabel = data.month || MONTH;
+      monthLabel = data.month || m_MONTH;
 
       // Dedupe by email
       const seen = new Set();
@@ -1294,8 +1294,8 @@ function m_handleJson(file) {
       });
 
       document.getElementById('m-jsonErr').style.display = 'none';
-      m_showOk('jsonOk', '✓ Loaded ' + portfolios.length + ' portfolios from ' + (data.month || MONTH));
-      dz.style.borderColor = '#22c55e';
+      m_showOk('jsonOk', '✓ Loaded ' + portfolios.length + ' portfolios from ' + (data.month || m_MONTH));
+      mDz.style.borderColor = '#22c55e';
       document.getElementById('m-dropText').textContent = '✓ ' + file.name + ' (' + portfolios.length + ' portfolios)';
       setTimeout(() => { m_renderPreview(); m_goS(3); }, 600);
     } catch(err) {
@@ -1307,7 +1307,7 @@ function m_handleJson(file) {
 
 // ── PREVIEW ──
 function m_renderPreview() {
-  const mo = monthLabel || MONTH;
+  const mo = monthLabel || m_MONTH;
   document.getElementById('m-dataInfo').textContent = portfolios.length + ' portfolios · ' + mo;
   document.getElementById('m-liveCount').textContent = portfolios.length;
   document.getElementById('m-rvCount').textContent = portfolios.length + ' portfolios';
@@ -1373,7 +1373,7 @@ async function m_generateEmail(p, idx) {
   document.getElementById('m-genProgress').style.width = pct + '%';
   document.getElementById('m-genMsg').textContent = 'Generating email for ' + p.firstName + '...';
 
-  const mo = monthLabel || MONTH;
+  const mo = monthLabel || m_MONTH;
   const isUp = p.gainPct && p.gainPct.includes('+');
   const isDn = p.gainPct && p.gainPct.includes('-');
   const gainNum = parseFloat(p.gainPct) || 0;
@@ -1496,7 +1496,7 @@ function m_buildPortfolioEmail(p, insight, mo) {
 
 // ── SEND ──
 function m_goSend() {
-  const mo = monthLabel || MONTH;
+  const mo = monthLabel || m_MONTH;
   const te = document.getElementById('m-testEmail').value.trim();
   document.getElementById('m-rvFrom').textContent = document.getElementById('m-fromName').value;
   document.getElementById('m-rvReply').textContent = document.getElementById('m-replyTo').value;
@@ -1551,7 +1551,7 @@ async function m_testMailchimp() {
 async function m_doSend() {
   const { from, reply } = m_mcInfo();
   const te = document.getElementById('m-testEmail').value.trim();
-  const mo = monthLabel || MONTH;
+  const mo = monthLabel || m_MONTH;
 
   if (mode === 'test' && !te) { m_showMsg('sendErr', 'Enter a test email address in step 1.'); return; }
 
