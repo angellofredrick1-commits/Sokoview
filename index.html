@@ -382,14 +382,25 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
   <!-- S2: COLLECT DATA -->
   <div id="m-s2" style="display:none">
     <div class="card">
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 1 — Install the bookmarklet</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:1rem">Drag the button below to your browser bookmarks bar. You only need to do this once.</div>
-      <div style="text-align:center;margin:1rem 0">
-        <a id="m-bookmarkletLink" href="#" class="btn btn-amber" style="text-decoration:none;display:inline-flex" draggable="true">
-          📊 Sokoview — Collect Portfolios
-        </a>
-        <div style="font-size:12px;color:#9ca3af;margin-top:.5rem">← Drag this to your bookmarks bar</div>
+      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 1 — Save the bookmarklet</div>
+      <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">Click the button below to copy the bookmarklet code, then add it as a bookmark manually. You only need to do this once.</div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:1.25rem;margin:1rem 0">
+        <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
+          <button class="btn btn-amber" onclick="m_copyBookmarklet()" id="m-copyBtn" style="flex:1;min-width:200px">
+            📋 Copy bookmarklet code
+          </button>
+          <span id="m-copyConfirm" style="font-size:13px;color:#16a34a;display:none;font-weight:600">✓ Copied!</span>
+        </div>
+        <div style="font-size:13px;color:#374151;font-weight:600;margin-bottom:.5rem">Then create the bookmark manually:</div>
+        <ol style="font-size:13px;color:#6b7280;margin-left:1.25rem;display:grid;gap:5px">
+          <li>Press <strong>Ctrl+Shift+B</strong> (Windows) or <strong>Cmd+Shift+B</strong> (Mac) to show your bookmarks bar</li>
+          <li>Right-click anywhere on the bookmarks bar → click <strong>"Add page"</strong> or <strong>"Add bookmark"</strong></li>
+          <li>Set the <strong>Name</strong> to: <code style="background:#f3f4f6;padding:1px 5px;border-radius:3px">📊 Sokoview Collect</code></li>
+          <li>In the <strong>URL</strong> field — delete what's there and <strong>paste</strong> the copied code</li>
+          <li>Click <strong>Save</strong></li>
+        </ol>
       </div>
+      <a id="m-bookmarkletLink" href="#" style="display:none"></a>
       <hr class="divider"/>
       <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 2 — Run it on your admin panel</div>
       <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">
@@ -1648,6 +1659,42 @@ window.addEventListener('load',function(){
   var l=document.getElementById('m-bookmarkletLink');
   if(l) l.href=m_buildBookmarklet();
 });
+
+function m_copyBookmarklet(){
+  const code = m_buildBookmarklet();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(function(){
+      const btn = document.getElementById('m-copyBtn');
+      const confirm = document.getElementById('m-copyConfirm');
+      if(btn){ btn.textContent = '✓ Copied!'; btn.style.background='#16a34a'; }
+      if(confirm) confirm.style.display='inline';
+      setTimeout(function(){
+        if(btn){ btn.textContent = '📋 Copy bookmarklet code'; btn.style.background=''; }
+        if(confirm) confirm.style.display='none';
+      }, 3000);
+    }).catch(function(){ m_copyFallback(code); });
+  } else {
+    m_copyFallback(code);
+  }
+}
+
+function m_copyFallback(code){
+  const ta = document.createElement('textarea');
+  ta.value = code;
+  ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  const btn = document.getElementById('m-copyBtn');
+  const confirm = document.getElementById('m-copyConfirm');
+  if(btn){ btn.textContent = '✓ Copied!'; btn.style.background='#16a34a'; }
+  if(confirm) confirm.style.display='inline';
+  setTimeout(function(){
+    if(btn){ btn.textContent = '📋 Copy bookmarklet code'; btn.style.background=''; }
+    if(confirm) confirm.style.display='none';
+  }, 3000);
+}
 </script>
 </body>
 </html>
