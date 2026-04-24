@@ -424,11 +424,12 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
       </div>
       <hr class="divider"/>
       <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 3 — Upload the JSON file</div>
-      <div style="border:2px dashed #d1d5db;border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:all .2s;background:#fafafa" id="m-dropZone" onclick="document.getElementById('m-jsonInput').click()">
-        <input type="file" id="m-jsonInput" accept=".json,application/json" style="display:none" onchange="m_handleJson(this.files[0])"/>
+      <div id="m-dropZone" style="border:2px dashed #d1d5db;border-radius:10px;padding:2rem;text-align:center;background:#fafafa;transition:all .2s;position:relative">
         <div style="font-size:36px;margin-bottom:.5rem">📂</div>
-        <div style="font-weight:600;color:#374151;margin-bottom:4px" id="m-dropText">Click to upload sokoview-portfolios.json</div>
-        <div style="font-size:12px;color:#9ca3af">or drag and drop</div>
+        <div style="font-weight:600;color:#374151;margin-bottom:.5rem" id="m-dropText">Upload sokoview-portfolios.json</div>
+        <label for="m-jsonInput" style="display:inline-block;background:#1a2744;color:#fff;padding:9px 22px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:.5rem">Browse file</label>
+        <div style="font-size:12px;color:#9ca3af">or drag and drop the file here</div>
+        <input type="file" id="m-jsonInput" accept=".json,application/json" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden" onchange="m_handleJson(this.files[0])"/>
       </div>
       <div class="err" id="m-jsonErr"></div>
       <div class="ok" id="m-jsonOk"></div>
@@ -1673,79 +1674,86 @@ window.addEventListener('load',function(){
 
 function m_getConsoleScript(){
   var month = new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  var panel = '<b style="color:#f59e0b;font-size:15px;display:block;margin-bottom:6px">\uD83D\uDCCA Sokoview Collector</b>'
+    + '<div id="skv-status" style="font-size:12px;color:#94a3b8;margin-bottom:8px">Ready. Click Collect to start.</div>'
+    + '<div style="height:4px;background:#334155;border-radius:2px;margin-bottom:8px"><div id="skv-bar" style="height:100%;background:#f59e0b;width:0%;transition:width .4s"></div></div>'
+    + '<button id="skv-btn" style="background:#f59e0b;color:#1a2744;border:none;padding:9px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;margin-bottom:6px">Collect all portfolios</button>'
+    + '<button id="skv-dl" style="background:#22c55e;color:#fff;border:none;padding:9px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;display:none">\u2B07 Download JSON</button>'
+    + '<button id="skv-x" style="background:none;color:#64748b;border:none;cursor:pointer;font-size:11px;margin-top:6px;width:100%">Close</button>';
 
-  // Panel HTML built separately - no JS string escaping needed here
-  function buildScript(m){
-    return [
-      '(function(){',
-      '  if(document.getElementById("skv-collector")){document.getElementById("skv-collector").remove();}',
-      '  var d=document.createElement("div");',
-      '  d.id="skv-collector";',
-      '  d.style="position:fixed;top:20px;right:20px;z-index:999999;background:#1a2744;color:#fff;border-radius:12px;padding:1.25rem 1.5rem;width:300px;font-family:system-ui,sans-serif;font-size:13px;box-shadow:0 8px 32px rgba(0,0,0,.4)";',
-      '  var h=document.createElement("div");',
-      '  h.innerHTML="<b style=\'color:#f59e0b;font-size:15px;display:block;margin-bottom:6px\'>\uD83D\uDCCA Sokoview Collector</b>"+',
-      '    "<div id=\'skv-status\' style=\'font-size:12px;color:#94a3b8;margin-bottom:8px\'>Ready. Click Collect.</div>"+',
-      '    "<div style=\'height:4px;background:#334155;border-radius:2px;margin-bottom:8px\'><div id=\'skv-bar\' style=\'height:100%;background:#f59e0b;width:0%;transition:width .4s\'></div></div>"+',
-      '    "<button id=\'skv-btn\' style=\'background:#f59e0b;color:#1a2744;border:none;padding:9px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;margin-bottom:6px\'>Collect all portfolios</button>"+',
-      '    "<button id=\'skv-dl\' style=\'background:#22c55e;color:#fff;border:none;padding:9px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;display:none\'">\u2B07 Download JSON</button>"+',
-      '    "<button onclick=\'this.closest(\"#skv-collector\").remove()\' style=\'background:none;color:#64748b;border:none;cursor:pointer;font-size:11px;margin-top:6px;width:100%\'>Close</button>";',
-      '  d.appendChild(h); document.body.appendChild(d);',
-      '  window._skvData=[];',
-      '  function sleep(ms){return new Promise(function(r){setTimeout(r,ms);})}',
-      '  function extract(){',
-      '    var rows=document.querySelectorAll("table tbody tr"),items=[];',
-      '    rows.forEach(function(row){',
-      '      var n=row.querySelector("td:first-child");if(!n)return;',
-      '      var lines=n.innerText.trim().split("\n").map(function(l){return l.trim();}).filter(Boolean);',
-      '      var name=lines[0]||"",email=lines[1]||"";',
-      '      if(!email||!email.includes("@"))return;',
-      '      var np=name.trim().split(/\s+/),cells=row.querySelectorAll("td");',
-      '      var lnk=row.querySelector("a[href*=\"/portfolios/\"]");',
-      '      var pid=(lnk?lnk.href:"").split("/portfolios/")[1]||"";',
-      '      items.push({firstName:np[0]||"",lastName:np.slice(1).join(" ")||"",',
-      '        email:email.toLowerCase().trim(),',
-      '        totalValue:cells[1]?cells[1].innerText.trim():"",',
-      '        invested:cells[2]?cells[2].innerText.trim():"",',
-      '        gainPct:cells[3]?cells[3].innerText.trim():"",',
-      '        holdingsCount:cells[4]?cells[4].innerText.trim():"",portfolioId:pid});',
-      '    });return items;',
-      '  }',
-      '  function getPageInfo(){var m=document.body.innerText.match(/Page\s+(\d+)\s+of\s+(\d+)/);return m?{cur:parseInt(m[1]),total:parseInt(m[2])}:null;}',
-      '  function clickNext(){var els=Array.from(document.querySelectorAll("a,button,li"));',
-      '    var nb=els.find(function(el){return el.innerText.trim()==="Next"&&!el.classList.contains("disabled")&&!el.hasAttribute("disabled");});',
-      '    if(nb){nb.click();return true;}return false;',
-      '  }',
-      '  async function collect(){',
-      '    document.getElementById("skv-btn").disabled=true;',
-      '    var st=document.getElementById("skv-status"),bar=document.getElementById("skv-bar");',
-      '    var info=getPageInfo(),total=info?info.total:1,cur=info?info.cur:1;',
-      '    window._skvData=extract();st.textContent="Page 1 of "+total+" — "+window._skvData.length+" collected";',
-      '    for(var i=0;i<total+2;i++){',
-      '      if(!clickNext())break;',
-      '      var waited=0,newCur=cur;',
-      '      while(newCur===cur&&waited<4000){await sleep(400);waited+=400;var ni=getPageInfo();if(ni)newCur=ni.cur;}',
-      '      if(newCur===cur)break; cur=newCur;',
-      '      var rows=extract(),seen=new Set(window._skvData.map(function(u){return u.email;}));',
-      '      rows.filter(function(u){return !seen.has(u.email);}).forEach(function(u){window._skvData.push(u);});',
-      '      bar.style.width=Math.round((cur/total)*100)+"%";',
-      '      st.textContent="Page "+cur+" of "+total+" — "+window._skvData.length+" collected";',
-      '    }',
-      '    bar.style.width="100%";',
-      '    st.innerHTML="<span style=\'color:#4ade80\'>\u2713 Done! "+window._skvData.length+" portfolios</span>";',
-      '    var dl=document.getElementById("skv-dl");dl.style.display="block";',
-      '    dl.onclick=function(){',
-      '      var json=JSON.stringify({collectedAt:new Date().toISOString(),month:"'+m+'",portfolios:window._skvData},null,2);',
-      '      var blob=new Blob([json],{type:"application/json"});',
-      '      var url=URL.createObjectURL(blob);',
-      '      var a=document.createElement("a");a.href=url;a.download="sokoview-portfolios.json";',
-      '      document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);',
-      '    };',
-      '  }',
-      '  document.getElementById("skv-btn").onclick=collect;',
-      '})();'
-    ].join('\n');
-  }
-  return buildScript(month);
+  var panelJSON = JSON.stringify(panel);
+  var monthJSON = JSON.stringify(month);
+
+  return [
+    '(function(){',
+    '  if(document.getElementById("skv-collector")){document.getElementById("skv-collector").remove();}',
+    '  var d=document.createElement("div");',
+    '  d.id="skv-collector";',
+    '  d.style="position:fixed;top:20px;right:20px;z-index:999999;background:#1a2744;color:#fff;border-radius:12px;padding:1.25rem 1.5rem;width:300px;font-family:system-ui,sans-serif;font-size:13px;box-shadow:0 8px 32px rgba(0,0,0,.4)";',
+    '  d.innerHTML=' + panelJSON + ';',
+    '  document.body.appendChild(d);',
+    '  document.getElementById("skv-x").onclick=function(){d.remove();};',
+    '  window._skvData=[];',
+    '  function sleep(ms){return new Promise(function(r){setTimeout(r,ms);})}',
+    '  function extract(){',
+    '    var rows=document.querySelectorAll("table tbody tr"),items=[];',
+    '    rows.forEach(function(row){',
+    '      var n=row.querySelector("td:first-child");if(!n)return;',
+    '      var t=n.innerText.trim().split("\n").map(function(l){return l.trim();}).filter(Boolean);',
+    '      var name=t[0]||"",email=t[1]||"";',
+    '      if(!email||!email.includes("@"))return;',
+    '      var np=name.split(/\s+/),cells=row.querySelectorAll("td");',
+    '      var lnk=row.querySelector("a[href*=\"/portfolios/\"]");',
+    '      var pid=lnk?lnk.href.split("/portfolios/")[1]||"":"";',
+    '      items.push({firstName:np[0]||"",lastName:np.slice(1).join(" ")||"",',
+    '        email:email.toLowerCase().trim(),',
+    '        totalValue:cells[1]?cells[1].innerText.trim():"",',
+    '        invested:cells[2]?cells[2].innerText.trim():"",',
+    '        gainPct:cells[3]?cells[3].innerText.trim():"",',
+    '        holdingsCount:cells[4]?cells[4].innerText.trim():"",',
+    '        portfolioId:pid});',
+    '    });',
+    '    return items;',
+    '  }',
+    '  function getPage(){',
+    '    var m=document.body.innerText.match(/Page\\s+(\\d+)\\s+of\\s+(\\d+)/);',
+    '    return m?{cur:parseInt(m[1]),total:parseInt(m[2])}:{cur:1,total:1};',
+    '  }',
+    '  function clickNext(){',
+    '    var els=Array.from(document.querySelectorAll("a,button,li"));',
+    '    var nb=els.find(function(el){return el.innerText.trim()==="Next"&&!el.disabled&&!el.classList.contains("disabled");});',
+    '    if(nb){nb.click();return true;}return false;',
+    '  }',
+    '  async function collect(){',
+    '    document.getElementById("skv-btn").disabled=true;',
+    '    var st=document.getElementById("skv-status"),bar=document.getElementById("skv-bar");',
+    '    var pg=getPage(),total=pg.total,cur=pg.cur;',
+    '    window._skvData=extract();',
+    '    st.textContent="Page 1 of "+total+" \u2014 "+window._skvData.length+" collected";',
+    '    for(var i=0;i<total+2;i++){',
+    '      if(!clickNext())break;',
+    '      var waited=0,newCur=cur;',
+    '      while(newCur===cur&&waited<4000){await sleep(400);waited+=400;newCur=getPage().cur;}',
+    '      if(newCur===cur)break;cur=newCur;',
+    '      var rows=extract(),seen=new Set(window._skvData.map(function(u){return u.email;}));',
+    '      rows.filter(function(u){return !seen.has(u.email);}).forEach(function(u){window._skvData.push(u);});',
+    '      bar.style.width=Math.round((cur/total)*100)+"%";',
+    '      st.textContent="Page "+cur+" of "+total+" \u2014 "+window._skvData.length+" collected";',
+    '    }',
+    '    bar.style.width="100%";',
+    '    st.innerHTML="<span style=\"color:#4ade80\">\u2713 Done! "+window._skvData.length+" portfolios</span>";',
+    '    var dl=document.getElementById("skv-dl");dl.style.display="block";',
+    '    dl.onclick=function(){',
+    '      var json=JSON.stringify({collectedAt:new Date().toISOString(),month:' + monthJSON + ',portfolios:window._skvData},null,2);',
+    '      var blob=new Blob([json],{type:"application/json"});',
+    '      var url=URL.createObjectURL(blob);',
+    '      var a=document.createElement("a");a.href=url;a.download="sokoview-portfolios.json";',
+    '      document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);',
+    '    };',
+    '  }',
+    '  document.getElementById("skv-btn").onclick=collect;',
+    '})();'
+  ].join("\n");
 }
 
 function m_copyScript(){
