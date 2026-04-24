@@ -382,23 +382,34 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
   <!-- S2: COLLECT DATA -->
   <div id="m-s2" style="display:none">
     <div class="card">
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 1 — Save the bookmarklet</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">Click the button below to copy the bookmarklet code, then add it as a bookmark manually. You only need to do this once.</div>
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:1.25rem;margin:1rem 0">
-        <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-bottom:1rem">
-          <button class="btn btn-amber" onclick="m_copyBookmarklet()" id="m-copyBtn" style="flex:1;min-width:200px">
-            📋 Copy bookmarklet code
-          </button>
-          <span id="m-copyConfirm" style="font-size:13px;color:#16a34a;display:none;font-weight:600">✓ Copied!</span>
+      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 1 — Copy the collection script</div>
+      <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">Click the button below to copy the script, then run it in your browser console on the Sokoview admin page.</div>
+
+      <button class="btn btn-amber btn-block" onclick="m_copyScript()" id="m-copyBtn" style="margin-bottom:1rem">
+        📋 Copy collection script
+      </button>
+      <div id="m-copyConfirm" style="display:none;font-size:13px;color:#16a34a;font-weight:600;text-align:center;margin-bottom:1rem">✓ Copied! Now follow the steps below →</div>
+
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:1.25rem">
+        <div style="font-weight:600;font-size:13px;color:#1a2744;margin-bottom:.875rem">Then run it on your Sokoview admin:</div>
+        <div style="display:grid;gap:10px">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="min-width:24px;height:24px;background:#1a2744;color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">1</div>
+            <div style="font-size:13px;color:#374151">Open <a href="https://sokoview.co.tz/admin/portfolios" target="_blank" style="color:#1a2744;font-weight:600">sokoview.co.tz/admin/portfolios</a> in your browser (stay logged in)</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="min-width:24px;height:24px;background:#1a2744;color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">2</div>
+            <div style="font-size:13px;color:#374151">Press <kbd style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:1px 6px;font-size:12px">F12</kbd> to open DevTools, then click the <strong>Console</strong> tab</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="min-width:24px;height:24px;background:#1a2744;color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">3</div>
+            <div style="font-size:13px;color:#374151">Click in the console, paste the script (<kbd style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:1px 6px;font-size:12px">Ctrl+V</kbd>), then press <kbd style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:1px 6px;font-size:12px">Enter</kbd></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="min-width:24px;height:24px;background:#22c55e;color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">4</div>
+            <div style="font-size:13px;color:#374151">A panel appears — click <strong>"Collect all portfolios"</strong>, wait, then click <strong>"Download JSON"</strong></div>
+          </div>
         </div>
-        <div style="font-size:13px;color:#374151;font-weight:600;margin-bottom:.5rem">Then create the bookmark manually:</div>
-        <ol style="font-size:13px;color:#6b7280;margin-left:1.25rem;display:grid;gap:5px">
-          <li>Press <strong>Ctrl+Shift+B</strong> (Windows) or <strong>Cmd+Shift+B</strong> (Mac) to show your bookmarks bar</li>
-          <li>Right-click anywhere on the bookmarks bar → click <strong>"Add page"</strong> or <strong>"Add bookmark"</strong></li>
-          <li>Set the <strong>Name</strong> to: <code style="background:#f3f4f6;padding:1px 5px;border-radius:3px">📊 Sokoview Collect</code></li>
-          <li>In the <strong>URL</strong> field — delete what's there and <strong>paste</strong> the copied code</li>
-          <li>Click <strong>Save</strong></li>
-        </ol>
       </div>
       <a id="m-bookmarkletLink" href="#" style="display:none"></a>
       <hr class="divider"/>
@@ -1660,40 +1671,83 @@ window.addEventListener('load',function(){
   if(l) l.href=m_buildBookmarklet();
 });
 
-function m_copyBookmarklet(){
-  const code = m_buildBookmarklet();
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(code).then(function(){
-      const btn = document.getElementById('m-copyBtn');
-      const confirm = document.getElementById('m-copyConfirm');
-      if(btn){ btn.textContent = '✓ Copied!'; btn.style.background='#16a34a'; }
-      if(confirm) confirm.style.display='inline';
-      setTimeout(function(){
-        if(btn){ btn.textContent = '📋 Copy bookmarklet code'; btn.style.background=''; }
-        if(confirm) confirm.style.display='none';
-      }, 3000);
-    }).catch(function(){ m_copyFallback(code); });
-  } else {
-    m_copyFallback(code);
+function m_getConsoleScript(){
+  // Build the inline collector script (no javascript: wrapper needed for console)
+  const MONTH = new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  return `(function(){
+if(document.getElementById('skv-collector')){document.getElementById('skv-collector').remove();}
+var d=document.createElement('div');
+d.id='skv-collector';
+d.style='position:fixed;top:20px;right:20px;z-index:999999;background:#1a2744;color:#fff;border-radius:12px;padding:1.25rem 1.5rem;width:320px;font-family:system-ui,sans-serif;font-size:14px;box-shadow:0 8px 32px rgba(0,0,0,.4)';
+d.innerHTML='<div style="font-weight:700;font-size:16px;color:#f59e0b;margin-bottom:.5rem">\u{1F4CA} Sokoview Collector</div><div id="skv-status" style="font-size:13px;color:#94a3b8;margin-bottom:1rem">Ready. Click Collect to start.</div><div id="skv-prog" style="height:4px;background:#334155;border-radius:2px;margin-bottom:1rem;display:none"><div id="skv-bar" style="height:100%;background:#f59e0b;border-radius:2px;width:0%;transition:width .3s"></div></div><button id="skv-btn" style="background:#f59e0b;color:#1a2744;border:none;padding:9px 18px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;margin-bottom:8px">Collect all portfolios</button><button id="skv-dl" style="background:#22c55e;color:#fff;border:none;padding:9px 18px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;display:none">\u2B07 Download JSON</button><button onclick="document.getElementById(\'skv-collector\').remove()" style="background:transparent;color:#64748b;border:none;cursor:pointer;font-size:12px;margin-top:8px;width:100%">Close</button>';
+document.body.appendChild(d);
+window._skvData=[];
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);})}
+function extract(){var rows=document.querySelectorAll('table tbody tr');var items=[];rows.forEach(function(row){var n=row.querySelector('td:first-child');if(!n)return;var lines=n.innerText.trim().split('\n').map(function(l){return l.trim();}).filter(Boolean);var name=lines[0]||'';var email=lines[1]||'';if(!email||!email.includes('@'))return;var np=name.trim().split(/\s+/);var cells=row.querySelectorAll('td');var lnk=row.querySelector('a[href*="/portfolios/"]');var pid=(lnk?lnk.href:'').split('/portfolios/')[1]||'';items.push({firstName:np[0]||'',lastName:np.slice(1).join(' ')||'',email:email.toLowerCase(),totalValue:cells[1]?cells[1].innerText.trim():'',invested:cells[2]?cells[2].innerText.trim():'',gainPct:cells[3]?cells[3].innerText.trim():'',holdingsCount:cells[4]?cells[4].innerText.trim():'',portfolioId:pid});});return items;}
+function getPage(){var m=document.body.innerText.match(/Page (\d+) of (\d+)/);return m?{cur:parseInt(m[1]),total:parseInt(m[2])}:{cur:1,total:1};}
+function clickNext(){var bs=Array.from(document.querySelectorAll('button'));var nb=bs.find(function(b){return b.innerText.trim()==='Next';});if(nb&&!nb.disabled){nb.click();return true;}return false;}
+async function collect(){
+  document.getElementById('skv-btn').disabled=true;
+  document.getElementById('skv-prog').style.display='block';
+  var st=document.getElementById('skv-status');
+  var bar=document.getElementById('skv-bar');
+  // Change to 50 rows per page
+  var rpp=Array.from(document.querySelectorAll('button,div')).find(function(el){return el.innerText.trim()==='50';});
+  if(rpp){rpp.click();await sleep(1200);}
+  var pg=getPage();
+  window._skvData=extract();
+  var last=getPage().cur;
+  st.textContent='Page 1 of '+pg.total+' ('+window._skvData.length+' found)';
+  for(var p=2;p<=pg.total+2;p++){
+    if(!clickNext())break;
+    await sleep(900);
+    var info=getPage();
+    if(info.cur===last)break;
+    last=info.cur;
+    var rows=extract();
+    var seen=new Set(window._skvData.map(function(u){return u.email;}));
+    rows.filter(function(u){return !seen.has(u.email);}).forEach(function(u){window._skvData.push(u);});
+    bar.style.width=Math.round((info.cur/info.total)*100)+'%';
+    st.textContent='Page '+info.cur+' of '+info.total+' ('+window._skvData.length+' portfolios)';
   }
+  bar.style.width='100%';
+  st.innerHTML='<span style="color:#4ade80">\u2713 Done! '+window._skvData.length+' portfolios collected.</span>';
+  var dl=document.getElementById('skv-dl');
+  dl.style.display='block';
+  dl.onclick=function(){
+    var json=JSON.stringify({collectedAt:new Date().toISOString(),month:'${MONTH}',portfolios:window._skvData},null,2);
+    var blob=new Blob([json],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download='sokoview-portfolios.json';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+}
+document.getElementById('skv-btn').onclick=collect;
+})();`;
 }
 
-function m_copyFallback(code){
-  const ta = document.createElement('textarea');
-  ta.value = code;
-  ta.style.position='fixed';ta.style.left='-9999px';
-  document.body.appendChild(ta);
-  ta.select();
-  document.execCommand('copy');
-  document.body.removeChild(ta);
+function m_copyScript(){
+  const code = m_getConsoleScript();
   const btn = document.getElementById('m-copyBtn');
   const confirm = document.getElementById('m-copyConfirm');
-  if(btn){ btn.textContent = '✓ Copied!'; btn.style.background='#16a34a'; }
-  if(confirm) confirm.style.display='inline';
-  setTimeout(function(){
-    if(btn){ btn.textContent = '📋 Copy bookmarklet code'; btn.style.background=''; }
-    if(confirm) confirm.style.display='none';
-  }, 3000);
+  function onCopied(){
+    if(btn){ btn.textContent='✓ Copied! Now open DevTools on sokoview admin'; btn.style.background='#16a34a'; }
+    if(confirm) confirm.style.display='block';
+    setTimeout(function(){
+      if(btn){ btn.textContent='📋 Copy collection script'; btn.style.background=''; }
+      if(confirm) confirm.style.display='none';
+    }, 4000);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(onCopied).catch(function(){
+      var ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';
+      document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);onCopied();
+    });
+  } else {
+    var ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);onCopied();
+  }
 }
 </script>
 </body>
