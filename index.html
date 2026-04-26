@@ -510,13 +510,13 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
       </div>
 
       <div id="m-testModeInfo" class="warn" style="margin-bottom:1rem">
-        🔒 <strong>Test mode:</strong> Only 1 email will be sent — to <strong id="m-testEmailDisplay"></strong>. It will show Nyemo's portfolio as a sample.
+        🔒 <strong>Test mode:</strong> One email sent only to <strong id="m-testEmailDisplay"></strong> via Mailchimp /actions/test — no subscribers contacted.
       </div>
       <div id="m-liveModeInfo" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-bottom:1rem;color:#991b1b">
         🚀 <strong>Live mode:</strong> <strong id="m-liveCount">0</strong> personalised emails will be sent — one per subscriber.
       </div>
       <div id="m-segmentModeInfo" style="display:none;background:#dbeafe;border:1px solid #93c5fd;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-bottom:1rem;color:#1e40af">
-        👥 <strong>Segment test:</strong> One email will be sent to all members of your tester segment. Real personalisation, safe audience.
+        👥 <strong>Segment test:</strong> Sending to segment ID <strong id="m-segmentIdDisplay"></strong> only. Real personalisation, controlled audience.
       </div>
 
       <div class="review-box">
@@ -1612,12 +1612,19 @@ function m_goSend() {
   document.getElementById('m-rvSubject').textContent = 'Your Sokoview Portfolio Update — ' + mo;
   var modeLabel = mode === 'test' ? 'TEST MODE' : mode === 'segment' ? 'SEGMENT TEST' : 'LIVE MODE';
   var modeCls   = mode === 'live' ? 'b-red' : mode === 'segment' ? 'b-blue' : 'b-amber';
-  document.getElementById('m-sendModeBadge').textContent = modeLabel;
-  document.getElementById('m-sendModeBadge').className = 'badge ' + modeCls;
-  document.getElementById('m-testModeInfo').style.display = mode === 'test' ? 'block' : 'none';
-  document.getElementById('m-liveModeInfo').style.display = mode === 'live' ? 'block' : 'none';
+  var badge = document.getElementById('m-sendModeBadge');
+  if(badge){ badge.textContent = modeLabel; badge.className = 'badge ' + modeCls; }
+  document.getElementById('m-testModeInfo').style.display  = mode === 'test' ? 'block' : 'none';
+  document.getElementById('m-liveModeInfo').style.display  = mode === 'live' ? 'block' : 'none';
   var segInfo = document.getElementById('m-segmentModeInfo');
   if(segInfo) segInfo.style.display = mode === 'segment' ? 'block' : 'none';
+  // Update test mode description with actual first portfolio name
+  var firstP = portfolios && portfolios[0];
+  var sampleName = firstP ? firstP.firstName : 'the first subscriber';
+  var teEl = document.getElementById('m-testEmailDisplay');
+  if(teEl) teEl.textContent = document.getElementById('m-testEmail').value.trim() || '(no email set)';
+  var segIdEl = document.getElementById('m-segmentIdDisplay');
+  if(segIdEl) segIdEl.textContent = document.getElementById('m-segmentId').value.trim() || '(no segment ID)';
   document.getElementById('m-testEmailDisplay').textContent = te || '(no test email set)';
   m_goS(4);
 }
@@ -1782,7 +1789,12 @@ async function m_doSend() {
         throw new Error((sr.json && sr.json.detail) || 'Send failed (status ' + sr.status + ')');
       }
     } catch(e) {
-      m_showMsg('m-sendErr', 'Error: ' + e.message);
+      var msg = e.message || 'Unknown error';
+      // Common issues explained
+      if(msg.includes('404')) msg += ' — Segment ID not found. Check the ID in Mailchimp → Audience → Segments.';
+      if(msg.includes('403')) msg += ' — API key or permissions issue.';
+      if(msg.includes('400')) msg += ' — Bad request. Check your Audience ID and Segment ID.';
+      m_showMsg('m-sendErr', 'Error: ' + msg);
       cleanup();
     }
     return;
