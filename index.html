@@ -261,7 +261,7 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
         <div class="review-row"><span class="review-lbl">Audience ID</span><span class="review-val" id="rvList"></span></div>
       </div>
       <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-        <button class="btn btn-outline" id="testMcBtn" onclick="testMailchimp()">
+        <button class="btn btn-outline" id="testMcBtn" onclick="m_testMailchimp()">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#374151" stroke-width="1.5"/><path d="M7 4v3l2 1.5" stroke="#374151" stroke-width="1.5" stroke-linecap="round"/></svg>
           Test connection
         </button>
@@ -309,7 +309,7 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
       </div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
-      <span class="badge b-amber" id="m-modeBadge">TEST MODE</span>
+      <span class="badge b-amber" id="m-modeBadge">SEGMENT TEST</span>
       <span class="badge b-blue">Mailchimp</span>
     </div>
   </div>
@@ -493,7 +493,7 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
     <div id="m-sendCard" class="card">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
         <div style="font-weight:600;font-size:15px;color:#1a2744">Ready to send</div>
-        <span class="badge" id="m-sendModeBadge">TEST MODE</span>
+        <span class="badge" id="m-sendModeBadge">SEGMENT TEST</span>
       </div>
 
 
@@ -514,6 +514,7 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
 
       <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.75rem">
         <button class="btn btn-outline" id="m-testMcBtn" onclick="m_testMailchimp()">Test Mailchimp connection</button>
+      <div id="m-mcTestResult" style="display:none;margin-top:.5rem;font-size:13px;padding:.5rem .75rem;border-radius:6px"></div>
         <button class="btn btn-primary" style="flex:1" id="m-sendBtn" onclick="m_doSend()">
           Send now
         </button>
@@ -1767,6 +1768,35 @@ function m_buildCampaignTemplate(mo){
   h+='<div style="font-size:11px;color:#475569;margin-top:8px">You received this because you have a Sokoview account. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
   h+='</td></tr></table></div></body></html>';
   return h;
+}
+
+function m_testMailchimp(){
+  var key = (document.getElementById('m-mcKey')||{}).value || '';
+  var list = (document.getElementById('m-mcList')||{}).value || '';
+  var resultEl = document.getElementById('m-mcTestResult');
+  var spinner  = document.getElementById('m-mcSpinner');
+  var btn      = document.getElementById('m-testMcBtn');
+  if(!key){ if(resultEl){resultEl.style.display='block';resultEl.style.background='#fef2f2';resultEl.style.color='#991b1b';resultEl.textContent='Enter your Mailchimp API key first.';} return; }
+  if(btn) btn.disabled=true;
+  if(spinner) spinner.style.display='inline-block';
+  if(resultEl) resultEl.style.display='none';
+  m_mcCall('ping',{}).then(function(r){
+    if(btn) btn.disabled=false;
+    if(spinner) spinner.style.display='none';
+    if(!resultEl) return;
+    resultEl.style.display='block';
+    if(r.ok || r.status===200){
+      resultEl.style.background='#f0fdf4';resultEl.style.color='#166534';
+      resultEl.textContent='✓ Mailchimp connected!'+(list?' Audience ID looks good.':' Add your Audience ID above.');
+    } else {
+      resultEl.style.background='#fef2f2';resultEl.style.color='#991b1b';
+      resultEl.textContent='✗ Connection failed ('+r.status+'): '+(r.json&&r.json.detail)||'Check your API key.';
+    }
+  }).catch(function(e){
+    if(btn) btn.disabled=false;
+    if(spinner) spinner.style.display='none';
+    if(resultEl){resultEl.style.display='block';resultEl.style.background='#fef2f2';resultEl.style.color='#991b1b';resultEl.textContent='Error: '+e.message;}
+  });
 }
 
 function m_resetSend() {
