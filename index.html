@@ -1317,12 +1317,12 @@ function m_handleJson(file) {
       });
 
       document.getElementById('m-jsonErr').style.display = 'none';
-      m_showOk('jsonOk', '✓ Loaded ' + portfolios.length + ' portfolios from ' + (data.month || m_MONTH));
-      mDz.style.borderColor = '#22c55e';
-      document.getElementById('m-dropText').textContent = '✓ ' + file.name + ' (' + portfolios.length + ' portfolios)';
+      m_showOk('m-jsonOk', '✓ Loaded ' + portfolios.length + ' portfolios from ' + (data.month || 'Sokoview'));
+      if(mDz) mDz.style.borderColor = '#22c55e';
+      const dt = document.getElementById('m-dropText'); if(dt) dt.textContent = '✓ ' + file.name + ' (' + portfolios.length + ' portfolios)';
       setTimeout(() => { m_renderPreview(); m_goS(3); }, 600);
     } catch(err) {
-      m_showMsg('jsonErr', 'Error reading file: ' + err.message);
+      m_showMsg('m-jsonErr', 'Error reading file: ' + err.message);
     }
   };
   reader.readAsText(file);
@@ -1388,7 +1388,10 @@ function m_updateNav(idx) {
 
 async function m_generateEmail(p, idx) {
   const key = document.getElementById('m-anthroKey').value.trim();
-  if (!key) { document.getElementById('m-previewFrame').srcdoc = '<p style="padding:2rem;font-family:sans-serif;color:#dc2626">Enter your Anthropic API key in step 1 first.</p>'; return; }
+  if (!key) {
+    document.getElementById('m-previewFrame').srcdoc = '<p style="padding:2rem;font-family:sans-serif;color:#dc2626">Enter your Anthropic API key in step 1 first.</p>';
+    return;
+  }
 
   document.getElementById('m-genStatus').style.display = 'block';
   document.getElementById('m-previewWrap').style.opacity = '.4';
@@ -1397,36 +1400,77 @@ async function m_generateEmail(p, idx) {
   document.getElementById('m-genMsg').textContent = 'Generating email for ' + p.firstName + '...';
 
   const mo = monthLabel || m_MONTH;
-  const isUp = p.gainPct && p.gainPct.includes('+');
-  const isDn = p.gainPct && p.gainPct.includes('-');
-  const gainNum = parseFloat(p.gainPct) || 0;
-  const gainAbs = Math.abs(gainNum);
+
+  // ── SEGMENT CLASSIFICATION ──
+  const gainNum = parseFloat((p.gainPct || '0').replace(/[^-0-9.]/g, '')) || 0;
+
+  // Calculate absolute gain in TZS
+  const parseAmt = v => parseFloat((v || '0').replace(/[^0-9.]/g, '')) || 0;
+  const totalVal  = parseAmt(p.totalValue);
+  const invested  = parseAmt(p.invested);
+  const absGain   = totalVal - invested;
+  const absGainFmt = (absGain >= 0 ? '+' : '') + 'TZS ' + Math.abs(Math.round(absGain)).toLocaleString();
+
+  let segment, segLabel, segEmoji, segTone;
+  if (gainNum >= 20) {
+    segment = 'strong';    segLabel = 'Strong Growth';  segEmoji = '🚀';
+    segTone = 'celebratory and energetic. Acknowledge their impressive gains, highlight what strong performance means for their wealth, and encourage them to think about rebalancing or compounding their gains.';
+  } else if (gainNum >= 5) {
+    segment = 'positive';  segLabel = 'Positive';       segEmoji = '📈';
+    segTone = 'encouraging and confident. Recognise steady positive performance, note that consistent gains beat market volatility, and suggest staying the course.';
+  } else if (gainNum >= -5) {
+    segment = 'breakeven'; segLabel = 'Breakeven';      segEmoji = '➡️';
+    segTone = 'reassuring and grounded. Acknowledge they are holding steady in a volatile market, remind them that capital preservation is itself a win, and encourage patience.';
+  } else if (gainNum >= -20) {
+    segment = 'recovering'; segLabel = 'Recovering';    segEmoji = '⚠️';
+    segTone = 'empathetic and contextual. Acknowledge the temporary drawdown without dismissing it, provide market context for why this can happen, and reassure them that long-term DSE investors historically recover well.';
+  } else {
+    segment = 'pressure';  segLabel = 'Under Pressure'; segEmoji = '🔴';
+    segTone = 'careful, supportive and honest. Acknowledge the significant loss with empathy, avoid false optimism, suggest they review their portfolio composition, and remind them that Sokoview gives them the tools to stay informed and make better decisions.';
+  }
+
+  var systemPrompt = 'You are a warm, trusted DSE investment analyst writing a personalised monthly portfolio update for a Sokoview subscriber. Write exactly 3 sentences. Be ' + segTone + ' Always reference their specific numbers. Never use generic platitudes. Write as if you know this person personally.';
+
+  var userPrompt = 'Write a 3-sentence personalised monthly portfolio commentary for ' + p.firstName + '. Month: ' + mo + '. Segment: ' + segEmoji + ' ' + segLabel + '. Value: ' + (p.totalValue||'N/A') + '. Invested: ' + (p.invested||'N/A') + '. Gain/loss: ' + absGainFmt + '. Return: ' + (p.gainPct||'N/A') + '. Holdings: ' + (p.holdingsCount||'N/A') + ' stocks. Write 3 sentences now, no preamble.';
 
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 200,
-        system: 'DSE investment analyst. Write a warm, personalised 2-sentence monthly portfolio commentary. Be specific to their numbers. No bullet points. Friendly but professional.',
-        messages: [{ role: 'user', content: `Write commentary for ${p.firstName}'s portfolio for ${mo}: Total value ${p.totalValue}, invested ${p.invested}, overall gain ${p.gainPct}, ${p.holdingsCount} holdings. ${isUp ? 'Portfolio is in profit.' : isDn ? 'Portfolio is below cost.' : 'Portfolio is near breakeven.'}` }]
+        max_tokens: 220,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
       })
     });
     const d = await r.json();
-    const insight = d.content?.[0]?.text || `Your portfolio currently stands at ${p.totalValue} with a total return of ${p.gainPct} since inception.`;
+    const insight = d.content?.[0]?.text?.trim()
+      || p.firstName + "'s portfolio stands at " + p.totalValue + " with a return of " + p.gainPct + " since inception across " + p.holdingsCount + " holdings.";
 
-    emails[p.email] = { subject: `Your Sokoview Portfolio Update — ${mo}`, html: m_buildPortfolioEmail(p, insight, mo) };
+    emails[p.email] = {
+      subject: 'Your Sokoview Portfolio Update — ' + mo,
+      html: m_buildPortfolioEmail(p, insight, mo, { segment, segLabel, segEmoji, absGainFmt })
+    };
     document.getElementById('m-previewFrame').srcdoc = emails[p.email].html;
   } catch(e) {
-    const insight = `Your portfolio currently stands at ${p.totalValue} with a total return of ${p.gainPct} since inception. You have ${p.holdingsCount} active holdings on the DSE.`;
-    emails[p.email] = { subject: `Your Sokoview Portfolio Update — ${mo}`, html: m_buildPortfolioEmail(p, insight, mo) };
+    const insight = p.firstName + "'s portfolio stands at " + p.totalValue + " with a total return of " + p.gainPct + " since inception across " + p.holdingsCount + " active DSE holdings.";
+    emails[p.email] = {
+      subject: 'Your Sokoview Portfolio Update — ' + mo,
+      html: m_buildPortfolioEmail(p, insight, mo, { segment, segLabel, segEmoji, absGainFmt })
+    };
     document.getElementById('m-previewFrame').srcdoc = emails[p.email].html;
   }
 
   document.getElementById('m-genStatus').style.display = 'none';
   document.getElementById('m-previewWrap').style.opacity = '1';
 }
+
 
 async function m_regenerateCurrent() {
   const p = portfolios[currentIdx];
@@ -1436,13 +1480,26 @@ async function m_regenerateCurrent() {
 }
 
 // ── EMAIL BUILDER ──
-function m_buildPortfolioEmail(p, insight, mo) {
+function m_buildPortfolioEmail(p, insight, mo, seg) {
+  seg = seg || {};
+  const segEmoji = seg.segEmoji || '📊';
+  const segLabel = seg.segLabel || 'Portfolio Update';
+  const absGainFmt = seg.absGainFmt || '';
   const isUp = p.gainPct && p.gainPct.includes('+');
   const isDn = p.gainPct && p.gainPct.includes('-');
   const gainClr = isUp ? '#16a34a' : isDn ? '#dc2626' : '#6b7280';
-  const gainBg = isUp ? '#dcfce7' : isDn ? '#fee2e2' : '#f3f4f6';
-  const gainTxt = isUp ? 'Gain' : isDn ? 'Loss' : 'Return';
-  const gainVal = p.gainPct || '—';
+  const gainBg  = isUp ? '#dcfce7' : isDn ? '#fee2e2' : '#f3f4f6';
+  const gainTxt = isUp ? 'Total Gain' : isDn ? 'Total Loss' : 'Return';
+
+  // Segment badge colours
+  const segColors = {
+    strong:    { bg:'#dcfce7', color:'#166534', border:'#86efac' },
+    positive:  { bg:'#dbeafe', color:'#1e40af', border:'#93c5fd' },
+    breakeven: { bg:'#f3f4f6', color:'#374151', border:'#d1d5db' },
+    recovering:{ bg:'#fef9c3', color:'#713f12', border:'#fde047' },
+    pressure:  { bg:'#fee2e2', color:'#991b1b', border:'#fca5a5' }
+  };
+  const sc = segColors[seg.segment] || segColors.breakeven;
 
   var h = '';
   h += '<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>';
@@ -1450,43 +1507,51 @@ function m_buildPortfolioEmail(p, insight, mo) {
   h += '<body style="margin:0;padding:0;background:#f0f4f8;font-family:Arial,Helvetica,sans-serif">';
   h += '<div class="wrap" style="max-width:600px;margin:0 auto;padding:20px 12px">';
 
-  // Header
+  // HEADER
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:12px 12px 0 0"><tr><td class="header-td" style="padding:26px 28px">';
   h += '<div style="font-size:26px;font-weight:900;color:#f59e0b;letter-spacing:2px">SOKOVIEW</div>';
   h += '<div style="font-size:12px;color:#94a3b8;margin-top:3px">Monthly Portfolio Performance &middot; ' + mo + '</div>';
   h += '<div style="margin-top:16px"><a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 22px;border-radius:6px;text-decoration:none">View Live Portfolio &rarr;</a></div>';
   h += '</td></tr></table>';
 
-  // Salutation + insight
+  // SALUTATION + SEGMENT BADGE
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0"><tr><td style="padding:22px 24px">';
-  h += '<div style="font-size:16px;color:#111;margin-bottom:12px">Hi <strong>' + (p.firstName || '*|FNAME|*') + '</strong>,</div>';
+  h += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">';
+  h += '<div style="font-size:16px;color:#111">Hi <strong>' + (p.firstName || '*|FNAME|*') + '</strong>,</div>';
+  h += '<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:' + sc.bg + ';color:' + sc.color + ';border:1px solid ' + sc.border + ';border-radius:20px;font-size:12px;font-weight:600">'
+    + segEmoji + ' ' + segLabel + '</div>';
+  h += '</div>';
   h += '<div style="font-size:14px;color:#374151;line-height:1.8">' + insight + '</div>';
   h += '</td></tr></table>';
 
-  // KPI Boxes
+  // KPI BOXES
   h += '<table class="kpi-table" width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr>';
-  h += '<td class="kpi-td" style="padding:14px 8px 14px 16px;width:33%;border-right:1px solid #f1f5f9;vertical-align:top">';
+  h += '<td class="kpi-td" style="padding:14px 8px 14px 16px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
   h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Portfolio value</div>';
-  h += '<div style="font-size:16px;font-weight:700;color:#111">' + (p.totalValue || '—') + '</div>';
+  h += '<div style="font-size:15px;font-weight:700;color:#111">' + (p.totalValue || '—') + '</div>';
   h += '</td>';
-  h += '<td class="kpi-td" style="padding:14px 8px;width:33%;border-right:1px solid #f1f5f9;vertical-align:top">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Amount invested</div>';
-  h += '<div style="font-size:16px;font-weight:700;color:#111">' + (p.invested || '—') + '</div>';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Invested</div>';
+  h += '<div style="font-size:15px;font-weight:700;color:#111">' + (p.invested || '—') + '</div>';
   h += '</td>';
-  h += '<td class="kpi-td" style="padding:14px 8px;width:33%;vertical-align:top">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Total ' + gainTxt.toLowerCase() + '</div>';
-  h += '<div style="font-size:16px;font-weight:700;background:' + gainBg + ';color:' + gainClr + ';padding:4px 10px;border-radius:20px;display:inline-block">' + gainVal + '</div>';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">' + gainTxt + '</div>';
+  h += '<div style="font-size:15px;font-weight:700;padding:3px 8px;background:' + gainBg + ';color:' + gainClr + ';border-radius:20px;display:inline-block">' + (p.gainPct || '—') + '</div>';
+  h += '</td>';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;vertical-align:top">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">In TZS</div>';
+  h += '<div style="font-size:14px;font-weight:700;color:' + gainClr + '">' + (absGainFmt || '—') + '</div>';
   h += '</td></tr></table>';
 
-  // Holdings count
+  // HOLDINGS
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:14px 16px">';
   h += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">';
   h += '<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:3px">Active holdings</div>';
   h += '<div style="font-size:20px;font-weight:700;color:#1a2744">' + (p.holdingsCount || '—') + ' <span style="font-size:13px;font-weight:400;color:#6b7280">stocks on the DSE</span></div></div>';
-  h += '<a href="https://sokoview.co.tz/dashboard/market" style="background:#f0f4ff;color:#1a2744;font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;text-decoration:none;white-space:nowrap">View all holdings &rarr;</a>';
+  h += '<a href="https://sokoview.co.tz/dashboard/market" style="background:#f0f4ff;color:#1a2744;font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;text-decoration:none">View holdings &rarr;</a>';
   h += '</div></td></tr></table>';
 
-  // Sokoview Insights
+  // INSIGHTS BOX
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px">';
   h += '<div style="border-left:4px solid #f59e0b;padding:14px 16px;background:#fffbeb;border-radius:0 8px 8px 0">';
   h += '<div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Sokoview Insights</div>';
@@ -1495,27 +1560,28 @@ function m_buildPortfolioEmail(p, insight, mo) {
 
   // CTA
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:20px 24px;text-align:center">';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:16px">Ready to take action on your portfolio?</div>';
-  h += '<a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#1a2744;color:#fff;font-size:14px;font-weight:700;padding:13px 32px;border-radius:8px;text-decoration:none;letter-spacing:.03em">Open My Portfolio on Sokoview &rarr;</a>';
+  h += '<div style="font-size:14px;color:#374151;margin-bottom:14px">Ready to review and act on your portfolio?</div>';
+  h += '<a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#1a2744;color:#fff;font-size:14px;font-weight:700;padding:13px 32px;border-radius:8px;text-decoration:none">Open My Portfolio on Sokoview &rarr;</a>';
   h += '</td></tr></table>';
 
-  // Sign off
+  // SIGN OFF
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px 24px">';
   h += '<div style="font-size:14px;color:#374151;margin-bottom:4px">Happy investing,</div>';
   h += '<div style="font-size:14px;font-weight:700;color:#1a2744">The Sokoview Analytics Team</div>';
   h += '</td></tr></table>';
 
-  // Footer
+  // FOOTER
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:0 0 12px 12px"><tr><td style="padding:18px 24px;text-align:center">';
   h += '<div style="font-size:15px;font-weight:700;color:#f59e0b;margin-bottom:4px">SOKOVIEW</div>';
   h += '<div style="margin:12px 0"><a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 24px;border-radius:6px;text-decoration:none">Track Your Portfolio &rarr;</a></div>';
-  h += '<div style="font-size:12px;color:#94a3b8"><a href="https://sokoview.co.tz" style="color:#94a3b8;text-decoration:none">sokoview.co.tz</a> &nbsp;&middot;&nbsp; Data prepared by Sokoview Analytics</div>';
+  h += '<div style="font-size:12px;color:#94a3b8"><a href="https://sokoview.co.tz" style="color:#94a3b8;text-decoration:none">sokoview.co.tz</a> &nbsp;&middot;&nbsp; Sokoview Analytics</div>';
   h += '<div style="font-size:11px;color:#475569;margin-top:8px">You received this because you have a Sokoview account. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
   h += '</td></tr></table>';
 
   h += '</div></body></html>';
   return h;
 }
+
 
 // ── SEND ──
 function m_goSend() {
@@ -1663,8 +1729,8 @@ function m_resetSend() {
   m_goS(3);
 }
 
-function m_showMsg(id, msg) { const e = document.getElementById(id); e.style.display = 'block'; e.textContent = msg; }
-function m_showOk(id, msg) { const e = document.getElementById(id); e.style.display = 'block'; e.textContent = msg; }
+function m_showMsg(id, msg) { const e = document.getElementById(id); if(e){e.style.display='block';e.textContent=msg;} }
+function m_showOk(id, msg) { const e = document.getElementById(id); if(e){e.style.display='block';e.textContent=msg;} }
 
 
 window.addEventListener('load',function(){
