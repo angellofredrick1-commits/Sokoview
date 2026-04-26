@@ -349,18 +349,30 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
       </div>
       <hr class="divider"/>
       <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Test mode</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">In test mode, emails are sent only to your address — not to subscribers. Always test before going live.</div>
+      <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">Choose how to test before going live.</div>
       <div class="mode-toggle">
-        <button class="mode-btn active" id="m-modeTestBtn" onclick="m_setMode('test')">🔒 Test mode — send to me only</button>
-        <button class="mode-btn" id="m-modeLiveBtn" onclick="m_setMode('live')">🚀 Live mode — send to all subscribers</button>
+        <button class="mode-btn active" id="m-modeTestBtn" onclick="m_setMode('test')">🔒 Test — my email only</button>
+        <button class="mode-btn" id="m-modeSegBtn" onclick="m_setMode('segment')">👥 Test — tester segment</button>
+        <button class="mode-btn" id="m-modeLiveBtn" onclick="m_setMode('live')">🚀 Live — all subscribers</button>
       </div>
+
       <div id="m-testEmailWrap">
         <label>Your test email address</label>
         <input type="email" id="m-testEmail" placeholder="your@email.com"/>
-        <div class="hint">Emails will only go here during test mode</div>
+        <div class="hint">A sample portfolio email will be sent only here — no subscribers contacted</div>
       </div>
+
+      <div id="m-segmentWrap" style="display:none">
+        <label>Tester segment ID</label>
+        <input type="text" id="m-segmentId" placeholder="e.g. 1234567"/>
+        <div class="hint">Mailchimp → Audience → Segments → click your segment → check the URL for the ID number</div>
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:.75rem 1rem;font-size:13px;color:#166534;margin-top:4px">
+          ✓ Emails will only go to members of this segment — perfect for a small tester group before live send
+        </div>
+      </div>
+
       <div id="m-liveWarning" style="display:none" class="warn">
-        ⚠️ Live mode will send personalised emails to ALL subscribers in your Mailchimp audience. Make sure you have previewed and approved emails first.
+        ⚠️ Live mode sends personalised emails to ALL subscribers. Preview and test first.
       </div>
     </div>
 
@@ -502,6 +514,9 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
       </div>
       <div id="m-liveModeInfo" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-bottom:1rem;color:#991b1b">
         🚀 <strong>Live mode:</strong> <strong id="m-liveCount">0</strong> personalised emails will be sent — one per subscriber.
+      </div>
+      <div id="m-segmentModeInfo" style="display:none;background:#dbeafe;border:1px solid #93c5fd;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-bottom:1rem;color:#1e40af">
+        👥 <strong>Segment test:</strong> One email will be sent to all members of your tester segment. Real personalisation, safe audience.
       </div>
 
       <div class="review-box">
@@ -1286,11 +1301,16 @@ function m_goS(n) {
 function m_setMode(m) {
   mode = m;
   document.getElementById('m-modeTestBtn').className = 'mode-btn' + (m === 'test' ? ' active' : '');
-  document.getElementById('m-modeLiveBtn').className = 'mode-btn' + (m === 'live' ? ' active' : '');
+  document.getElementById('m-modeSegBtn').className  = 'mode-btn' + (m === 'segment' ? ' active' : '');
+  document.getElementById('m-modeLiveBtn').className  = 'mode-btn' + (m === 'live' ? ' active' : '');
   document.getElementById('m-testEmailWrap').style.display = m === 'test' ? 'block' : 'none';
-  document.getElementById('m-liveWarning').style.display = m === 'live' ? 'block' : 'none';
-  document.getElementById('m-modeBadge').textContent = m === 'test' ? 'TEST MODE' : 'LIVE MODE';
-  document.getElementById('m-modeBadge').className = 'badge ' + (m === 'test' ? 'b-amber' : 'b-red');
+  document.getElementById('m-segmentWrap').style.display   = m === 'segment' ? 'block' : 'none';
+  document.getElementById('m-liveWarning').style.display   = m === 'live' ? 'block' : 'none';
+  var badge = document.getElementById('m-modeBadge');
+  if(badge) {
+    badge.textContent = m === 'test' ? 'TEST MODE' : m === 'segment' ? 'SEGMENT TEST' : 'LIVE MODE';
+    badge.className   = 'badge ' + (m === 'live' ? 'b-red' : m === 'segment' ? 'b-blue' : 'b-amber');
+  }
 }
 
 // Drag and drop for JSON
@@ -1590,10 +1610,14 @@ function m_goSend() {
   document.getElementById('m-rvFrom').textContent = document.getElementById('m-fromName').value;
   document.getElementById('m-rvReply').textContent = document.getElementById('m-replyTo').value;
   document.getElementById('m-rvSubject').textContent = 'Your Sokoview Portfolio Update — ' + mo;
-  document.getElementById('m-sendModeBadge').textContent = mode === 'test' ? 'TEST MODE' : 'LIVE MODE';
-  document.getElementById('m-sendModeBadge').className = 'badge ' + (mode === 'test' ? 'b-amber' : 'b-red');
+  var modeLabel = mode === 'test' ? 'TEST MODE' : mode === 'segment' ? 'SEGMENT TEST' : 'LIVE MODE';
+  var modeCls   = mode === 'live' ? 'b-red' : mode === 'segment' ? 'b-blue' : 'b-amber';
+  document.getElementById('m-sendModeBadge').textContent = modeLabel;
+  document.getElementById('m-sendModeBadge').className = 'badge ' + modeCls;
   document.getElementById('m-testModeInfo').style.display = mode === 'test' ? 'block' : 'none';
   document.getElementById('m-liveModeInfo').style.display = mode === 'live' ? 'block' : 'none';
+  var segInfo = document.getElementById('m-segmentModeInfo');
+  if(segInfo) segInfo.style.display = mode === 'segment' ? 'block' : 'none';
   document.getElementById('m-testEmailDisplay').textContent = te || '(no test email set)';
   m_goS(4);
 }
@@ -1642,7 +1666,7 @@ async function m_doSend() {
   const te  = document.getElementById('m-testEmail').value.trim();
   const mo  = monthLabel || m_MONTH;
 
-  if (!list) { m_showMsg('m-sendErr', 'Enter your Mailchimp Audience ID in step 1.'); return; }
+  if (!list) { m_showMsg('m-sendErr', 'Audience ID required — go back to step 1 and enter your Mailchimp Audience ID. Mailchimp needs this to create the campaign even in test mode.'); return; }
   if (mode === 'test' && !te) { m_showMsg('m-sendErr', 'Enter a test email address in step 1.'); return; }
 
   document.getElementById('m-sendBtn').disabled = true;
@@ -1700,6 +1724,62 @@ async function m_doSend() {
         document.getElementById('m-successMsg').textContent = 'Check ' + te + ' — it shows ' + p.firstName + "'s portfolio as a sample. No real subscribers were emailed. Switch to Live mode when ready.";
       } else {
         throw new Error((tr.json && tr.json.detail) || 'Test send failed (status ' + tr.status + ')');
+      }
+    } catch(e) {
+      m_showMsg('m-sendErr', 'Error: ' + e.message);
+      cleanup();
+    }
+    return;
+  }
+
+  // ── SEGMENT TEST MODE ──
+  // Send one campaign to a saved Mailchimp segment (your tester group)
+  // Each member of the segment gets a personalised email based on portfolio match
+  if (mode === 'segment') {
+    var segId = document.getElementById('m-segmentId').value.trim();
+    if (!segId) { m_showMsg('m-sendErr', 'Enter your tester segment ID in step 1.'); cleanup(); return; }
+
+    document.getElementById('m-sendMsg').textContent = 'Sending to tester segment...';
+    document.getElementById('m-sendProgress').style.width = '25%';
+
+    var p = portfolios[0];
+    if (!emails[p.email]) {
+      var fb = p.firstName + "'s portfolio stands at " + p.totalValue + " with a return of " + p.gainPct + ".";
+      emails[p.email] = { subject: 'Your Sokoview Portfolio Update — ' + mo, html: m_buildPortfolioEmail(p, fb, mo, {}) };
+    }
+    try {
+      var cr = await m_mcCall('createCampaign', { payload: {
+        type: 'regular',
+        recipients: {
+          list_id: list,
+          segment_opts: { saved_segment_id: parseInt(segId) }
+        },
+        settings: {
+          subject_line: emails[p.email].subject,
+          preview_text: 'Your personalised monthly portfolio update from Sokoview Analytics',
+          from_name: from, reply_to: reply,
+          title: 'SEGMENT TEST — ' + mo
+        }
+      }});
+      if (!cr.json.id) throw new Error((cr.json && cr.json.detail) || 'Campaign creation failed');
+      document.getElementById('m-sendProgress').style.width = '60%';
+      var personalHtml = emails[p.email].html.replace('*|FNAME|*', p.firstName || 'Subscriber');
+      await m_mcCall('setContent', { campaignId: cr.json.id, content: { html: personalHtml } });
+      document.getElementById('m-sendProgress').style.width = '85%';
+      document.getElementById('m-sendMsg').textContent = 'Sending to segment ' + segId + '...';
+      var sr = await m_mcCall('sendCampaign', { campaignId: cr.json.id });
+      document.getElementById('m-sendProgress').style.width = '100%';
+      cleanup();
+      if (sr.status === 204) {
+        document.getElementById('m-sendCard').style.display = 'none';
+        document.getElementById('m-successBox').style.display = 'block';
+        document.getElementById('m-backToPreview').style.display = 'none';
+        document.getElementById('m-successTitle').textContent = 'Segment test sent!';
+        document.getElementById('m-successMsg').textContent = 'Email delivered to your tester segment (ID: ' + segId + '). Check their inboxes, then switch to Live mode when happy.';
+        var firstBtn = document.querySelector('#m-successBox button');
+        if (firstBtn) firstBtn.style.display = 'none';
+      } else {
+        throw new Error((sr.json && sr.json.detail) || 'Send failed (status ' + sr.status + ')');
       }
     } catch(e) {
       m_showMsg('m-sendErr', 'Error: ' + e.message);
