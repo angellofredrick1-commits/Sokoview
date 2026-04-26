@@ -1638,11 +1638,12 @@ async function m_testMailchimp() {
 }
 
 async function m_doSend() {
-  const { from, reply } = m_mcInfo();
-  const te = document.getElementById('m-testEmail').value.trim();
-  const mo = monthLabel || m_MONTH;
+  const { from, reply, list } = m_mcInfo();
+  const te  = document.getElementById('m-testEmail').value.trim();
+  const mo  = monthLabel || m_MONTH;
 
-  if (mode === 'test' && !te) { m_showMsg('sendErr', 'Enter a test email address in step 1.'); return; }
+  if (!list) { m_showMsg('m-sendErr', 'Enter your Mailchimp Audience ID in step 1.'); return; }
+  if (mode === 'test' && !te) { m_showMsg('m-sendErr', 'Enter a test email address in step 1.'); return; }
 
   document.getElementById('m-sendBtn').disabled = true;
   document.getElementById('m-testMcBtn').disabled = true;
@@ -1651,75 +1652,121 @@ async function m_doSend() {
   document.getElementById('m-sendStatusRow').style.display = 'flex';
   document.getElementById('m-sendProgressWrap').style.display = 'block';
 
-  const toSend = mode === 'test' ? [portfolios[0]] : portfolios;
-  let sent = 0, failed = 0;
+  function cleanup() {
+    document.getElementById('m-sendStatusRow').style.display = 'none';
+    document.getElementById('m-sendProgressWrap').style.display = 'none';
+    document.getElementById('m-sendBtn').disabled = false;
+    document.getElementById('m-testMcBtn').disabled = false;
+    document.getElementById('m-sendDetail').textContent = '';
+  }
 
-  for (let i = 0; i < toSend.length; i++) {
-    const p = toSend[i];
-    const pct = Math.round(((i + 1) / toSend.length) * 100);
-    document.getElementById('m-sendProgress').style.width = pct + '%';
-    document.getElementById('m-sendMsg').textContent = mode === 'test' ? 'Sending test email...' : `Sending ${i + 1} of ${toSend.length}...`;
-    document.getElementById('m-sendDetail').textContent = mode === 'test' ? te : p.email;
-
-    // Build email if not already generated
+  // ── TEST MODE ──
+  // Uses Mailchimp /actions/test endpoint — ONLY sends to specified test
+  // addresses, never to real subscribers regardless of list_id
+  if (mode === 'test') {
+    document.getElementById('m-sendMsg').textContent = 'Creating test campaign...';
+    document.getElementById('m-sendProgress').style.width = '25%';
+    var p = portfolios[0];
     if (!emails[p.email]) {
-      const insight = `Your portfolio stands at ${p.totalValue} with a total return of ${p.gainPct} since inception. You have ${p.holdingsCount} active holdings on the DSE.`;
-      emails[p.email] = { subject: `Your Sokoview Portfolio Update — ${mo}`, html: m_buildPortfolioEmail(p, insight, mo) };
+      var fallback = p.firstName + "'s portfolio stands at " + p.totalValue + " with a return of " + p.gainPct + ".";
+      emails[p.email] = { subject: 'Your Sokoview Portfolio Update — ' + mo, html: m_buildPortfolioEmail(p, fallback, mo, {}) };
     }
+    try {
+      var cr = await m_mcCall('createCampaign', { payload: {
+        type: 'regular',
+        recipients: { list_id: list },
+        settings: { subject_line: emails[p.email].subject, preview_text: 'Your personalised monthly portfolio update', from_name: from, reply_to: reply, title: 'TEST — ' + mo }
+      }});
+      if (!cr.json.id) throw new Error(cr.json.detail || 'Campaign creation failed');
+      document.getElementById('m-sendProgress').style.width = '55%';
+      document.getElementById('m-sendMsg').textContent = 'Uploading content...';
 
-    const recipient = mode === 'test' ? te : p.email;
-    const firstName = mode === 'test' ? (p.firstName || 'Subscriber') : (p.firstName || 'Subscriber');
+      var personalHtml = emails[p.email].html.replace('*|FNAME|*', p.firstName || 'Subscriber');
+      await m_mcCall('setContent', { campaignId: cr.json.id, content: { html: personalHtml } });
+
+      document.getElementById('m-sendProgress').style.width = '80%';
+      document.getElementById('m-sendMsg').textContent = 'Sending test to ' + te + '...';
+
+      // /actions/test — guaranteed safe, only goes to test_emails array
+      var tr = await m_mcCall('testCampaign', { campaignId: cr.json.id, testEmails: [te] });
+      document.getElementById('m-sendProgress').style.width = '100%';
+      cleanup();
+
+      if (tr.status === 204) {
+        document.getElementById('m-sendCard').style.display = 'none';
+        document.getElementById('m-successBox').style.display = 'block';
+        document.getElementById('m-backToPreview').style.display = 'none';
+        document.getElementById('m-successTitle').textContent = 'Test email sent!';
+        document.getElementById('m-successMsg').textContent = 'Check ' + te + ' — it shows ' + p.firstName + "'s portfolio as a sample. No real subscribers were emailed. Switch to Live mode when ready.";
+      } else {
+        throw new Error((tr.json && tr.json.detail) || 'Test send failed (status ' + tr.status + ')');
+      }
+    } catch(e) {
+      m_showMsg('m-sendErr', 'Error: ' + e.message);
+      cleanup();
+    }
+    return;
+  }
+
+  // ── LIVE MODE ──
+  // One campaign per subscriber, each with a segment condition matching
+  // ONLY that subscriber's email address — nobody else receives it
+  var sent = 0, failed = 0;
+  for (var i = 0; i < portfolios.length; i++) {
+    var p = portfolios[i];
+    var pct = Math.round(((i + 1) / portfolios.length) * 100);
+    document.getElementById('m-sendProgress').style.width = pct + '%';
+    document.getElementById('m-sendMsg').textContent = 'Sending ' + (i + 1) + ' of ' + portfolios.length + '...';
+    document.getElementById('m-sendDetail').textContent = p.email;
+
+    if (!emails[p.email]) {
+      var fallback = p.firstName + "'s portfolio stands at " + p.totalValue + " with a return of " + p.gainPct + " since inception across " + p.holdingsCount + " holdings.";
+      emails[p.email] = { subject: 'Your Sokoview Portfolio Update — ' + mo, html: m_buildPortfolioEmail(p, fallback, mo, {}) };
+    }
 
     try {
-      // Create campaign
-      const cr = await m_mcCall('createCampaign', {
-        payload: {
-          type: 'regular',
-          recipients: { list_id: m_mcInfo().list, segment_opts: mode === 'test' ? undefined : { saved_segment_id: undefined } },
-          settings: { subject_line: emails[p.email].subject, preview_text: 'Your personalised monthly portfolio update from Sokoview Analytics', from_name: from, reply_to: reply, title: 'Portfolio — ' + p.email + ' — ' + mo }
+      // Segment condition: EMAIL is exactly this subscriber's address
+      // Mailchimp will only send to this one person
+      var cr = await m_mcCall('createCampaign', { payload: {
+        type: 'regular',
+        recipients: {
+          list_id: list,
+          segment_opts: {
+            match: 'any',
+            conditions: [{ condition_type: 'EmailAddress', field: 'EMAIL', op: 'is', value: p.email }]
+          }
+        },
+        settings: {
+          subject_line: emails[p.email].subject,
+          preview_text: 'Your personalised monthly portfolio update from Sokoview Analytics',
+          from_name: from, reply_to: reply,
+          title: 'Portfolio — ' + p.email + ' — ' + mo
         }
-      });
-      if (!cr.json.id) throw new Error(cr.json.detail || 'Campaign creation failed');
+      }});
+      if (!cr.json.id) throw new Error((cr.json && cr.json.detail) || 'Campaign creation failed for ' + p.email);
 
-      // Upload content
-      await m_mcCall('setContent', { campaignId: cr.json.id, content: { html: emails[p.email].html.replace('*|FNAME|*', firstName) } });
+      var personalHtml = emails[p.email].html.replace('*|FNAME|*', p.firstName || 'Subscriber');
+      await m_mcCall('setContent', { campaignId: cr.json.id, content: { html: personalHtml } });
 
-      // For test mode — send to test email via segment
-      // For live mode — we need to target specific subscriber
-      // Both modes: send the campaign
-      const sr = await m_mcCall('sendCampaign', { campaignId: cr.json.id });
-      if (sr.status === 204) sent++;
-      else throw new Error(sr.json.detail || 'Send failed');
+      var sr = await m_mcCall('sendCampaign', { campaignId: cr.json.id });
+      if (sr.status === 204) { sent++; }
+      else throw new Error((sr.json && sr.json.detail) || 'Send failed for ' + p.email);
 
-      // Small delay to avoid rate limiting
-      if (i < toSend.length - 1) await new Promise(r => setTimeout(r, 800));
+      if (i < portfolios.length - 1) await new Promise(function(r){setTimeout(r, 600);});
     } catch(e) {
       failed++;
-      console.error('Failed for', p.email, e.message);
+      console.warn('Failed for', p.email, ':', e.message);
     }
   }
 
-  document.getElementById('m-sendStatusRow').style.display = 'none';
-  document.getElementById('m-sendProgressWrap').style.display = 'none';
-  document.getElementById('m-sendBtn').disabled = false;
-  document.getElementById('m-testMcBtn').disabled = false;
-  document.getElementById('m-sendDetail').textContent = '';
-
-  if (mode === 'test') {
-    document.getElementById('m-sendCard').style.display = 'none';
-    document.getElementById('m-successBox').style.display = 'block';
-    document.getElementById('m-backToPreview').style.display = 'none';
-    document.getElementById('m-successTitle').textContent = 'Test email sent!';
-    document.getElementById('m-successMsg').textContent = `A sample portfolio email was sent to ${te}. Check your inbox, then switch to live mode to send to all ${portfolios.length} subscribers.`;
-  } else {
-    document.getElementById('m-sendCard').style.display = 'none';
-    document.getElementById('m-successBox').style.display = 'block';
-    document.getElementById('m-backToPreview').style.display = 'none';
-    document.getElementById('m-successTitle').textContent = `${sent} emails sent!`;
-    document.getElementById('m-successMsg').textContent = `Monthly portfolio updates sent to ${sent} subscribers.${failed > 0 ? ` ${failed} failed.` : ''}`;
-    // Hide the "switch to live" button since we're already live
-    document.querySelector('#successBox button').style.display = 'none';
-  }
+  cleanup();
+  document.getElementById('m-sendCard').style.display = 'none';
+  document.getElementById('m-successBox').style.display = 'block';
+  document.getElementById('m-backToPreview').style.display = 'none';
+  document.getElementById('m-successTitle').textContent = sent + ' emails sent!';
+  document.getElementById('m-successMsg').textContent = 'Personalised portfolio updates delivered to ' + sent + ' subscribers.' + (failed ? ' ' + failed + ' failed — check browser console.' : '');
+  var firstBtn = document.querySelector('#m-successBox button');
+  if (firstBtn) firstBtn.style.display = 'none';
 }
 
 function m_resetSend() {
