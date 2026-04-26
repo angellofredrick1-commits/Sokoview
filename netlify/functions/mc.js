@@ -55,6 +55,12 @@ exports.handler = async (event) => {
       url = `${base}/campaigns/${data.campaignId}/actions/send`;
       method = 'POST';
       break;
+    case 'testCampaign':
+      // Sends ONLY to specified test email addresses — never to subscribers
+      url = `${base}/campaigns/${data.campaignId}/actions/test`;
+      method = 'POST';
+      body = JSON.stringify({ test_emails: data.testEmails, send_type: 'html' });
+      break;
     default:
       return { statusCode: 400, headers: cors, body: JSON.stringify({ error: 'Unknown action: ' + action }) };
   }
