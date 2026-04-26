@@ -496,9 +496,7 @@ td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{col
         <span class="badge" id="m-sendModeBadge">TEST MODE</span>
       </div>
 
-      <div id="m-testModeInfo" class="warn" style="margin-bottom:1rem">
-        🔒 <strong>Test mode:</strong> One email sent only to <strong id="m-testEmailDisplay"></strong> via Mailchimp /actions/test — no subscribers contacted.
-      </div>
+
       <div id="m-liveModeInfo" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-bottom:1rem;color:#991b1b">
         🚀 <strong>Live mode:</strong> <strong id="m-liveCount">0</strong> personalised emails will be sent — one per subscriber.
       </div>
@@ -1590,11 +1588,11 @@ function m_buildPortfolioEmail(p, insight, mo, seg) {
 // ── SEND ──
 function m_goSend() {
   const mo = monthLabel || m_MONTH;
-  document.getElementById('m-rvFrom').textContent = document.getElementById('m-fromName').value;
-  document.getElementById('m-rvReply').textContent = document.getElementById('m-replyTo').value;
-  document.getElementById('m-rvSubject').textContent = 'Your Sokoview Portfolio Update — ' + mo;
-  document.getElementById('m-rvPortfolios').textContent = portfolios ? portfolios.length : 0;
-  document.getElementById('m-rvMonth').textContent = mo;
+  var rvFrom=document.getElementById('m-rvFrom');if(rvFrom)rvFrom.textContent=document.getElementById('m-fromName').value;
+  var rvReply=document.getElementById('m-rvReply');if(rvReply)rvReply.textContent=document.getElementById('m-replyTo').value;
+  var rvSubj=document.getElementById('m-rvSubject');if(rvSubj)rvSubj.textContent='Your Sokoview Portfolio Update — '+mo;
+  var rvCnt=document.getElementById('m-rvCount');if(rvCnt)rvCnt.textContent=portfolios?portfolios.length:0;
+  var rvMo=document.getElementById('m-rvMonth');if(rvMo)rvMo.textContent=mo;
   var badge=document.getElementById('m-sendModeBadge');
   if(badge){badge.textContent=mode==='live'?'LIVE MODE':'SEGMENT TEST';badge.className='badge '+(mode==='live'?'b-red':'b-blue');}
   var si=document.getElementById('m-segmentModeInfo');if(si)si.style.display=mode==='segment'?'block':'none';
