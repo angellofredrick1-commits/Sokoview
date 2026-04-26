@@ -1600,6 +1600,7 @@ function m_goSend() {
   var sid=document.getElementById('m-segmentIdDisplay');
   if(sid){sid.textContent=((document.getElementById('m-segmentId')||{}).value||'not set').trim();}
   document.getElementById('m-liveCount').textContent = portfolios ? portfolios.length : 0;
+  m_goS(4);
 }
 
 async function m_doSend(){
