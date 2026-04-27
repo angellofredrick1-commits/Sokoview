@@ -35,46 +35,22 @@ exports.handler = async (event) => {
       case 'getList':
         return send(await go(`${base}/lists/${data.listId}`));
 
-      // Ensure all 8 custom merge fields exist — creates missing ones
-      case 'ensureMergeFields': {
-        const fields = [
-          {tag:'PORTVAL', name:'Portfolio Value', type:'text'},
-          {tag:'INVESTED',name:'Amount Invested', type:'text'},
-          {tag:'GAINPCT', name:'Return %',        type:'text'},
-          {tag:'ABSGAIN', name:'TZS Gain/Loss',   type:'text'},
-          {tag:'HOLDINGS',name:'Holdings',         type:'text'},
-          {tag:'INSIGHT', name:'AI Insight',       type:'text'},
-          {tag:'SEGLBL',  name:'Segment Label',    type:'text'},
-          {tag:'SEGEMO',  name:'Segment Emoji',    type:'text'},
-        ];
-        const ex = await go(`${base}/lists/${data.listId}/merge-fields?count=100`);
-        const existing = (ex.json.merge_fields||[]).map(f=>f.tag);
-        const results = [];
-        for (const f of fields) {
-          if (existing.includes(f.tag)) { results.push({tag:f.tag,status:'exists'}); continue; }
-          const r = await go(`${base}/lists/${data.listId}/merge-fields`,'POST',JSON.stringify({tag:f.tag,name:f.name,type:f.type,required:false}));
-          results.push({tag:f.tag,status:r.status});
-        }
-        return { statusCode:200, headers:{...cors,'Content-Type':'application/json'}, body:JSON.stringify({fields:results}) };
-      }
-
-      // Update one subscriber's merge fields by email
-      case 'updateMember': {
-        const hash = crypto.createHash('md5').update((data.email||'').toLowerCase().trim()).digest('hex');
-        return send(await go(`${base}/lists/${data.listId}/members/${hash}`,'PATCH',JSON.stringify({merge_fields:data.mergeFields})));
-      }
-
       case 'createCampaign':
-        return send(await go(`${base}/campaigns`,'POST',JSON.stringify(data.payload)));
+        return send(await go(`${base}/campaigns`, 'POST', JSON.stringify(data.payload)));
 
       case 'setContent':
-        return send(await go(`${base}/campaigns/${data.campaignId}/content`,'PUT',JSON.stringify(data.content)));
+        return send(await go(`${base}/campaigns/${data.campaignId}/content`, 'PUT', JSON.stringify(data.content)));
 
       case 'sendCampaign':
-        return send(await go(`${base}/campaigns/${data.campaignId}/actions/send`,'POST'));
+        return send(await go(`${base}/campaigns/${data.campaignId}/actions/send`, 'POST'));
 
-      case 'testCampaign':
-        return send(await go(`${base}/campaigns/${data.campaignId}/actions/test`,'POST',JSON.stringify({test_emails:data.testEmails,send_type:'html'})));
+      // ── Stats: full campaign report (open rate, clicks, bounces etc) ──────
+      case 'getCampaignReport':
+        return send(await go(`${base}/reports/${data.campaignId}`));
+
+      // ── Stats: campaign send status (sent / sending / scheduled) ──────────
+      case 'getCampaignStatus':
+        return send(await go(`${base}/campaigns/${data.campaignId}`));
 
       default:
         return { statusCode:400, headers:cors, body:JSON.stringify({error:'Unknown action: '+action}) };
