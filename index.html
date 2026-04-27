@@ -2,671 +2,404 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Sokoview Email Suite</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sokoview — Daily Market Email</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,sans-serif;background:#f0f2f5;color:#111;font-size:14px;min-height:100vh}
-.app-header{background:#1a2744;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
-.app-header-inner{max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.875rem 1rem;gap:1rem;flex-wrap:wrap}
-.app-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.app-logo-mark{width:34px;height:34px;background:rgba(245,158,11,.15);border-radius:8px;display:flex;align-items:center;justify-content:center}
-.app-logo-name{font-weight:700;font-size:16px;color:#fff;line-height:1.2}
-.app-logo-sub{font-size:11px;color:#64748b}
-.tab-bar{display:flex;gap:2px;background:rgba(255,255,255,.08);border-radius:8px;padding:3px}
-.tab-btn{padding:7px 16px;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:#94a3b8;transition:all .15s;font-family:inherit;white-space:nowrap}
-.tab-btn.active{background:#fff;color:#1a2744;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.15)}
-.tab-btn:hover:not(.active){color:#e2e8f0}
-.tab-pane{display:none;padding:1.5rem 1rem;max-width:760px;margin:0 auto}
-.tab-pane.active{display:block}
-.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.05)}
-label{display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;margin-bottom:5px}
-input[type=text],input[type=password],input[type=email]{width:100%;padding:10px 12px;font-size:14px;font-family:inherit;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:#111;outline:none;margin-bottom:4px;transition:border-color .15s}
-input:focus{border-color:#1a2744;box-shadow:0 0 0 3px rgba(26,39,68,.08)}
-.hint{font-size:12px;color:#9ca3af;margin-bottom:14px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:520px){.row2{grid-template-columns:1fr}}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;font-size:14px;font-family:inherit;border-radius:8px;cursor:pointer;font-weight:500;transition:all .15s;border:none}
-.btn-block{width:100%}
-.btn-primary{background:#1a2744;color:#fff}.btn-primary:hover{background:#253460}.btn-primary:disabled{opacity:.45;cursor:not-allowed}
-.btn-outline{background:#fff;border:1px solid #d1d5db;color:#374151}.btn-outline:hover{background:#f9fafb}.btn-outline:disabled{opacity:.45;cursor:not-allowed}
-.btn-amber{background:#f59e0b;color:#1a2744;font-weight:700}.btn-amber:hover{background:#d97706}
-.divider{border:none;border-top:1px solid #f3f4f6;margin:1.25rem 0}
-.err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-top:.875rem;display:none}
-.ok{background:#f0fdf4;color:#166534;border:1px solid #86efac;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-top:.875rem;display:none}
-.warn{background:#fefce8;color:#713f12;border:1px solid #fde047;border-radius:8px;padding:.875rem 1rem;font-size:13px}
-.spin{width:18px;height:18px;border:2.5px solid rgba(26,39,68,.15);border-top-color:#1a2744;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
-.status-box{display:none;align-items:center;gap:10px;padding:1.25rem 0;justify-content:center;font-size:13px;color:#6b7280}
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.b-blue{background:#dbeafe;color:#1e40af}.b-green{background:#dcfce7;color:#166534}
-.b-amber{background:#fef3c7;color:#92400e}.b-red{background:#fee2e2;color:#991b1b}
-.success{background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:2.5rem;text-align:center}
-.back-btn{background:none;border:none;cursor:pointer;color:#6b7280;font-size:13px;padding:0;margin-top:.875rem;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
-.back-btn:hover{color:#374151}
-.debug{display:none;margin-top:.875rem;background:#1e293b;color:#e2e8f0;border-radius:8px;padding:1rem;font-size:12px;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto}
-.steps{display:flex;margin-bottom:2rem;position:relative}
-.steps::before{content:'';position:absolute;top:14px;left:10%;right:10%;height:1px;background:#e5e7eb}
-.step{flex:1;text-align:center;position:relative;z-index:1}
-.dot{width:28px;height:28px;border-radius:50%;margin:0 auto 6px;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid #d1d5db;color:#9ca3af;transition:all .2s}
-.dot.active{background:#1a2744;color:#fff;border-color:#1a2744}.dot.done{background:#22c55e;color:#fff;border-color:#22c55e}
-.step-lbl{font-size:11px;color:#9ca3af;font-weight:500}.step-lbl.active{color:#1a2744;font-weight:600}
-.preview-wrap{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:1rem}
-iframe{width:100%;min-height:560px;border:none;display:block}
-.review-box{background:#f9fafb;border-radius:8px;padding:1rem;margin:1rem 0;font-size:13px}
-.review-row{display:flex;justify-content:space-between;gap:1rem;padding:5px 0;border-bottom:1px solid #e5e7eb}
-.review-row:last-child{border:none}
-.prog-bar{height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden;margin:.5rem 0 .25rem}
-.prog-fill{height:100%;background:#1a2744;border-radius:2px;transition:width .5s ease}
-.prog-lbl{font-size:11px;color:#9ca3af;text-align:center}
-.drop-zone{border:2px dashed #d1d5db;border-radius:12px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .2s;background:#fafafa}
-.drop-zone:hover,.drop-zone.dragover{border-color:#1a2744;background:#f0f4ff}
-.drop-zone.has-file{border-color:#22c55e;background:#f0fdf4;border-style:solid}
-.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:1rem 0}
-@media(max-width:520px){.metric-grid{grid-template-columns:1fr 1fr}}
-.metric{background:#f9fafb;border-radius:8px;padding:.75rem .875rem}
-.m-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;margin-bottom:3px}
-.m-val{font-size:15px;font-weight:600;color:#111}.m-val.up{color:#16a34a}.m-val.dn{color:#dc2626}
-.tbl-wrap{overflow-x:auto;margin:.5rem 0}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:7px 10px;background:#f9fafb;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;border-bottom:1px solid #e5e7eb}
-td{padding:8px 10px;border-bottom:1px solid #f3f4f6}
-td.bold{font-weight:600;color:#111}td.up{color:#16a34a;font-weight:600}td.dn{color:#dc2626;font-weight:600}td.muted{color:#6b7280}
-.mode-toggle{display:flex;gap:.5rem;margin-bottom:1rem;background:#f3f4f6;padding:4px;border-radius:8px}
-.mode-btn{flex:1;padding:8px;border:none;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;background:transparent;color:#6b7280;transition:all .15s;font-family:inherit}
-.mode-btn.active{background:#fff;color:#1a2744;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
-.portfolio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin:.875rem 0}
-.portfolio-card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:.875rem;font-size:13px;cursor:pointer;transition:border-color .15s}
-.portfolio-card:hover{border-color:#1a2744}
-.portfolio-card .p-name{font-weight:600;color:#111;margin-bottom:2px}
-.portfolio-card .p-email{color:#6b7280;font-size:12px;margin-bottom:.5rem;word-break:break-all}
-.portfolio-card .p-value{font-size:15px;font-weight:700;color:#111}
-.portfolio-card .p-gain{font-size:12px;font-weight:600}
-.portfolio-card .p-gain.up{color:#16a34a}.portfolio-card .p-gain.dn{color:#dc2626}
-.nav-row{display:flex;align-items:center;justify-content:space-between;margin:.75rem 0}
-.nav-row button{padding:7px 16px;font-size:13px;border-radius:6px;cursor:pointer;border:1px solid #d1d5db;background:#fff;font-family:inherit}
-.nav-row button:disabled{opacity:.4;cursor:not-allowed}
-.progress-bar-wrap{width:100%;background:#e5e7eb;border-radius:4px;height:6px;margin:.5rem 0;overflow:hidden}
-.progress-bar-fill{height:100%;background:#1a2744;border-radius:4px;transition:width .3s ease}
+  :root {
+    --navy:#1a2744; --amber:#f59e0b; --bg:#f0f4f8;
+    --card:#fff; --border:#e2e8f0; --muted:#6b7280;
+    --green:#16a34a; --red:#dc2626; --blue:#1d4ed8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;color:#111;font-size:14px}
+  /* ── App shell */
+  .shell{max-width:680px;margin:0 auto;padding:16px 12px 40px}
+  /* ── Header */
+  .hdr{background:var(--navy);border-radius:14px;padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+  .hdr-logo{font-size:22px;font-weight:900;color:var(--amber);letter-spacing:2px}
+  .hdr-sub{font-size:11px;color:#94a3b8;margin-top:2px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+  .b-mc{background:#ffe4b5;color:#92400e}
+  /* ── Step nav */
+  .steps{display:flex;align-items:center;gap:0;margin-bottom:16px;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+  .step{flex:1;padding:12px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-right:1px solid var(--border);transition:all .15s;position:relative}
+  .step:last-child{border-right:none}
+  .step.active{color:var(--navy);background:#f8faff}
+  .step.done{color:var(--green)}
+  .step-n{width:20px;height:20px;border-radius:50%;background:#e5e7eb;color:var(--muted);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 4px}
+  .step.active .step-n{background:var(--navy);color:#fff}
+  .step.done .step-n{background:var(--green);color:#fff}
+  /* ── Cards */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:12px}
+  .card-title{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f1f5f9}
+  /* ── Form */
+  label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.04em}
+  input[type=text],input[type=password],input[type=email]{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;outline:none;transition:border .15s}
+  input:focus{border-color:var(--navy)}
+  .hint{font-size:11px;color:#9ca3af;margin-top:3px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  /* ── Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+  .btn-primary{background:var(--navy);color:#fff}
+  .btn-primary:hover{background:#223366}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+  .btn-amber{background:var(--amber);color:var(--navy)}
+  .btn-amber:hover{background:#d97706}
+  .btn-outline{background:#fff;color:var(--navy);border:1.5px solid var(--border)}
+  .btn-outline:hover{border-color:var(--navy)}
+  .btn-sm{padding:7px 14px;font-size:12px}
+  .btn-block{width:100%}
+  /* ── Drop zone */
+  .dropzone{border:2px dashed #cbd5e1;border-radius:12px;padding:2rem;text-align:center;background:#fafbfc;transition:all .2s;cursor:pointer;position:relative}
+  .dropzone.hover{border-color:var(--navy);background:#f0f4ff}
+  .dropzone-icon{font-size:32px;margin-bottom:8px}
+  .dropzone label{font-size:13px;font-weight:600;color:var(--navy);text-transform:none;letter-spacing:0;cursor:pointer;margin:0}
+  .dropzone label:hover{text-decoration:underline}
+  input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+  /* ── Status */
+  .status-row{display:none;align-items:center;gap:10px;padding:12px 16px;background:#f8faff;border-radius:8px;margin:8px 0}
+  .spinner{width:16px;height:16px;border:2px solid #e2e8f0;border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .progress-wrap{height:4px;background:#e5e7eb;border-radius:2px;margin:6px 0;overflow:hidden}
+  .progress-bar{height:100%;background:var(--navy);border-radius:2px;width:0%;transition:width .4s}
+  .msg-err{color:var(--red);font-size:12px;padding:6px 0;display:none}
+  .msg-ok{color:var(--green);font-size:12px;padding:6px 0;display:none}
+  /* ── Preview */
+  .prev-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+  .metric{background:#f9fafb;border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+  .m-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+  .m-val{font-size:15px;font-weight:700;color:#111}
+  .m-val.up{color:var(--green)} .m-val.dn{color:var(--red)}
+  iframe{width:100%;height:520px;border:1px solid var(--border);border-radius:8px;background:#fff}
+  .tbl-wrap{overflow-x:auto;margin:8px 0}
+  table{width:100%;border-collapse:collapse;min-width:400px}
+  th{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+  th:not(:first-child){text-align:right}
+  td{font-size:12px;padding:8px 10px;border-bottom:1px solid #f3f4f6}
+  td:not(:first-child){text-align:right}
+  .bold{font-weight:700} .muted{color:var(--muted)} .up{color:var(--green)} .dn{color:var(--red)}
+  /* ── Subject input */
+  .subject-wrap{display:flex;gap:8px;align-items:center}
+  .subject-wrap input{flex:1}
+  /* ── Success box */
+  .success-box{display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:24px;text-align:center}
+  .success-box .icon{font-size:40px;margin-bottom:8px}
+  .success-box h3{font-size:17px;font-weight:700;color:#166534;margin-bottom:6px}
+  .success-box p{font-size:13px;color:#4b7a57}
+  /* ── Stats panel */
+  .stats-panel{display:none;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:12px}
+  .stats-panel h3{font-size:13px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  .stat-card{background:#f9fafb;border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+  .stat-card .s-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+  .stat-card .s-val{font-size:24px;font-weight:800;color:var(--navy)}
+  .stat-card .s-sub{font-size:11px;color:var(--muted);margin-top:2px}
+  .stat-status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+  .stat-sent{background:#dbeafe;color:#1e40af}
+  .stat-sending{background:#fef3c7;color:#92400e}
+  .stat-scheduled{background:#ede9fe;color:#6d28d9}
+  .stat-err{background:#fee2e2;color:#991b1b}
+  .stats-footer{font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .refresh-link{color:var(--navy);cursor:pointer;font-weight:600;text-decoration:underline;font-size:12px}
+  .debug-box{display:none;background:#1e293b;color:#94a3b8;font-family:monospace;font-size:11px;padding:12px;border-radius:8px;margin-top:8px;max-height:200px;overflow-y:auto;white-space:pre-wrap;line-height:1.6}
 </style>
 </head>
 <body>
+<div class="shell">
 
-<div class="app-header">
-  <div class="app-header-inner">
-    <div class="app-logo">
-      <div class="app-logo-mark"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polyline points="1,14 5,8 9,11 13,4 17,7" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div><div class="app-logo-name">Sokoview</div><div class="app-logo-sub">Email Suite</div></div>
+  <!-- Header -->
+  <div class="hdr">
+    <div>
+      <div class="hdr-logo">SOKOVIEW</div>
+      <div class="hdr-sub">Daily Market Email &middot; PDF &rarr; Mailchimp</div>
     </div>
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('daily')" id="tab-daily">📈 Daily Market</button>
-      <button class="tab-btn" onclick="switchTab('monthly')" id="tab-monthly">📊 Monthly Portfolio</button>
-    </div>
-  </div>
-</div>
-
-<div class="tab-pane active" id="pane-daily">
-<div class="wrap">
-
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:10px">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:40px;height:40px;background:#1a2744;border-radius:10px;display:flex;align-items:center;justify-content:center">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <polyline points="1,17 6,9 11,13 16,5 21,8" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <div>
-        <div style="font-weight:700;font-size:18px;color:#1a2744">Sokoview</div>
-        <div style="font-size:12px;color:#6b7280">Daily Market Email · PDF → Mailchimp</div>
-      </div>
-    </div>
-    <span class="badge b-blue">Sokoview Analytics</span>
+    <span class="badge b-mc">Sokoview Analytics</span>
   </div>
 
-  <!-- STEPS -->
+  <!-- Step nav -->
   <div class="steps">
-    <div class="step"><div class="dot active" id="d1">1</div><div class="step-lbl active" id="sl1">Settings</div></div>
-    <div class="step"><div class="dot" id="d2">2</div><div class="step-lbl" id="sl2">Upload PDF</div></div>
-    <div class="step"><div class="dot" id="d3">3</div><div class="step-lbl" id="sl3">Preview</div></div>
-    <div class="step"><div class="dot" id="d4">4</div><div class="step-lbl" id="sl4">Send</div></div>
+    <div class="step active" id="d1" onclick="goS(1)"><div class="step-n" id="sl1">1</div>Settings</div>
+    <div class="step" id="d2" onclick="goS(2)"><div class="step-n" id="sl2">2</div>Upload PDF</div>
+    <div class="step" id="d3" onclick="goS(3)"><div class="step-n" id="sl3">3</div>Preview</div>
+    <div class="step" id="d4" onclick="goS(4)"><div class="step-n" id="sl4">4</div>Send</div>
   </div>
 
-  <!-- S1: SETTINGS -->
+  <!-- ══ STEP 1: SETTINGS ══ -->
   <div id="s1">
     <div class="card">
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:1rem">API keys</div>
-      <label>Anthropic API key</label>
+      <div class="card-title">API Keys</div>
+      <label>Anthropic API Key</label>
       <input type="password" id="anthroKey" placeholder="sk-ant-api03-..."/>
-      <div class="hint">console.anthropic.com → API Keys → Create Key</div>
-      <hr class="divider"/>
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:1rem">Mailchimp</div>
-      <label>Mailchimp API key</label>
-      <input type="password" id="mcKey" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1"/>
-      <div class="hint">Mailchimp → Account → Extras → API keys</div>
+      <div class="hint"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> &rarr; API Keys &rarr; Create Key</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Mailchimp</div>
+      <label>Mailchimp API Key</label>
+      <input type="password" id="mcKey" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1"/>
+      <div class="hint">Mailchimp &rarr; Account &rarr; Extras &rarr; API keys</div>
       <label>Audience / List ID</label>
       <input type="text" id="mcList" placeholder="e.g. a1b2c3d4e5"/>
-      <div class="hint">Mailchimp → Audience → Settings → Audience name and defaults → "Audience ID"</div>
-      <div class="row2">
+      <div class="hint">Mailchimp &rarr; Audience &rarr; Settings &rarr; Audience name and defaults &rarr; "Audience ID"</div>
+      <div class="grid2" style="margin-top:10px">
         <div>
-          <label>From name</label>
-          <input type="text" id="fromName" value="Sokoview"/>
+          <label>From Name</label>
+          <input type="text" id="fromName" value="Sokoview Analytics"/>
         </div>
         <div>
-          <label>Verified reply-to email</label>
-          <input type="text" id="replyTo" placeholder="you@yourdomain.com"/>
+          <label>Verified Reply-to Email</label>
+          <input type="email" id="replyTo" placeholder="you@yourdomain.com"/>
           <div class="hint">Must be verified in Mailchimp</div>
         </div>
       </div>
     </div>
-    <div class="card" style="background:#f8fafc;border-color:#e2e8f0">
-      <div style="font-weight:600;font-size:13px;color:#374151;margin-bottom:.75rem">How it works</div>
-      <div style="display:grid;gap:8px">
+
+    <div class="card" style="background:#f8faff;border-color:#c7d2fe">
+      <div class="card-title" style="color:#4338ca">How it works</div>
+      <div style="display:grid;gap:10px">
         <div style="display:flex;gap:10px;align-items:flex-start">
-          <div style="min-width:22px;height:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">1</div>
-          <span style="font-size:13px;color:#6b7280">Upload today's <strong>Sokoview Analytics daily market report PDF</strong></span>
+          <div style="width:22px;height:22px;background:#4338ca;color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+          <div style="font-size:13px;color:#374151">Upload today's <strong>Sokoview Analytics daily market report PDF</strong></div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start">
-          <div style="min-width:22px;height:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">2</div>
-          <span style="font-size:13px;color:#6b7280">Claude reads the PDF and <strong>extracts all market data</strong> — prices, indices, gainers, losers, turnover</span>
+          <div style="width:22px;height:22px;background:#4338ca;color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+          <div style="font-size:13px;color:#374151">Claude reads the PDF and <strong>extracts all market data</strong> — prices, indices, gainers, losers, turnover</div>
         </div>
         <div style="display:flex;gap:10px;align-items:flex-start">
-          <div style="min-width:22px;height:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">3</div>
-          <span style="font-size:13px;color:#6b7280">Generates a <strong>branded Sokoview email</strong> and sends via Mailchimp — no web scraping, no rate limits</span>
+          <div style="width:22px;height:22px;background:#4338ca;color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+          <div style="font-size:13px;color:#374151">Generates a <strong>branded Sokoview email</strong> and sends via Mailchimp — <strong>one campaign to your full audience</strong></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="width:22px;height:22px;background:#059669;color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+          <div style="font-size:13px;color:#374151">After sending, <strong>pull live Mailchimp stats</strong> — delivery rate, open rate, and click rate</div>
         </div>
       </div>
     </div>
-    <button class="btn btn-primary btn-block" onclick="goS(2)">
-      Continue
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
+
+    <button class="btn btn-primary btn-block" onclick="goS(2)" style="margin-top:4px">Continue &rarr;</button>
   </div>
 
-  <!-- S2: UPLOAD PDF -->
+  <!-- ══ STEP 2: UPLOAD PDF ══ -->
   <div id="s2" style="display:none">
     <div class="card">
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Upload today's market report</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:1.25rem">Drop in the Sokoview Analytics Daily Market Report PDF. Claude will read it and generate the email automatically.</div>
-
-      <div class="drop-zone" id="dropZone" onclick="document.getElementById('pdfInput').click()">
-        <input type="file" id="pdfInput" accept=".pdf,application/pdf" style="display:none" onchange="handleFile(this.files[0])"/>
-        <div class="file-icon" id="fileIcon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div id="dropText" style="font-weight:600;color:#374151;margin-bottom:4px">Click to upload or drag &amp; drop</div>
-        <div id="dropSub" style="font-size:12px;color:#9ca3af">Sokoview Analytics Daily Market Report PDF</div>
+      <div class="card-title">Upload Sokoview Analytics PDF</div>
+      <div class="dropzone" id="dropZone">
+        <div class="dropzone-icon">📄</div>
+        <div style="font-weight:600;color:var(--navy);margin-bottom:4px" id="dropText">Drop your PDF here</div>
+        <label for="pdfInput" class="btn btn-outline btn-sm" style="display:inline-flex;margin-top:6px">Browse file</label>
+        <input type="file" id="pdfInput" accept="application/pdf,.pdf" onchange="handlePdf(this.files[0])"/>
+        <div style="font-size:11px;color:#9ca3af;margin-top:6px">Sokoview Analytics daily market report PDF</div>
       </div>
-
-      <div class="status-box" id="statusBox">
-        <div class="spin"></div>
-        <div style="text-align:center">
-          <div id="statusMsg" style="font-weight:500;color:#374151"></div>
-          <div class="prog-bar" style="width:280px;margin:.5rem auto .25rem"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-          <div class="prog-lbl" id="progLbl"></div>
-        </div>
-      </div>
-
-      <div class="err" id="genErr"></div>
-      <div class="debug" id="genDebug"></div>
+      <div class="msg-err" id="genErr"></div>
     </div>
-    <button class="back-btn" onclick="goS(1)">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 7H4M6 4L3 7l3 3" stroke="#6b7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Back to settings
-    </button>
+
+    <div class="status-row" id="statusBox">
+      <div class="spinner"></div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--navy)" id="statusMsg">Reading PDF...</div>
+        <div class="progress-wrap" style="width:200px;margin-top:4px"><div class="progress-bar" id="progressBar"></div></div>
+      </div>
+    </div>
+
+    <div style="margin-top:8px"><a href="#" onclick="goS(1);return false" style="font-size:12px;color:var(--muted)">&larr; Back to settings</a></div>
   </div>
 
-  <!-- S3: PREVIEW -->
+  <!-- ══ STEP 3: PREVIEW ══ -->
   <div id="s3" style="display:none">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+      <div class="prev-header">
         <div>
-          <div style="font-weight:600;font-size:15px;color:#1a2744">Extracted market data</div>
-          <div style="font-size:12px;color:#9ca3af" id="dataDate"></div>
+          <div style="font-size:15px;font-weight:700" id="dataDate">—</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">DSE Daily Briefing</div>
         </div>
-        <span class="badge b-neu" id="sentBadge">—</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="badge" id="sentBadge" style="background:#fef3c7;color:#92400e">Neutral</span>
+        </div>
       </div>
-      <div class="metric-grid" id="metrics"></div>
+
+      <div class="metrics" id="metrics"></div>
+
       <div id="gainTable"></div>
       <div id="lossTable"></div>
-    </div>
-    <div class="card">
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.875rem">Email preview</div>
-      <label>Subject line</label>
-      <input type="text" id="subjectInput" style="margin-bottom:1rem"/>
-      <div class="preview-wrap">
-        <iframe id="previewFrame" sandbox="allow-same-origin" title="Email preview"></iframe>
+
+      <div style="margin-top:14px">
+        <div class="subject-wrap">
+          <input type="text" id="subjectInput" placeholder="Email subject line"/>
+          <button class="btn btn-outline btn-sm" onclick="regenerateSubject()">↺ Subject</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Email Preview</div>
+        <iframe id="previewFrame" title="Email preview"></iframe>
       </div>
     </div>
-    <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-      <button class="btn btn-outline" onclick="goS(2);resetUpload()">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 2v4H8M2 12a6 6 0 100-8.485" stroke="#374151" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Upload new PDF
-      </button>
-      <button class="btn btn-primary" style="flex:1" onclick="goSend()">
-        Looks good — send via Mailchimp
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
+
+    <button class="btn btn-primary btn-block" onclick="goS(4)">Continue &rarr; Send</button>
+    <div style="margin-top:8px"><a href="#" onclick="goS(2);return false" style="font-size:12px;color:var(--muted)">&larr; Re-upload PDF</a></div>
   </div>
 
-  <!-- S4: SEND -->
+  <!-- ══ STEP 4: SEND ══ -->
   <div id="s4" style="display:none">
-    <div id="sendCard" class="card">
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.25rem">Ready to send</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:1rem">Creates a Mailchimp campaign and immediately delivers it to your full audience.</div>
-      <div class="review-box">
-        <div class="review-row"><span class="review-lbl">Subject</span><span class="review-val" id="rvSubj"></span></div>
-        <div class="review-row"><span class="review-lbl">From name</span><span class="review-val" id="rvFrom"></span></div>
-        <div class="review-row"><span class="review-lbl">Reply-to</span><span class="review-val" id="rvReply"></span></div>
-        <div class="review-row"><span class="review-lbl">Audience ID</span><span class="review-val" id="rvList"></span></div>
-      </div>
-      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-        <button class="btn btn-outline" id="testMcBtn" onclick="m_testMailchimp()">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#374151" stroke-width="1.5"/><path d="M7 4v3l2 1.5" stroke="#374151" stroke-width="1.5" stroke-linecap="round"/></svg>
-          Test connection
-        </button>
-        <button class="btn btn-primary" style="flex:1" id="sendBtn" onclick="doSend()">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 6-12 6V9l8-1-8-1V2z" fill="#fff"/></svg>
-          Send campaign now
-        </button>
-      </div>
-      <div class="status-box" id="sendStatusBox">
-        <div class="spin"></div><span id="sendMsg" style="font-size:13px;color:#6b7280"></span>
-      </div>
-      <div class="err" id="sendErr"></div>
-      <div class="ok" id="sendOk"></div>
-      <div class="debug" id="sendDebug"></div>
-    </div>
-    <div id="successBox" style="display:none" class="success">
-      <div style="width:56px;height:56px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .875rem">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><polyline points="5,14 11,20 23,8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div style="font-weight:700;font-size:18px;color:#166534;margin-bottom:.25rem">Sent!</div>
-      <div style="color:#15803d;font-size:13px;margin-bottom:1.5rem">Today's personalised DSE briefing from Sokoview Analytics is on its way to your audience.</div>
-      <button class="btn btn-primary" style="margin:0 auto" onclick="resetAll()">Send tomorrow's email</button>
-    </div>
-    <button class="back-btn" id="backBtn" onclick="goS(3)">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 7H4M6 4L3 7l3 3" stroke="#6b7280" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Back to preview
-    </button>
-  </div>
 
-</div>
-</div>
+    <!-- Send card -->
+    <div class="card" id="sendCard">
+      <div class="card-title">Ready to Send</div>
 
-<div class="tab-pane" id="pane-monthly">
-<div class="wrap">
+      <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:7px 0;color:var(--muted);font-size:12px">From</td><td style="padding:7px 0;text-align:right;font-weight:600;font-size:13px" id="rvFrom">—</td></tr>
+        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:7px 0;color:var(--muted);font-size:12px">Reply-to</td><td style="padding:7px 0;text-align:right;font-weight:600;font-size:13px" id="rvReply">—</td></tr>
+        <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:7px 0;color:var(--muted);font-size:12px">Subject</td><td style="padding:7px 0;text-align:right;font-weight:500;font-size:12px;color:var(--muted)" id="rvSubject">—</td></tr>
+        <tr><td style="padding:7px 0;color:var(--muted);font-size:12px">Audience</td><td style="padding:7px 0;text-align:right;font-weight:600;font-size:13px" id="rvAudience">All subscribers</td></tr>
+      </table>
 
-  <!-- HEADER -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:10px">
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="width:40px;height:40px;background:#1a2744;border-radius:10px;display:flex;align-items:center;justify-content:center">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><polyline points="1,17 6,9 11,13 16,5 21,8" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline" id="testMcBtn" onclick="testMailchimp()" style="flex:1">Test Mailchimp</button>
+        <button class="btn btn-amber" id="sendBtn" onclick="doSend()" style="flex:2">Send Campaign &rarr;</button>
       </div>
-      <div>
-        <div style="font-weight:700;font-size:18px;color:#1a2744">Sokoview</div>
-        <div style="font-size:12px;color:#6b7280">Monthly Portfolio Performance Emailer</div>
+      <div id="mcTestResult" style="display:none;margin-top:8px;font-size:12px;padding:8px 10px;border-radius:6px"></div>
+
+      <div class="status-row" id="sendStatusBox" style="margin-top:8px">
+        <div class="spinner"></div>
+        <div style="font-size:13px;color:var(--navy)" id="sendMsg">Sending...</div>
+      </div>
+      <div class="msg-err" id="sendErr" style="margin-top:6px"></div>
+      <div class="msg-ok"  id="sendOk"  style="margin-top:6px"></div>
+
+      <div style="margin-top:10px">
+        <div style="font-size:11px;color:var(--muted);cursor:pointer" onclick="document.getElementById('sendDebug').style.display=document.getElementById('sendDebug').style.display==='none'?'block':'none'">&#9654; Debug log</div>
+        <div class="debug-box" id="sendDebug"></div>
       </div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <span class="badge b-amber" id="m-modeBadge">SEGMENT TEST</span>
-      <span class="badge b-blue">Mailchimp</span>
+
+    <!-- Success + Stats -->
+    <div class="success-box" id="successBox">
+      <div class="icon">🎉</div>
+      <h3>Campaign sent successfully!</h3>
+      <p id="successDetail">Your daily DSE briefing is on its way to your subscribers.</p>
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="fetchStats()">&#8635; Load campaign stats</button>
+        <button class="btn btn-outline btn-sm" onclick="resetAll()">Send another &rarr;</button>
+      </div>
     </div>
-  </div>
 
-  <!-- STEPS -->
-  <div class="steps">
-    <div class="step"><div class="dot active" id="m-d1">1</div><div class="step-lbl active" id="m-sl1">Configure</div></div>
-    <div class="step"><div class="dot" id="m-d2">2</div><div class="step-lbl" id="m-sl2">Collect Data</div></div>
-    <div class="step"><div class="dot" id="m-d3">3</div><div class="step-lbl" id="m-sl3">Preview</div></div>
-    <div class="step"><div class="dot" id="m-d4">4</div><div class="step-lbl" id="m-sl4">Send</div></div>
-  </div>
+    <!-- Stats panel -->
+    <div class="stats-panel" id="statsPanel">
+      <h3>
+        📊 Campaign Performance
+        <span class="stat-status" id="statStatus">—</span>
+        <span class="refresh-link" onclick="fetchStats()" style="margin-left:auto">&#8635; Refresh</span>
+      </h3>
 
-  <!-- S1: CONFIGURE -->
-  <div id="m-s1">
-    <div class="card">
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:1rem">API keys</div>
-      <label>Anthropic API key</label>
-      <input type="password" id="m-anthroKey" placeholder="sk-ant-api03-..."/>
-      <div class="hint">console.anthropic.com → API Keys</div>
-      <hr class="divider"/>
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:1rem">Mailchimp</div>
-      <label>Mailchimp API key</label>
-      <input type="password" id="m-mcKey" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1"/>
-      <div class="hint">Mailchimp → Account → Extras → API keys</div>
-      <label>Audience / List ID</label>
-      <input type="text" id="m-mcList" placeholder="e.g. a1b2c3d4e5"/>
-      <div class="hint">Mailchimp → Audience → Settings → Audience name and defaults</div>
-      <div class="row2">
-        <div>
-          <label>From name</label>
-          <input type="text" id="m-fromName" value="Sokoview Analytics"/>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="s-lbl">Emails sent</div>
+          <div class="s-val" id="statSent">—</div>
+          <div class="s-sub">total delivered</div>
         </div>
-        <div>
-          <label>Verified reply-to email</label>
-          <input type="text" id="m-replyTo" placeholder="you@yourdomain.com"/>
+        <div class="stat-card">
+          <div class="s-lbl">Open rate</div>
+          <div class="s-val" id="statOpen">—</div>
+          <div class="s-sub"><span id="statOpenN">—</span> opens</div>
         </div>
-      </div>
-      <hr class="divider"/>
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Send mode</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">Test with your segment first, then go live to all subscribers.</div>
-      <div class="mode-toggle">
-        <button class="mode-btn active" id="m-modeSegBtn"  onclick="m_setMode('segment')">&#128101; Segment test</button>
-        <button class="mode-btn"        id="m-modeLiveBtn" onclick="m_setMode('live')">&#128640; Live &mdash; all subscribers</button>
-      </div>
-      <div id="m-segmentWrap">
-        <label>Tester segment ID</label>
-        <input type="text" id="m-segmentId" placeholder="e.g. 1234567"/>
-        <div class="hint">Mailchimp &rarr; Audience &rarr; Segments &rarr; click segment &rarr; copy number from URL</div>
-        <div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:8px;padding:.75rem;font-size:13px;color:#1e40af;margin-top:4px">&#128101; Only members of this segment receive the email</div>
-      </div>
-      <div id="m-liveWarning" style="display:none" class="warn">&#9888;&#65039; <strong>Live mode</strong> sends personalised emails to ALL subscribers. Review previews first.</div>
-    </div>
-
-    <div class="card" style="background:#f8fafc;border-color:#e2e8f0">
-      <div style="font-weight:600;font-size:13px;color:#1a2744;margin-bottom:.75rem">What this tool does</div>
-      <div style="display:grid;gap:8px">
-        <div style="display:flex;gap:10px;align-items:flex-start"><div style="min-width:22px;height:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">1</div><span style="font-size:13px;color:#6b7280">You run a bookmarklet on your Sokoview admin to collect all portfolio data</span></div>
-        <div style="display:flex;gap:10px;align-items:flex-start"><div style="min-width:22px;height:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">2</div><span style="font-size:13px;color:#6b7280">Claude generates a personalised monthly performance email for each subscriber</span></div>
-        <div style="display:flex;gap:10px;align-items:flex-start"><div style="min-width:22px;height:22px;border-radius:50%;background:#1a2744;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">3</div><span style="font-size:13px;color:#6b7280">Preview each email, test with your own address, then send to all subscribers</span></div>
-      </div>
-    </div>
-
-    <button class="btn btn-primary btn-block" onclick="m_goS(2)">
-      Continue → Set up data collection
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-  </div>
-
-  <!-- S2: COLLECT DATA -->
-  <div id="m-s2" style="display:none">
-    <div class="card">
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 1 — Copy the collection script</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">Click the button below to copy the script, then run it in your browser console on the Sokoview admin page.</div>
-
-      <button class="btn btn-amber btn-block" onclick="m_copyScript()" id="m-copyBtn" style="margin-bottom:1rem">
-        📋 Copy collection script
-      </button>
-      <div id="m-copyConfirm" style="display:none;font-size:13px;color:#16a34a;font-weight:600;text-align:center;margin-bottom:1rem">✓ Copied! Now follow the steps below →</div>
-
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:1.25rem">
-        <div style="font-weight:600;font-size:13px;color:#1a2744;margin-bottom:.875rem">Then run it on your Sokoview admin:</div>
-        <div style="display:grid;gap:10px">
-          <div style="display:flex;gap:10px;align-items:flex-start">
-            <div style="min-width:24px;height:24px;background:#1a2744;color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">1</div>
-            <div style="font-size:13px;color:#374151">Open <a href="https://sokoview.co.tz/admin/portfolios" target="_blank" style="color:#1a2744;font-weight:600">sokoview.co.tz/admin/portfolios</a> in your browser (stay logged in)</div>
-          </div>
-          <div style="display:flex;gap:10px;align-items:flex-start">
-            <div style="min-width:24px;height:24px;background:#1a2744;color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">2</div>
-            <div style="font-size:13px;color:#374151">Press <kbd style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:1px 6px;font-size:12px">F12</kbd> to open DevTools, then click the <strong>Console</strong> tab</div>
-          </div>
-          <div style="display:flex;gap:10px;align-items:flex-start">
-            <div style="min-width:24px;height:24px;background:#1a2744;color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">3</div>
-            <div style="font-size:13px;color:#374151">Click in the console, paste the script (<kbd style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:1px 6px;font-size:12px">Ctrl+V</kbd>), then press <kbd style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;padding:1px 6px;font-size:12px">Enter</kbd></div>
-          </div>
-          <div style="display:flex;gap:10px;align-items:flex-start">
-            <div style="min-width:24px;height:24px;background:#22c55e;color:#fff;border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">4</div>
-            <div style="font-size:13px;color:#374151">A panel appears — click <strong>"Collect all portfolios"</strong>, wait, then click <strong>"Download JSON"</strong></div>
-          </div>
-        </div>
-      </div>
-      <a id="m-bookmarkletLink" href="#" style="display:none"></a>
-      <hr class="divider"/>
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 2 — Run it on your admin panel</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:.875rem">
-        <ol style="margin-left:1.25rem;display:grid;gap:5px">
-          <li>Open <strong>sokoview.co.tz/admin/portfolios</strong> in your browser (make sure you're logged in)</li>
-          <li>Click the <strong>📊 Sokoview — Collect Portfolios</strong> bookmark you just added</li>
-          <li>A panel will appear — click <strong>"Collect all portfolios"</strong> and wait for it to finish</li>
-          <li>Click <strong>"Download JSON"</strong> — this saves <code>sokoview-portfolios.json</code></li>
-        </ol>
-      </div>
-      <hr class="divider"/>
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Step 3 — Upload the JSON file</div>
-      <div id="m-dropZone" style="border:2px dashed #d1d5db;border-radius:10px;padding:2rem;text-align:center;background:#fafafa;transition:all .2s;position:relative">
-        <div style="font-size:36px;margin-bottom:.5rem">📂</div>
-        <div style="font-weight:600;color:#374151;margin-bottom:.5rem" id="m-dropText">Upload sokoview-portfolios.json</div>
-        <label for="m-jsonInput" style="display:inline-block;background:#1a2744;color:#fff;padding:9px 22px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:.5rem">Browse file</label>
-        <div style="font-size:12px;color:#9ca3af">or drag and drop the file here</div>
-        <input type="file" id="m-jsonInput" accept=".json,application/json" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden" onchange="m_handleJson(this.files[0])"/>
-      </div>
-      <div class="err" id="m-jsonErr"></div>
-      <div class="ok" id="m-jsonOk"></div>
-    </div>
-    <button class="back-btn" onclick="m_goS(1)">← Back to configuration</button>
-  </div>
-
-  <!-- S3: PREVIEW -->
-  <div id="m-s3" style="display:none">
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:1rem">
-        <div>
-          <div style="font-weight:600;font-size:15px;color:#1a2744">Portfolio data loaded</div>
-          <div style="font-size:12px;color:#9ca3af" id="m-dataInfo"></div>
-        </div>
-        <span class="badge b-amber" id="m-modeLabel">TEST MODE</span>
-      </div>
-      <div id="m-portfolioGrid" class="portfolio-grid"></div>
-    </div>
-
-    <div class="card">
-      <div style="font-weight:600;font-size:15px;color:#1a2744;margin-bottom:.5rem">Email preview</div>
-      <div style="font-size:13px;color:#6b7280;margin-bottom:1rem">Browse through personalised emails — each one is unique to that subscriber's portfolio.</div>
-
-      <div class="nav-row">
-        <button id="m-prevBtn" onclick="m_navigate(-1)" disabled>← Previous</button>
-        <span class="counter" id="m-navCounter">1 of 0</span>
-        <button id="m-nextBtn" onclick="m_navigate(1)">Next →</button>
-      </div>
-
-      <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:.875rem;margin-bottom:.875rem;font-size:13px">
-        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
-          <span><strong id="m-previewName">—</strong> <span id="m-previewEmail" style="color:#6b7280"></span></span>
-          <span>Portfolio: <strong id="m-previewValue" style="color:#1a2744">—</strong> &nbsp; Gain: <strong id="m-previewGain">—</strong></span>
+        <div class="stat-card">
+          <div class="s-lbl">Click rate</div>
+          <div class="s-val" id="statClick">—</div>
+          <div class="s-sub"><span id="statClickN">—</span> clicks</div>
         </div>
       </div>
 
-      <div id="m-genStatus" style="display:none;text-align:center;padding:1rem">
-        <div class="status-row" style="justify-content:center">
-          <div class="spin"></div>
-          <span id="m-genMsg">Generating personalised email...</span>
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card">
+          <div class="s-lbl">Bounced</div>
+          <div class="s-val" style="font-size:18px" id="statBounce">—</div>
         </div>
-        <div class="progress-bar-wrap" style="max-width:300px;margin:.5rem auto"><div class="progress-bar-fill" id="m-genProgress" style="width:0%"></div></div>
+        <div class="stat-card">
+          <div class="s-lbl">Unsubscribed</div>
+          <div class="s-val" style="font-size:18px" id="statUnsub">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-lbl">Unique opens</div>
+          <div class="s-val" style="font-size:18px" id="statUniqOpen">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="s-lbl">Unique clicks</div>
+          <div class="s-val" style="font-size:18px" id="statUniqClick">—</div>
+        </div>
       </div>
 
-      <div class="preview-wrap" id="m-previewWrap">
-        <iframe id="m-previewFrame" sandbox="allow-same-origin" title="Email preview"></iframe>
-      </div>
-
-      <div style="display:flex;gap:.75rem;flex-wrap:wrap">
-        <button class="btn btn-outline" onclick="m_regenerateCurrent()">↻ Regenerate this email</button>
-        <button class="btn btn-primary" style="flex:1" onclick="m_goSend()">
-          Ready to send →
-        </button>
+      <div class="stats-footer">
+        <div id="statSentAt" style="color:var(--muted);font-size:12px">—</div>
+        <div style="font-size:11px;color:#9ca3af">Stats update in Mailchimp every ~30 min after send</div>
       </div>
     </div>
-    <button class="back-btn" onclick="m_goS(2)">← Back to data collection</button>
+
+    <div style="margin-top:10px"><a href="#" onclick="goS(3);return false" style="font-size:12px;color:var(--muted)">&larr; Back to preview</a></div>
   </div>
 
-  <!-- S4: SEND -->
-  <div id="m-s4" style="display:none">
-    <div id="m-sendCard" class="card">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
-        <div style="font-weight:600;font-size:15px;color:#1a2744">Ready to send</div>
-        <span class="badge" id="m-sendModeBadge">SEGMENT TEST</span>
-      </div>
-
-
-      <div id="m-liveModeInfo" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-bottom:1rem;color:#991b1b">
-        🚀 <strong>Live mode:</strong> <strong id="m-liveCount">0</strong> personalised emails will be sent — one per subscriber.
-      </div>
-      <div id="m-segmentModeInfo" style="display:none;background:#dbeafe;border:1px solid #93c5fd;border-radius:8px;padding:.875rem 1rem;font-size:13px;margin-bottom:1rem;color:#1e40af">
-        👥 <strong>Segment test:</strong> Sending to segment ID <strong id="m-segmentIdDisplay"></strong> only. Real personalisation, controlled audience.
-      </div>
-
-      <div class="review-box">
-        <div class="review-row"><span style="color:#6b7280">From name</span><span style="font-weight:600" id="m-rvFrom"></span></div>
-        <div class="review-row"><span style="color:#6b7280">Reply-to</span><span style="font-weight:600" id="m-rvReply"></span></div>
-        <div class="review-row"><span style="color:#6b7280">Subject</span><span style="font-weight:600" id="m-rvSubject"></span></div>
-        <div class="review-row"><span style="color:#6b7280">Portfolios</span><span style="font-weight:600" id="m-rvCount"></span></div>
-        <div class="review-row"><span style="color:#6b7280">Month</span><span style="font-weight:600" id="m-rvMonth"></span></div>
-      </div>
-
-      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.75rem">
-        <button class="btn btn-outline" id="m-testMcBtn" onclick="m_testMailchimp()">Test Mailchimp connection</button>
-      <div id="m-mcTestResult" style="display:none;margin-top:.5rem;font-size:13px;padding:.5rem .75rem;border-radius:6px"></div>
-        <button class="btn btn-primary" style="flex:1" id="m-sendBtn" onclick="m_doSend()">
-          Send now
-        </button>
-      </div>
-
-      <div class="status-row" id="m-sendStatusRow">
-        <div class="spin"></div><span id="m-sendMsg"></span>
-      </div>
-      <div class="progress-bar-wrap" id="m-sendProgressWrap" style="display:none">
-        <div class="progress-bar-fill" id="m-sendProgress" style="width:0%"></div>
-      </div>
-      <div style="font-size:12px;color:#9ca3af;text-align:center" id="m-sendDetail"></div>
-
-      <div class="err" id="m-sendErr"></div>
-      <div class="ok" id="m-sendOk"></div>
-      <div class="debug" id="m-sendDebug"></div>
-    </div>
-
-    <div id="m-successBox" style="display:none" class="success">
-      <div style="width:56px;height:56px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .875rem">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><polyline points="5,14 11,20 23,8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div style="font-weight:700;font-size:18px;color:#166534;margin-bottom:.25rem" id="m-successTitle">Emails sent!</div>
-      <div style="color:#15803d;font-size:13px;margin-bottom:1.5rem" id="m-successMsg"></div>
-      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn-primary" onclick="m_setMode('live');m_goS(4)">Switch to live mode & send</button>
-        <button class="btn btn-outline" onclick="m_resetSend()">Back to preview</button>
-      </div>
-    </div>
-
-    <button class="back-btn" id="m-backToPreview" onclick="m_goS(3)">← Back to preview</button>
-  </div>
-
-</div>
-</div>
+</div><!-- /shell -->
 
 <script>
-// ── TAB SWITCHER ──
-function switchTab(t){
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('pane-'+t).classList.add('active');
-  document.getElementById('tab-'+t).classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-// ── TAB 1: DAILY MARKET EMAIL ──
-
+// ── STATE ────────────────────────────────────────────────────────────────────
 let mkt = {}, emailHtml = '', emailSubject = '', pdfB64 = '';
+let lastCampaignId = '';
 
+// ── STEP NAV ─────────────────────────────────────────────────────────────────
 function goS(n) {
   for (let i = 1; i <= 4; i++) {
     document.getElementById('s' + i).style.display = i === n ? 'block' : 'none';
     const dot = document.getElementById('d' + i);
     const lbl = document.getElementById('sl' + i);
-    dot.className = 'dot' + (i < n ? ' done' : i === n ? ' active' : '');
-    dot.textContent = i < n ? '✓' : i;
-    if (lbl) lbl.className = 'step-lbl' + (i === n ? ' active' : '');
+    dot.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    if (lbl) {
+      if (i < n) lbl.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+      else lbl.textContent = i;
+    }
   }
+  if (n === 4) populateSendReview();
   window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function goSend() {
-  document.getElementById('rvSubj').textContent = document.getElementById('subjectInput').value;
-  document.getElementById('rvFrom').textContent = document.getElementById('fromName').value;
-  document.getElementById('rvReply').textContent = document.getElementById('replyTo').value;
-  document.getElementById('rvList').textContent = document.getElementById('mcList').value;
-  document.getElementById('sendCard').style.display = 'block';
-  document.getElementById('successBox').style.display = 'none';
-  document.getElementById('backBtn').style.display = 'inline-flex';
-  goS(4);
-}
-
-/* ── DRAG & DROP ── */
-const dz = document.getElementById('dropZone');
-dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
-dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('dragover'); const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
-
-function resetUpload() {
-  pdfB64 = '';
-  dz.className = 'drop-zone';
-  document.getElementById('fileIcon').className = 'file-icon';
-  document.getElementById('fileIcon').innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="#dc2626" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  document.getElementById('dropText').textContent = 'Click to upload or drag & drop';
-  document.getElementById('dropSub').textContent = 'Sokoview Analytics Daily Market Report PDF';
-  document.getElementById('pdfInput').value = '';
-  document.getElementById('statusBox').style.display = 'none';
-  document.getElementById('genErr').style.display = 'none';
-  document.getElementById('genDebug').style.display = 'none';
-  document.getElementById('genDebug').textContent = '';
-}
-
-function handleFile(file) {
-  if (!file || file.type !== 'application/pdf') {
-    showMsg('genErr', 'Please upload a PDF file.');
-    return;
-  }
-  document.getElementById('genErr').style.display = 'none';
-  document.getElementById('genDebug').style.display = 'none';
-  document.getElementById('genDebug').textContent = '';
-
-  // Show file selected state
-  dz.className = 'drop-zone has-file';
-  document.getElementById('fileIcon').className = 'file-icon ok';
-  document.getElementById('fileIcon').innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9,12 11,14 15,10" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  document.getElementById('dropText').textContent = file.name;
-  document.getElementById('dropSub').textContent = (file.size / 1024).toFixed(0) + ' KB · Click to change';
-
-  const reader = new FileReader();
-  reader.onload = e => {
-    pdfB64 = e.target.result.split(',')[1];
-    processPDF();
-  };
-  reader.readAsDataURL(file);
 }
 
 function setProgress(msg, pct) {
   document.getElementById('statusMsg').textContent = msg;
-  document.getElementById('progFill').style.width = pct + '%';
-  document.getElementById('progLbl').textContent = pct + '%';
+  document.getElementById('progressBar').style.width = pct + '%';
 }
 
 function showMsg(id, msg) {
-  const el = document.getElementById(id);
-  el.style.display = 'block';
-  el.textContent = msg;
+  const e = document.getElementById(id);
+  e.style.display = 'block';
+  e.textContent = msg;
 }
 
-function dbg(msg, data) {
-  const b = document.getElementById('genDebug');
-  b.style.display = 'block';
-  b.textContent += '[' + new Date().toLocaleTimeString() + '] ' + msg + (data ? '\n' + JSON.stringify(data, null, 2) : '') + '\n\n';
-  b.scrollTop = b.scrollHeight;
+// ── PDF UPLOAD ────────────────────────────────────────────────────────────────
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('hover'); });
+dz.addEventListener('dragleave', ()  => dz.classList.remove('hover'));
+dz.addEventListener('drop',      e  => { e.preventDefault(); dz.classList.remove('hover'); handlePdf(e.dataTransfer.files[0]); });
+
+function handlePdf(file) {
+  if (!file || !file.name.endsWith('.pdf')) { showMsg('genErr', 'Please upload a PDF file.'); return; }
+  document.getElementById('genErr').style.display = 'none';
+  document.getElementById('dropText').textContent = '✓ ' + file.name;
+  const reader = new FileReader();
+  reader.onload = e => { pdfB64 = e.target.result.split(',')[1]; processPDF(); };
+  reader.readAsDataURL(file);
 }
 
-async function apiCall(systemPrompt, userText, pdfBase64) {
+function resetUpload() {
+  pdfB64 = '';
+  document.getElementById('dropText').textContent = 'Drop your PDF here';
+}
+
+// ── ANTHROPIC API ─────────────────────────────────────────────────────────────
+async function apiCall(system, user, pdfData) {
   const key = document.getElementById('anthroKey').value.trim();
-  if (!key) throw new Error('Anthropic API key missing — go back to step 1.');
+  if (!key) throw new Error('Enter your Anthropic API key in step 1 first.');
 
-  const userContent = [];
-  if (pdfBase64) {
-    userContent.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } });
-  }
-  userContent.push({ type: 'text', text: userText });
-
-  const body = {
-    model: 'claude-sonnet-4-6',
-    max_tokens: 4000,
-    system: systemPrompt,
-    messages: [{ role: 'user', content: userContent }]
-  };
+  const content = pdfData
+    ? [{ type:'document', source:{ type:'base64', media_type:'application/pdf', data:pdfData }}, { type:'text', text:user }]
+    : [{ type:'text', text:user }];
 
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -676,325 +409,82 @@ async function apiCall(systemPrompt, userText, pdfBase64) {
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true'
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:4096, system, messages:[{ role:'user', content }] })
   });
-
-  const d = await r.json().catch(() => ({}));
-  if (!r.ok || d.error) {
-    const hint = r.status === 401 ? ' — invalid API key' : r.status === 429 ? ' — rate limit, wait 60s and retry' : r.status === 400 ? ' — bad request' : '';
-    throw new Error('HTTP ' + r.status + hint + ': ' + (d.error?.message || JSON.stringify(d)));
-  }
-  return d;
+  if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error('Anthropic error ' + r.status + ': ' + (e.error?.message || r.statusText)); }
+  return r.json();
 }
 
-function buildSubject(m) {
-  const s = m.sentiment || 'Neutral';
-  const chg = m.dseiChangePct || m.dseiChange || '';
-  const mood = s === 'Bullish' ? 'Bullish Session' : s === 'Bearish' ? 'Bearish Session' : 'Mixed Session';
-  const top = m.gainers && m.gainers.length ? m.gainers[0].name || m.gainers[0].ticker : '';
-  return `DSE Daily Briefing – ${m.date || ''} | ${mood}${top ? ', ' + top + ' leads' : ''}`;
-}
-
-function buildEmail(m) {
-  // normalise field names
-  m.marketCap     = m.marketCap  || m.totalMarketCap   || m.market_cap    || 'N/A';
-  m.turnover      = m.turnover   || m.weeklyTurnover   || m.marketTurnover|| 'N/A';
-  m.volume        = m.volume     || m.volumeTraded     || 'N/A';
-  m.dseiChangePct = m.dseiChangePct || m.dseiChange    || m.dailyChange   || 'N/A';
-  var tanzPct     = parseFloat(m.tanzanianPct || 0) || 77;
-  var forPct      = 100 - tanzPct;
-
-  var s        = m.sentiment || 'Neutral';
-  var sentClr  = s==='Bullish' ? '#16a34a' : s==='Bearish' ? '#dc2626' : '#b45309';
-  var sentBg   = s==='Bullish' ? '#dcfce7' : s==='Bearish' ? '#fee2e2' : '#fef9c3';
-
-  function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function clr(v){ v=String(v||''); return v.includes('+')?'color:#16a34a;font-weight:600':v.includes('-')?'color:#dc2626;font-weight:600':'color:#6b7280'; }
-
-  var tot  = (m.advancers||0)+(m.decliners||0)+(m.unchanged||0);
-  var ap   = tot ? Math.round((m.advancers||0)/tot*100) : 0;
-  var dp   = tot ? Math.round((m.decliners||0)/tot*100) : 0;
-  var up   = 100-ap-dp;
-
-  var h = '';
-  h += '<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>';
-  h += '<style>';
-  h += '@media only screen and (max-width:600px){';
-  h += '.wrap{padding:12px 8px!important}';
-  h += '.header-td{padding:20px 16px!important}';
-  h += '.logo{font-size:20px!important}';
-  h += '.kpi-table{display:block!important}';
-  h += '.kpi-td{display:inline-block!important;width:48%!important;border-right:none!important;border-bottom:1px solid #f1f5f9!important;vertical-align:top}';
-  h += '.kpi-val{font-size:15px!important}';
-  h += '.sal-td{padding:16px!important}';
-  h += '.sal-name{font-size:15px!important}';
-  h += '.sal-body{font-size:13px!important}';
-  h += 'table{min-width:unset!important}';
-  h += 'td,th{padding:6px 8px!important;font-size:12px!important}';
-  h += '.section-title{font-size:11px!important}';
-  h += '.insight-box{padding:10px 12px!important}';
-  h += '.footer-td{padding:14px 16px!important}';
-  h += '}';
-  h += '</style></head>';
-  h += '<body style="margin:0;padding:0;background:#f0f4f8;font-family:Arial,Helvetica,sans-serif">';
-  h += '<div class="wrap" style="max-width:600px;margin:0 auto;padding:20px 12px">';
-
-  // HEADER
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:12px 12px 0 0"><tr><td class="header-td" style="padding:26px 28px">';
-  h += '<div class="logo" style="font-size:26px;font-weight:900;color:#f59e0b;letter-spacing:2px">SOKOVIEW</div>';
-  h += '<div style="font-size:12px;color:#94a3b8;margin-top:3px">Dar es Salaam Stock Exchange &middot; Daily Market Briefing</div>';
-  h += '<div style="font-size:15px;color:#ffffff;margin-top:6px;font-weight:600">'+esc(m.date||'')+'</div>';
-  h += '<div style="font-size:11px;color:#64748b;margin-top:3px">Data prepared by Sokoview Analytics &middot; <a href="https://sokoview.co.tz" style="color:#64748b">sokoview.co.tz</a></div>';
-  h += '<div style="margin-top:16px">';
-  h += '<a href="https://sokoview.co.tz" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 24px;border-radius:6px;text-decoration:none;letter-spacing:0.03em">View Full Market Dashboard &rarr;</a>';
-  h += '</div>';
-  h += '</td></tr></table>';
-
-  // SALUTATION
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0"><tr><td class="sal-td" style="padding:22px 24px">';
-  h += '<div class="sal-name" style="font-size:16px;color:#111111;margin-bottom:12px">Hi <strong>*|FNAME|*</strong>,</div>';
-  h += '<div class="sal-body" style="font-size:14px;color:#374151;line-height:1.8">'+esc(m.insight||'Here is your daily DSE market briefing.')+'</div>';
-  h += '</td></tr></table>';
-
-  // KPI BOXES
-  h += '<table class="kpi-table" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr>';
-  h += '<td class="kpi-td" style="padding:14px 8px 14px 16px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:6px">Sentiment</div>';
-  h += '<div style="font-size:13px;font-weight:700;background:'+sentBg+';color:'+sentClr+';padding:4px 12px;border-radius:20px;display:inline-block">'+esc(s)+'</div>';
-  h += '</td>';
-  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">DSEI Index</div>';
-  h += '<div class="kpi-val" style="font-size:18px;font-weight:700;color:#111111">'+esc(m.dsei||'—')+'</div>';
-  h += '<div style="font-size:12px;font-weight:600;'+clr(m.dseiChangePct)+'">'+esc(m.dseiChangePct)+'</div>';
-  h += '</td>';
-  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Market Cap</div>';
-  h += '<div style="font-size:16px;font-weight:700;color:#111111">'+esc(m.marketCap)+'</div>';
-  h += '</td>';
-  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;vertical-align:top">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Turnover</div>';
-  h += '<div style="font-size:16px;font-weight:700;color:#111111">'+esc(m.turnover)+'</div>';
-  h += '<div style="font-size:11px;color:#6b7280">Vol: '+esc(m.volume)+'</div>';
-  h += '</td></tr></table>';
-
-  // BREADTH
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:8px">Market Breadth</div>';
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:6px"><tr>';
-  h += '<td style="width:'+ap+'%;background:#22c55e;height:9px;border-radius:4px 0 0 4px"></td>';
-  h += '<td style="width:'+dp+'%;background:#ef4444;height:9px"></td>';
-  h += '<td style="width:'+up+'%;background:#e5e7eb;height:9px;border-radius:0 4px 4px 0"></td>';
-  h += '</tr></table>';
-  h += '<table width="100%" cellpadding="0" cellspacing="0"><tr>';
-  h += '<td style="font-size:12px;color:#16a34a;font-weight:600">&#9650; '+(m.advancers||0)+' advancers</td>';
-  h += '<td style="font-size:12px;color:#dc2626;font-weight:600;text-align:center">&#9660; '+(m.decliners||0)+' decliners</td>';
-  h += '<td style="font-size:12px;color:#6b7280;text-align:right">&#8212; '+(m.unchanged||0)+' unchanged</td>';
-  h += '</tr></table></td></tr></table>';
-
-  // INDICES
-  if (m.indices && m.indices.length) {
-    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
-    h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a2744;margin-bottom:8px">Market Indices</div>';
-    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f9fafb">';
-    h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Index</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Points</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Daily</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">1M</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">YTD</th>';
-    h += '</tr></thead><tbody>';
-    (m.indices||[]).forEach(function(r){
-      h += '<tr>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;font-weight:600;font-size:13px;color:#111111">'+esc(r.name)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;color:#374151">'+esc(r.points)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;'+clr(r.change)+'">'+esc(r.change)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;'+clr(r.m1)+'">'+esc(r.m1||'—')+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;'+clr(r.ytd)+'">'+esc(r.ytd||'—')+'</td>';
-      h += '</tr>';
-    });
-    h += '</tbody></table></div></td></tr></table>';
-  }
-
-  // GAINERS
-  if (m.gainers && m.gainers.length) {
-    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
-    h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#16a34a;margin-bottom:8px">&#9650; Gainers</div>';
-    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f0fdf4">';
-    h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Ticker</th>';
-    h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Company</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Price</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Daily %</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">YTD</th>';
-    h += '</tr></thead><tbody>';
-    (m.gainers||[]).forEach(function(r){
-      h += '<tr>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;font-weight:700;font-size:13px;color:#111111">'+esc(r.ticker)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;font-size:13px;color:#374151">'+esc(r.name)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;text-align:right;font-size:13px;color:#374151">'+esc(r.price)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;text-align:right;font-size:13px;color:#16a34a;font-weight:700">'+esc(r.change)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;text-align:right;font-size:13px;'+clr(r.ytd)+'">'+esc(r.ytd||'—')+'</td>';
-      h += '</tr>';
-    });
-    h += '</tbody></table></div></td></tr></table>';
-  }
-
-  // LOSERS
-  if (m.losers && m.losers.length) {
-    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
-    h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#dc2626;margin-bottom:8px">&#9660; Losers</div>';
-    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#fef2f2">';
-    h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Ticker</th>';
-    h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Company</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Price</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Daily %</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">YTD</th>';
-    h += '</tr></thead><tbody>';
-    (m.losers||[]).forEach(function(r){
-      h += '<tr>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #fff1f2;font-weight:700;font-size:13px;color:#111111">'+esc(r.ticker)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #fff1f2;font-size:13px;color:#374151">'+esc(r.name)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #fff1f2;text-align:right;font-size:13px;color:#374151">'+esc(r.price)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #fff1f2;text-align:right;font-size:13px;color:#dc2626;font-weight:700">'+esc(r.change)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #fff1f2;text-align:right;font-size:13px;'+clr(r.ytd)+'">'+esc(r.ytd||'—')+'</td>';
-      h += '</tr>';
-    });
-    h += '</tbody></table></div></td></tr></table>';
-  }
-
-  // TOP MOVERS
-  if (m.movers && m.movers.length) {
-    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
-    h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a2744;margin-bottom:8px">Top Movers by Turnover</div>';
-    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f9fafb">';
-    h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Ticker</th>';
-    h += '<th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Company</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Price</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Volume</th>';
-    h += '<th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Turnover</th>';
-    h += '</tr></thead><tbody>';
-    (m.movers||[]).forEach(function(r){
-      h += '<tr>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;font-weight:700;font-size:13px;color:#111111">'+esc(r.ticker)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;font-size:13px;color:#374151">'+esc(r.name)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;color:#374151">'+esc(r.price)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;color:#6b7280">'+esc(r.volume)+'</td>';
-      h += '<td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;font-weight:600;color:#1a2744">'+esc(r.turnover)+'</td>';
-      h += '</tr>';
-    });
-    h += '</tbody></table></div></td></tr></table>';
-  }
-
-  // SOKOVIEW INSIGHTS
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px">';
-  h += '<div class="insight-box" style="border-left:4px solid #f59e0b;padding:14px 16px;background:#fffbeb;border-radius:0 8px 8px 0">';
-  h += '<div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Sokoview Insights</div>';
-  h += '<div style="font-size:13px;color:#78350f;line-height:1.8">'+esc(m.insight||'')+'</div>';
-  h += '</div></td></tr></table>';
-
-  // HIGHLIGHTS
-  if (m.highlights && m.highlights.length) {
-    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:14px 16px">';
-    h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a2744;margin-bottom:10px">Market Highlights</div>';
-    (m.highlights||[]).forEach(function(hl){
-      h += '<div style="font-size:13px;color:#374151;padding:8px 12px;border-left:3px solid #1a2744;background:#f8fafc;margin-bottom:6px;border-radius:0 4px 4px 0">'+esc(hl)+'</div>';
-    });
-    h += '</td></tr></table>';
-  }
-
-  // PARTICIPATION
-  if (m.tanzanianPct) {
-    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
-    h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:8px">Investor Participation</div>';
-    h += '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:6px"><tr>';
-    h += '<td style="width:'+tanzPct+'%;background:#1a2744;height:10px;border-radius:4px 0 0 4px"></td>';
-    h += '<td style="width:'+forPct+'%;background:#f59e0b;height:10px;border-radius:0 4px 4px 0"></td>';
-    h += '</tr></table>';
-    h += '<table width="100%" cellpadding="0" cellspacing="0"><tr>';
-    h += '<td style="font-size:12px;color:#1a2744;font-weight:600">&#9632; Tanzanians '+tanzPct+'%</td>';
-    h += '<td style="font-size:12px;color:#b45309;font-weight:600;text-align:right">&#9632; Foreign '+forPct+'%</td>';
-    h += '</tr></table></td></tr></table>';
-  }
-
-  // SIGN OFF
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:18px 24px">';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:4px">Happy investing,</div>';
-  h += '<div style="font-size:14px;font-weight:700;color:#1a2744">The Sokoview Analytics Team</div>';
-  h += '</td></tr></table>';
-
-  // FOOTER
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:0 0 12px 12px"><tr><td class="footer-td" style="padding:18px 24px;text-align:center">';
-  h += '<div style="font-size:15px;font-weight:700;color:#f59e0b;margin-bottom:4px">SOKOVIEW</div>';
-  h += '<div style="font-size:12px;color:#94a3b8"><a href="https://sokoview.co.tz" style="color:#94a3b8;text-decoration:none">sokoview.co.tz</a> &nbsp;&middot;&nbsp; Data prepared by Sokoview Analytics</div>';
-  h += '<div style="margin:16px 0">';
-  h += '<a href="https://sokoview.co.tz" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:11px 28px;border-radius:6px;text-decoration:none;letter-spacing:0.03em">Track Your Portfolio on Sokoview &rarr;</a>';
-  h += '</div>';
-  h += '<div style="font-size:11px;color:#475569;margin-top:4px">You received this because you subscribed to Sokoview market updates. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
-  h += '</td></tr></table>';
-
-  h += '</div></body></html>';
-  return h;
-}
-
-
+// ── PROCESS PDF ───────────────────────────────────────────────────────────────
 async function processPDF() {
   document.getElementById('statusBox').style.display = 'flex';
   setProgress('Reading PDF...', 10);
 
   try {
-    dbg('Call 1 — extract market data from PDF');
     setProgress('Extracting market data from PDF...', 25);
-
     const r1 = await apiCall(
-      'You are a DSE market data analyst working for Sokoview Analytics. Extract data from the PDF and return ONLY valid JSON with no markdown fences.',
+      'You are a DSE market data analyst for Sokoview Analytics. Extract data from the PDF and return ONLY valid JSON with no markdown fences.',
       `Extract all market data from this DSE daily market report PDF and return this exact JSON structure:
-{"date":"DD Month YYYY","sentiment":"Bullish|Bearish|Neutral","dsei":"0.00","dseiChange":"-0.00","dseiChangePct":"-0.00%","dsei1M":"+0.00%","dseiYTD":"+0.00%","marketCap":"TZS 0T","domesticCap":"TZS 0T","turnover":"TZS 0B","volume":"0","netCashFlow":"TZS 0M","deals":"0","advancers":0,"decliners":0,"unchanged":0,"tanzanianPct":"0%","foreignPct":"0%","gainers":[{"ticker":"","name":"","price":0,"change":"+0%","mtd":"+0%","ytd":"+0%"}],"losers":[{"ticker":"","name":"","price":0,"change":"-0%","mtd":"0%","ytd":"+0%"}],"movers":[{"ticker":"","name":"","price":0,"volume":0,"turnover":"0"}],"indices":[{"name":"","points":"0","change":"-0%","m1":"+0%","ytd":"+0%"}],"highlights":["h1","h2","h3"],"insight":"2-3 sentences of warm, personalised analyst commentary for retail investors — what happened today, why it matters, and one thing to watch."}
-Rules: sentiment = Bullish if advancers > decliners, Bearish if decliners > advancers, else Neutral. Include ALL gainers and ALL losers from the report. highlights should be 3 key observations from the data.`,
+{"date":"DD Month YYYY","sentiment":"Bullish|Bearish|Neutral","dsei":"0.00","dseiChange":"-0.00","dseiChangePct":"-0.00%","dsei1M":"+0.00%","dseiYTD":"+0.00%","marketCap":"TZS 0T","domesticCap":"TZS 0T","turnover":"TZS 0B","volume":"0","netCashFlow":"TZS 0M","deals":"0","advancers":0,"decliners":0,"unchanged":0,"tanzanianPct":"0%","foreignPct":"0%","gainers":[{"ticker":"","name":"","price":0,"change":"+0%","mtd":"+0%","ytd":"+0%"}],"losers":[{"ticker":"","name":"","price":0,"change":"-0%","mtd":"0%","ytd":"+0%"}],"movers":[{"ticker":"","name":"","price":0,"volume":0,"turnover":"0"}],"indices":[{"name":"","points":"0","change":"-0%","m1":"+0%","ytd":"+0%"}],"highlights":["h1","h2","h3"],"insight":"2-3 sentences of warm analyst commentary for retail investors."}
+Rules: sentiment = Bullish if advancers > decliners, Bearish if opposite, else Neutral. Include ALL gainers and ALL losers.`,
       pdfB64
     );
 
-    setProgress('Processing data...', 55);
+    setProgress('Building email...', 65);
     const t1 = r1.content?.find(b => b.type === 'text')?.text || '{}';
-    dbg('Raw extract (first 400 chars):', t1.substring(0, 400));
-
     try {
       mkt = JSON.parse(t1.replace(/```json|```/g, '').trim());
     } catch(e) {
-      dbg('JSON parse failed, using fallback', { error: e.message });
-      mkt = { date: new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'long', year:'numeric' }), sentiment:'Neutral', dsei:'N/A', dseiChangePct:'N/A', marketCap:'N/A', turnover:'N/A', advancers:0, decliners:0, unchanged:0, gainers:[], losers:[], movers:[], indices:[], highlights:['See PDF for full data'], insight:'Data extraction incomplete.' };
+      mkt = { date: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}), sentiment:'Neutral', dsei:'N/A', dseiChangePct:'N/A', marketCap:'N/A', turnover:'N/A', advancers:0, decliners:0, unchanged:0, gainers:[], losers:[], movers:[], indices:[], highlights:[], insight:'Market data extracted.' };
     }
 
-    setProgress('Building email...', 65);
     emailSubject = buildSubject(mkt);
-    emailHtml = buildEmail(mkt);
-
+    emailHtml    = buildEmail(mkt);
     setProgress('Done!', 100);
-    setTimeout(() => { renderPreview(); goS(3); }, 400);
+    setTimeout(() => {
+      document.getElementById('statusBox').style.display = 'none';
+      renderPreview();
+      goS(3);
+    }, 400);
 
   } catch(e) {
     document.getElementById('statusBox').style.display = 'none';
     showMsg('genErr', e.message);
-    dbg('Error', { message: e.message });
   }
+}
+
+// ── SUBJECT / PREVIEW ─────────────────────────────────────────────────────────
+function buildSubject(m) {
+  const s = m.sentiment || 'Neutral';
+  const mood = s === 'Bullish' ? 'Bullish Session' : s === 'Bearish' ? 'Bearish Session' : 'Mixed Session';
+  const top = m.gainers?.length ? (m.gainers[0].name || m.gainers[0].ticker) : '';
+  return `DSE Daily Briefing – ${m.date || ''} | ${mood}${top ? ', ' + top + ' leads' : ''}`;
+}
+
+function regenerateSubject() {
+  document.getElementById('subjectInput').value = buildSubject(mkt);
 }
 
 function renderPreview() {
   const s = mkt.sentiment || 'Neutral';
   const b = document.getElementById('sentBadge');
   b.textContent = s;
-  b.className = 'badge ' + (s === 'Bullish' ? 'b-bull' : s === 'Bearish' ? 'b-bear' : 'b-neu');
+  b.style.background = s==='Bullish'?'#dcfce7':s==='Bearish'?'#fee2e2':'#fef3c7';
+  b.style.color      = s==='Bullish'?'#166534':s==='Bearish'?'#991b1b':'#92400e';
   document.getElementById('dataDate').textContent = mkt.date || '';
 
-  const isUp = v => v && v.toString().includes('+');
-  const isDn = v => v && v.toString().includes('-');
+  const isUp = v => v && String(v).includes('+');
+  const isDn = v => v && String(v).includes('-');
 
   document.getElementById('metrics').innerHTML = [
     ['DSEI', mkt.dsei],
-    ['Daily change', mkt.dseiChangePct],
+    ['Daily', mkt.dseiChangePct],
     ['Market cap', mkt.marketCap],
     ['Turnover', mkt.turnover]
-  ].map(([l, v]) => `<div class="metric"><div class="m-lbl">${l}</div><div class="m-val ${isUp(v)?'up':isDn(v)?'dn':''}">${v||'—'}</div></div>`).join('');
+  ].map(([l,v]) => `<div class="metric"><div class="m-lbl">${l}</div><div class="m-val ${isUp(v)?'up':isDn(v)?'dn':''}">${v||'—'}</div></div>`).join('');
 
-  const tbl = (rows, isGain) => !rows?.length ? '' : `
-    <div style="font-weight:600;font-size:13px;margin:1rem 0 .4rem;color:${isGain?'#16a34a':'#dc2626'}">${isGain?'▲ Gainers':'▼ Losers'}</div>
+  const tbl = (rows, isGain) => !rows?.length ? '' :
+    `<div style="font-weight:600;font-size:12px;margin:12px 0 4px;color:${isGain?'#16a34a':'#dc2626'}">${isGain?'▲ Gainers':'▼ Losers'}</div>
     <div class="tbl-wrap"><table>
       <thead><tr><th>Ticker</th><th>Company</th><th>Price</th><th>Daily</th><th>YTD</th></tr></thead>
       <tbody>${rows.map(r=>`<tr>
@@ -1002,7 +492,7 @@ function renderPreview() {
         <td class="muted" style="max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name||''}</td>
         <td>${r.price||''}</td>
         <td class="${isGain?'up':'dn'}">${r.change||''}</td>
-        <td class="${isUp(r.ytd)?'up':isDn(r.ytd)?'dn':'muted'}">${r.ytd||''}</td>
+        <td class="${isUp(r.ytd)?'up':isDn(r.ytd)?'dn':'muted'}">${r.ytd||'—'}</td>
       </tr>`).join('')}</tbody>
     </table></div>`;
 
@@ -1012,7 +502,16 @@ function renderPreview() {
   document.getElementById('previewFrame').srcdoc = emailHtml;
 }
 
-/* ── MAILCHIMP via Netlify proxy ── */
+// ── SEND REVIEW ───────────────────────────────────────────────────────────────
+function populateSendReview() {
+  const mi = mcInfo();
+  document.getElementById('rvFrom').textContent    = mi.from  || '—';
+  document.getElementById('rvReply').textContent   = mi.reply || '—';
+  document.getElementById('rvSubject').textContent = document.getElementById('subjectInput').value || emailSubject || '—';
+  document.getElementById('rvAudience').textContent = mi.list ? 'All subscribers (List: ' + mi.list + ')' : 'All subscribers';
+}
+
+// ── MAILCHIMP API ─────────────────────────────────────────────────────────────
 function mcInfo() {
   return {
     key:   document.getElementById('mcKey').value.trim(),
@@ -1028,886 +527,300 @@ async function mcCall(action, data) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ mcKey: mcInfo().key, action, data: data || {} })
   });
-  let json = {};
-  try { json = await r.json(); } catch {}
+  let json = {}; try { json = await r.json(); } catch {}
   return { status: r.status, ok: r.ok, json };
 }
 
-function logDebug(boxId, msg, data) {
-  const b = document.getElementById(boxId);
+function dbg(msg, data) {
+  const b = document.getElementById('sendDebug');
   b.style.display = 'block';
   b.textContent += '[' + new Date().toLocaleTimeString() + '] ' + msg +
     (data ? '\n' + JSON.stringify(data, null, 2) : '') + '\n\n';
   b.scrollTop = b.scrollHeight;
 }
 
+// ── TEST MAILCHIMP ────────────────────────────────────────────────────────────
 async function testMailchimp() {
   const { key, list } = mcInfo();
-  if (!key) { showMsg('sendErr', 'Enter your Mailchimp API key in step 1 first.'); return; }
+  const res = document.getElementById('mcTestResult');
+  if (!key) { res.style.display='block'; res.style.background='#fef2f2'; res.style.color='#991b1b'; res.textContent='Enter your Mailchimp API key in step 1 first.'; return; }
 
   document.getElementById('testMcBtn').disabled = true;
-  document.getElementById('sendErr').style.display = 'none';
-  document.getElementById('sendOk').style.display = 'none';
-  document.getElementById('sendDebug').style.display = 'none';
-  document.getElementById('sendDebug').textContent = '';
+  res.style.display = 'none';
   document.getElementById('sendStatusBox').style.display = 'flex';
-  document.getElementById('sendMsg').textContent = 'Checking API key...';
+  document.getElementById('sendMsg').textContent = 'Checking Mailchimp connection...';
 
-  const done = (ok, msg) => {
+  try {
+    const ping = await mcCall('ping');
+    dbg('ping', { status: ping.status });
+    if (!ping.ok && ping.status !== 200) throw new Error('Invalid API key (' + ping.status + '): ' + (ping.json.detail || ping.json.title || 'Check your Mailchimp API key.'));
+
+    let detail = '✓ Mailchimp connected!';
+    if (list) {
+      const lr = await mcCall('getList', { listId: list });
+      dbg('getList', { status: lr.status, name: lr.json.name, members: lr.json.stats?.member_count });
+      if (lr.status === 404) throw new Error('Audience ID "' + list + '" not found. Check Mailchimp → Audience → Settings.');
+      if (!lr.ok) throw new Error('Audience error ' + lr.status + ': ' + (lr.json.detail || lr.json.title));
+      detail = '✓ Connected! Audience: "' + (lr.json.name || list) + '" · ' + (lr.json.stats?.member_count || '?') + ' subscribers.';
+    }
+
     document.getElementById('sendStatusBox').style.display = 'none';
     document.getElementById('testMcBtn').disabled = false;
-    if (ok) { const el = document.getElementById('sendOk'); el.style.display = 'block'; el.textContent = msg; }
-    else { showMsg('sendErr', msg); }
+    res.style.display = 'block'; res.style.background = '#f0fdf4'; res.style.color = '#166534';
+    res.textContent = detail;
+  } catch(e) {
+    document.getElementById('sendStatusBox').style.display = 'none';
+    document.getElementById('testMcBtn').disabled = false;
+    res.style.display = 'block'; res.style.background = '#fef2f2'; res.style.color = '#991b1b';
+    res.textContent = e.message;
+  }
+}
+
+// ── SEND ──────────────────────────────────────────────────────────────────────
+async function doSend() {
+  const { key, list, from, reply } = mcInfo();
+  const subject = document.getElementById('subjectInput').value.trim() || emailSubject;
+  if (!key || !list) { showMsg('sendErr', 'Enter your Mailchimp API key and Audience ID in step 1.'); return; }
+  if (!reply) { showMsg('sendErr', 'Enter a verified reply-to email address in step 1.'); return; }
+  if (!emailHtml) { showMsg('sendErr', 'No email generated. Go back to step 2 and upload a PDF.'); return; }
+
+  document.getElementById('sendBtn').disabled  = true;
+  document.getElementById('testMcBtn').disabled = true;
+  document.getElementById('sendErr').style.display = 'none';
+  document.getElementById('sendOk').style.display  = 'none';
+  document.getElementById('sendDebug').style.display = 'none';
+  document.getElementById('sendDebug').textContent   = '';
+  document.getElementById('sendStatusBox').style.display = 'flex';
+  document.getElementById('mcTestResult').style.display  = 'none';
+
+  const done = () => {
+    document.getElementById('sendStatusBox').style.display = 'none';
+    document.getElementById('sendBtn').disabled  = false;
+    document.getElementById('testMcBtn').disabled = false;
   };
 
   try {
-    logDebug('sendDebug', 'Step 1 — ping Mailchimp via proxy');
-    const ping = await mcCall('ping');
-    logDebug('sendDebug', 'ping HTTP ' + ping.status, ping.json);
-    if (ping.status === 401) { done(false, 'Invalid API key (401). Create a fresh key at Mailchimp → Account → Extras → API keys.'); return; }
-    if (!ping.ok) { done(false, 'Mailchimp error ' + ping.status + ': ' + (ping.json.detail || ping.json.title || JSON.stringify(ping.json))); return; }
-
-    if (list) {
-      document.getElementById('sendMsg').textContent = 'Checking audience...';
-      logDebug('sendDebug', 'Step 2 — check audience ' + list);
-      const lr = await mcCall('getList', { listId: list });
-      logDebug('sendDebug', 'getList HTTP ' + lr.status, { name: lr.json.name, id: lr.json.id, members: lr.json.stats?.member_count });
-      if (lr.status === 404) { done(false, 'Audience ID "' + list + '" not found. Check Mailchimp → Audience → Settings.'); return; }
-      if (!lr.ok) { done(false, 'Audience error ' + lr.status + ': ' + (lr.json.detail || lr.json.title || JSON.stringify(lr.json))); return; }
-      done(true, '✓ Connected! Audience: "' + (lr.json.name || list) + '" · ' + (lr.json.stats?.member_count || '?') + ' subscribers. Ready to send.');
-    } else {
-      done(true, '✓ API key valid. Enter your Audience ID to finish setup.');
-    }
-  } catch(e) {
-    logDebug('sendDebug', 'Error', { message: e.message });
-    done(false, 'Error: ' + e.message);
-  }
-}
-
-async function doSend() {
-  const { key, list, from, reply } = mcInfo();
-  const subject = document.getElementById('subjectInput').value.trim();
-  if (!key || !list) { showMsg('sendErr', 'Enter your Mailchimp API key and Audience ID in step 1.'); return; }
-  if (!reply) { showMsg('sendErr', 'Enter a verified reply-to email address in step 1.'); return; }
-
-  document.getElementById('sendBtn').disabled = true;
-  document.getElementById('testMcBtn').disabled = true;
-  document.getElementById('sendErr').style.display = 'none';
-  document.getElementById('sendOk').style.display = 'none';
-  document.getElementById('sendDebug').style.display = 'none';
-  document.getElementById('sendDebug').textContent = '';
-  document.getElementById('sendStatusBox').style.display = 'flex';
-
-  try {
-    /* Step 1 — create campaign */
+    // Step 1 — create campaign
     document.getElementById('sendMsg').textContent = 'Creating campaign...';
-    const campPayload = {
+    const cr = await mcCall('createCampaign', { payload: {
       type: 'regular',
       recipients: { list_id: list },
-      settings: {
-        subject_line: subject,
-        preview_text: 'Your personalised DSE daily briefing from Sokoview Analytics',
-        from_name: from,
-        reply_to: reply,
-        title: 'Sokoview Analytics Daily – ' + (mkt.date || new Date().toLocaleDateString())
-      }
-    };
-    logDebug('sendDebug', 'createCampaign', campPayload);
-    const cr = await mcCall('createCampaign', { payload: campPayload });
-    logDebug('sendDebug', 'createCampaign HTTP ' + cr.status, { id: cr.json.id, errors: cr.json.errors, detail: cr.json.detail });
-    if (!cr.json.id) {
-      throw new Error('Campaign creation failed (' + cr.status + '): ' +
-        (cr.json.detail || cr.json.title || JSON.stringify(cr.json.errors || cr.json)));
-    }
+      settings: { subject_line: subject, preview_text:'Your personalised DSE daily briefing from Sokoview Analytics', from_name: from, reply_to: reply, title: 'Sokoview Daily – ' + (mkt.date || new Date().toLocaleDateString()) }
+    }});
+    dbg('createCampaign', { status: cr.status, id: cr.json.id });
+    if (!cr.json.id) throw new Error('Campaign creation failed (' + cr.status + '): ' + (cr.json.detail || cr.json.title || JSON.stringify(cr.json)));
 
-    /* Step 2 — upload HTML content */
+    lastCampaignId = cr.json.id;
+
+    // Step 2 — upload content
     document.getElementById('sendMsg').textContent = 'Uploading email content...';
-    logDebug('sendDebug', 'setContent → campaign ' + cr.json.id);
     const up = await mcCall('setContent', { campaignId: cr.json.id, content: { html: emailHtml } });
-    logDebug('sendDebug', 'setContent HTTP ' + up.status);
-    if (!up.ok) {
-      throw new Error('Content upload failed (' + up.status + '): ' +
-        (up.json.detail || up.json.title || JSON.stringify(up.json)));
-    }
+    dbg('setContent', { status: up.status });
+    if (!up.ok) throw new Error('Content upload failed (' + up.status + '): ' + (up.json.detail || up.json.title || JSON.stringify(up.json)));
 
-    /* Step 3 — send */
+    // Step 3 — send
     document.getElementById('sendMsg').textContent = 'Sending to your audience...';
-    logDebug('sendDebug', 'sendCampaign → campaign ' + cr.json.id);
     const sr = await mcCall('sendCampaign', { campaignId: cr.json.id });
-    logDebug('sendDebug', 'sendCampaign HTTP ' + sr.status, sr.status !== 204 ? sr.json : null);
+    dbg('sendCampaign', { status: sr.status });
 
     if (sr.status === 204) {
-      document.getElementById('sendStatusBox').style.display = 'none';
+      done();
       document.getElementById('sendCard').style.display = 'none';
       document.getElementById('successBox').style.display = 'block';
-      document.getElementById('backBtn').style.display = 'none';
+      document.getElementById('successDetail').textContent = 'Your daily DSE briefing is on its way to your subscribers. Campaign ID: ' + cr.json.id;
+      // Auto-fetch stats after 10 seconds
+      setTimeout(fetchStats, 10000);
     } else {
-      throw new Error('Send failed (' + sr.status + '): ' +
-        (sr.json.detail || sr.json.title || JSON.stringify(sr.json)));
+      throw new Error('Send failed (' + sr.status + '): ' + (sr.json.detail || sr.json.title || JSON.stringify(sr.json)));
     }
-
   } catch(e) {
-    logDebug('sendDebug', 'doSend error', { message: e.message });
-    document.getElementById('sendStatusBox').style.display = 'none';
-    document.getElementById('sendBtn').disabled = false;
-    document.getElementById('testMcBtn').disabled = false;
+    done();
     showMsg('sendErr', e.message);
+    dbg('ERROR', { message: e.message });
   }
 }
 
+// ── CAMPAIGN STATS ────────────────────────────────────────────────────────────
+async function fetchStats() {
+  if (!lastCampaignId) { alert('No campaign ID found. Send a campaign first.'); return; }
+  const panel = document.getElementById('statsPanel');
+  panel.style.display = 'block';
+  document.getElementById('statStatus').textContent = 'Loading...';
+  document.getElementById('statStatus').className = 'stat-status stat-sending';
+
+  try {
+    // Fetch campaign report from Mailchimp
+    const r = await mcCall('getCampaignReport', { campaignId: lastCampaignId });
+    dbg('getCampaignReport', { status: r.status });
+
+    if (!r.ok) {
+      // Campaign may not have sent yet — fetch status instead
+      const cr = await mcCall('getCampaignStatus', { campaignId: lastCampaignId });
+      const status = cr.json.status || 'unknown';
+      document.getElementById('statStatus').textContent = status.charAt(0).toUpperCase() + status.slice(1);
+      document.getElementById('statStatus').className = 'stat-status stat-' + (status === 'sent' ? 'sent' : status === 'sending' ? 'sending' : 'scheduled');
+      if (status !== 'sent') {
+        document.getElementById('statSentAt').textContent = 'Campaign is ' + status + ' — stats available after delivery.';
+        return;
+      }
+    }
+
+    const rep = r.json;
+    const fmt = n => n !== undefined && n !== null ? Number(n).toLocaleString() : '—';
+    const pct = n => n !== undefined && n !== null ? (Number(n) * 100).toFixed(1) + '%' : '—';
+
+    // Status badge
+    const status = rep.status || 'sent';
+    document.getElementById('statStatus').textContent = status.charAt(0).toUpperCase() + status.slice(1);
+    document.getElementById('statStatus').className = 'stat-status stat-' + (status === 'sent' ? 'sent' : 'sending');
+
+    // Main stats
+    document.getElementById('statSent').textContent      = fmt(rep.emails_sent);
+    document.getElementById('statOpen').textContent      = pct(rep.open_rate);
+    document.getElementById('statOpenN').textContent     = fmt(rep.opens?.opens_total) + ' total';
+    document.getElementById('statClick').textContent     = pct(rep.click_rate);
+    document.getElementById('statClickN').textContent    = fmt(rep.clicks?.clicks_total) + ' total';
+
+    // Secondary stats
+    document.getElementById('statBounce').textContent    = fmt((rep.bounces?.hard_bounces||0) + (rep.bounces?.soft_bounces||0));
+    document.getElementById('statUnsub').textContent     = fmt(rep.unsubscribed);
+    document.getElementById('statUniqOpen').textContent  = fmt(rep.opens?.unique_opens);
+    document.getElementById('statUniqClick').textContent = fmt(rep.clicks?.unique_clicks);
+
+    // Sent at
+    const sentAt = rep.send_time ? new Date(rep.send_time).toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'short'}) : '—';
+    document.getElementById('statSentAt').textContent = 'Sent: ' + sentAt + ' · Subject: ' + (rep.campaign_title || rep.settings?.title || '—');
+
+  } catch(e) {
+    document.getElementById('statStatus').textContent = 'Error';
+    document.getElementById('statStatus').className   = 'stat-status stat-err';
+    document.getElementById('statSentAt').textContent = 'Could not load stats: ' + e.message;
+    dbg('fetchStats ERROR', { message: e.message });
+  }
+}
+
+// ── RESET ─────────────────────────────────────────────────────────────────────
 function resetAll() {
   mkt = {}; emailHtml = ''; emailSubject = ''; pdfB64 = '';
+  lastCampaignId = '';
   resetUpload();
-  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('sendBtn').disabled  = false;
   document.getElementById('testMcBtn').disabled = false;
   document.getElementById('sendStatusBox').style.display = 'none';
   document.getElementById('sendErr').style.display = 'none';
-  document.getElementById('sendOk').style.display = 'none';
+  document.getElementById('sendOk').style.display  = 'none';
   document.getElementById('sendDebug').style.display = 'none';
+  document.getElementById('mcTestResult').style.display = 'none';
+  document.getElementById('sendCard').style.display    = 'block';
+  document.getElementById('successBox').style.display  = 'none';
+  document.getElementById('statsPanel').style.display  = 'none';
   goS(2);
 }
 
-
-// ── TAB 2: MONTHLY PORTFOLIO ──
-
-// ── STATE ──
-var mode='segment';
-let portfolios = [];     // [{firstName,lastName,email,totalValue,invested,gainPct,holdingsCount,portfolioId}]
-let emails = {};         // { email: { subject, html } }
-let currentIdx = 0;
-let monthLabel = '';
-
-const m_MONTH = new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-
-// ── BOOKMARKLET ──
-function m_buildBookmarklet() {
-  const code = `(function(){
-if(document.getElementById('skv-collector')){return;}
-var d=document.createElement('div');
-d.id='skv-collector';
-d.style='position:fixed;top:20px;right:20px;z-index:999999;background:#1a2744;color:#fff;border-radius:12px;padding:1.25rem 1.5rem;width:320px;font-family:system-ui,sans-serif;font-size:14px;box-shadow:0 8px 32px rgba(0,0,0,.4)';
-d.innerHTML='<div style="font-weight:700;font-size:16px;color:#f59e0b;margin-bottom:.5rem">📊 Sokoview Collector</div><div id="skv-status" style="font-size:13px;color:#94a3b8;margin-bottom:1rem">Ready to collect all portfolios</div><div id="skv-progress" style="height:4px;background:#334155;border-radius:2px;margin-bottom:1rem;display:none"><div id="skv-bar" style="height:100%;background:#f59e0b;border-radius:2px;width:0%;transition:width .3s"></div></div><button id="skv-start" onclick="m_skvCollect()" style="background:#f59e0b;color:#1a2744;border:none;padding:9px 18px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;margin-bottom:8px">Collect all portfolios</button><button id="skv-download" onclick="skvDownload()" disabled style="background:#22c55e;color:#fff;border:none;padding:9px 18px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;display:none">Download JSON</button><button onclick="document.getElementById(\'skv-collector\').remove()" style="background:transparent;color:#64748b;border:none;cursor:pointer;font-size:12px;margin-top:8px;width:100%">Close</button>';
-document.body.appendChild(d);
-
-window._skvData=[];
-
-async function m_skvCollect(){
-  document.getElementById('skv-start').disabled=true;
-  document.getElementById('skv-progress').style.display='block';
-  var s=document.getElementById('skv-status');
-  var bar=document.getElementById('skv-bar');
-
-  function m_extractRows(){
-    var rows=document.querySelectorAll('table tbody tr');
-    var items=[];
-    rows.forEach(function(row){
-      var nameEl=row.querySelector('td:first-child');
-      if(!nameEl) return;
-      var lines=nameEl.innerText.trim().split('\\n').map(function(l){return l.trim();}).filter(Boolean);
-      var fullName=lines[0]||'';
-      var email=lines[1]||'';
-      if(!email||!email.includes('@')) return;
-      var nameParts=fullName.trim().split(/\\s+/);
-      var cells=row.querySelectorAll('td');
-      var eyeLink=row.querySelector('a[href*="/portfolios/"]');
-      var portfolioId=(eyeLink?eyeLink.href:'').split('/portfolios/')[1]||'';
-      items.push({firstName:nameParts[0]||'',lastName:nameParts.slice(1).join(' ')||'',email:email.toLowerCase(),totalValue:cells[1]?cells[1].innerText.trim():'',invested:cells[2]?cells[2].innerText.trim():'',gainPct:cells[3]?cells[3].innerText.trim():'',holdingsCount:cells[4]?cells[4].innerText.trim():'',portfolioId:portfolioId});
-    });
-    return items;
-  }
-
-  function m_sleep(ms){return new Promise(function(r){setTimeout(r,ms)});}
-  function m_getPage(){var m=document.body.innerText.match(/Page (\\d+) of (\\d+)/);return m?{cur:parseInt(m[1]),total:parseInt(m[2])}:{cur:1,total:1};}
-  function m_clickNext(){var btns=Array.from(document.querySelectorAll('button'));var nb=btns.find(function(b){return b.innerText.trim()==='Next';});if(nb&&!nb.disabled){nb.click();return true;}return false;}
-
-  // Set 50 rows per page
-  var rppBtns=Array.from(document.querySelectorAll('button,div,span')).find(function(el){return el.innerText.trim()==='50';});
-  if(rppBtns) rppBtns.click();
-  await m_sleep(1200);
-
-  var pg=m_getPage();
-  s.textContent='Collecting page 1 of '+pg.total+'...';
-  window._skvData=m_extractRows();
-  var lastPage=1;
-
-  for(var p=2;p<=pg.total+1;p++){
-    if(!m_clickNext()) break;
-    await m_sleep(1000);
-    var info=m_getPage();
-    if(info.cur===lastPage) break;
-    lastPage=info.cur;
-    var newRows=m_extractRows();
-    var existing=new Set(window._skvData.map(function(u){return u.email;}));
-    newRows.filter(function(u){return !existing.has(u.email);}).forEach(function(u){window._skvData.push(u);});
-    s.textContent='Collecting page '+info.cur+' of '+info.total+'... ('+window._skvData.length+' portfolios)';
-    bar.style.width=Math.round((info.cur/info.total)*100)+'%';
-  }
-
-  bar.style.width='100%';
-  s.innerHTML='<span style="color:#4ade80">✓ Collected '+window._skvData.length+' portfolios!</span>';
-  var dl=document.getElementById('skv-download');
-  dl.style.display='block';
-  dl.disabled=false;
+// ── EMAIL BUILDER (unchanged from original) ───────────────────────────────────
+function buildSubject(m) {
+  const s = m.sentiment || 'Neutral';
+  const chg = m.dseiChangePct || m.dseiChange || '';
+  const mood = s === 'Bullish' ? 'Bullish Session' : s === 'Bearish' ? 'Bearish Session' : 'Mixed Session';
+  const top = m.gainers && m.gainers.length ? m.gainers[0].name || m.gainers[0].ticker : '';
+  return `DSE Daily Briefing \u2013 ${m.date || ''} | ${mood}${top ? ', ' + top + ' leads' : ''}`;
 }
 
-window.m_skvCollect=m_skvCollect;
-window.skvDownload=function(){
-  var json=JSON.stringify({collectedAt:new Date().toISOString(),month:'${m_MONTH}',portfolios:window._skvData},null,2);
-  var blob=new Blob([json],{type:'application/json'});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement('a');
-  a.href=url;a.download='sokoview-portfolios.json';
-  document.body.appendChild(a);a.click();document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-};
-})();`;
-  return 'javascript:' + encodeURIComponent(code);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  monthLabel = m_MONTH;
-  const link = document.getElementById('m-bookmarkletLink');
-  link.href = m_buildBookmarklet();
-  link.setAttribute('href', m_buildBookmarklet());
-});
-
-// ── NAVIGATION ──
-function m_goS(n) {
-  for (let i = 1; i <= 4; i++) {
-    document.getElementById('m-s' + i).style.display = i === n ? 'block' : 'none';
-    const dot = document.getElementById('m-d' + i);
-    const lbl = document.getElementById('m-sl' + i);
-    dot.className = 'dot' + (i < n ? ' done' : i === n ? ' active' : '');
-    dot.textContent = i < n ? '✓' : i;
-    if (lbl) lbl.className = 'step-lbl' + (i === n ? ' active' : '');
-  }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function m_setMode(m){
-  mode=m;
-  var sb=document.getElementById('m-modeSegBtn');
-  var lb=document.getElementById('m-modeLiveBtn');
-  if(sb)sb.className='mode-btn'+(m==='segment'?' active':'');
-  if(lb)lb.className='mode-btn'+(m==='live'?' active':'');
-  var sw=document.getElementById('m-segmentWrap');if(sw)sw.style.display=m==='segment'?'block':'none';
-  var lw=document.getElementById('m-liveWarning');if(lw)lw.style.display=m==='live'?'block':'none';
-  var badge=document.getElementById('m-modeBadge');
-  if(badge){badge.textContent=m==='live'?'LIVE MODE':'SEGMENT TEST';badge.className='badge '+(m==='live'?'b-red':'b-blue');}
-}
-
-// Drag and drop for JSON
-const mDz = document.getElementById('m-dropZone');
-mDz.addEventListener('dragover', e => { e.preventDefault(); mDz.style.borderColor = '#1a2744'; });
-mDz.addEventListener('dragleave', () => { mDz.style.borderColor = '#d1d5db'; });
-mDz.addEventListener('drop', e => { e.preventDefault(); mDz.style.borderColor = '#d1d5db'; m_handleJson(e.dataTransfer.files[0]); });
-
-function m_handleJson(file) {
-  if (!file || !file.name.endsWith('.json')) { m_showMsg('jsonErr', 'Please upload a .json file'); return; }
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const data = JSON.parse(e.target.result);
-      portfolios = data.portfolios || data;
-      if (!Array.isArray(portfolios) || !portfolios.length) throw new Error('No portfolio data found');
-      monthLabel = data.month || m_MONTH;
-
-      // Dedupe by email
-      const seen = new Set();
-      portfolios = portfolios.filter(p => {
-        if (seen.has(p.email)) return false;
-        seen.add(p.email); return true;
-      });
-
-      document.getElementById('m-jsonErr').style.display = 'none';
-      m_showOk('m-jsonOk', '✓ Loaded ' + portfolios.length + ' portfolios from ' + (data.month || 'Sokoview'));
-      if(mDz) mDz.style.borderColor = '#22c55e';
-      const dt = document.getElementById('m-dropText'); if(dt) dt.textContent = '✓ ' + file.name + ' (' + portfolios.length + ' portfolios)';
-      setTimeout(() => { m_renderPreview(); m_goS(3); }, 600);
-    } catch(err) {
-      m_showMsg('m-jsonErr', 'Error reading file: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-}
-
-// ── PREVIEW ──
-function m_renderPreview() {
-  const mo = monthLabel || m_MONTH;
-  document.getElementById('m-dataInfo').textContent = portfolios.length + ' portfolios · ' + mo;
-  document.getElementById('m-liveCount').textContent = portfolios.length;
-  document.getElementById('m-rvCount').textContent = portfolios.length + ' portfolios';
-  document.getElementById('m-rvMonth').textContent = mo;
-  document.getElementById('m-modeLabel').textContent = mode === 'test' ? 'TEST MODE' : 'LIVE MODE';
-  document.getElementById('m-modeLabel').className = 'badge ' + (mode === 'test' ? 'b-amber' : 'b-red');
-
-  // Portfolio grid (show first 6)
-  const grid = document.getElementById('m-portfolioGrid');
-  const show = portfolios.slice(0, 6);
-  grid.innerHTML = show.map((p, i) => {
-    const up = p.gainPct && p.gainPct.includes('+');
-    const dn = p.gainPct && p.gainPct.includes('-');
-    return `<div class="portfolio-card" onclick="m_jumpTo(${i})" style="cursor:pointer">
-      <div class="name">${p.firstName} ${p.lastName}</div>
-      <div class="email">${p.email}</div>
-      <div class="value">${p.totalValue || '—'}</div>
-      <div class="gain ${up?'up':dn?'dn':''}">${p.gainPct || '—'} since inception</div>
-    </div>`;
-  }).join('') + (portfolios.length > 6 ? `<div class="portfolio-card" style="display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:13px">+${portfolios.length-6} more</div>` : '');
-
-  currentIdx = 0;
-  m_showEmailForIdx(0);
-}
-
-function m_jumpTo(i) { currentIdx = i; m_showEmailForIdx(i); }
-function m_navigate(dir) {
-  currentIdx = Math.max(0, Math.min(portfolios.length - 1, currentIdx + dir));
-  m_showEmailForIdx(currentIdx);
-}
-
-async function m_showEmailForIdx(idx) {
-  const p = portfolios[idx];
-  if (!p) return;
-  m_updateNav(idx);
-  document.getElementById('m-previewName').textContent = p.firstName + ' ' + p.lastName;
-  document.getElementById('m-previewEmail').textContent = '· ' + p.email;
-  document.getElementById('m-previewValue').textContent = p.totalValue || '—';
-  document.getElementById('m-previewGain').textContent = p.gainPct || '—';
-  const gainEl = document.getElementById('m-previewGain');
-  gainEl.style.color = p.gainPct?.includes('+') ? '#16a34a' : p.gainPct?.includes('-') ? '#dc2626' : '#111';
-
-  if (emails[p.email]) {
-    document.getElementById('m-previewFrame').srcdoc = emails[p.email].html;
-    return;
-  }
-  await m_generateEmail(p, idx);
-}
-
-function m_updateNav(idx) {
-  document.getElementById('m-navCounter').textContent = (idx + 1) + ' of ' + portfolios.length;
-  document.getElementById('m-prevBtn').disabled = idx === 0;
-  document.getElementById('m-nextBtn').disabled = idx === portfolios.length - 1;
-}
-
-async function m_generateEmail(p, idx) {
-  const key = document.getElementById('m-anthroKey').value.trim();
-  if (!key) {
-    document.getElementById('m-previewFrame').srcdoc = '<p style="padding:2rem;font-family:sans-serif;color:#dc2626">Enter your Anthropic API key in step 1 first.</p>';
-    return;
-  }
-
-  document.getElementById('m-genStatus').style.display = 'block';
-  document.getElementById('m-previewWrap').style.opacity = '.4';
-  const pct = Math.round(((idx + 1) / portfolios.length) * 100);
-  document.getElementById('m-genProgress').style.width = pct + '%';
-  document.getElementById('m-genMsg').textContent = 'Generating email for ' + p.firstName + '...';
-
-  const mo = monthLabel || m_MONTH;
-
-  // ── SEGMENT CLASSIFICATION ──
-  const gainNum = parseFloat((p.gainPct || '0').replace(/[^-0-9.]/g, '')) || 0;
-
-  // Calculate absolute gain in TZS
-  const parseAmt = v => parseFloat((v || '0').replace(/[^0-9.]/g, '')) || 0;
-  const totalVal  = parseAmt(p.totalValue);
-  const invested  = parseAmt(p.invested);
-  const absGain   = totalVal - invested;
-  const absGainFmt = (absGain >= 0 ? '+' : '') + 'TZS ' + Math.abs(Math.round(absGain)).toLocaleString();
-
-  let segment, segLabel, segEmoji, segTone;
-  if (gainNum >= 20) {
-    segment = 'strong';    segLabel = 'Strong Growth';  segEmoji = '🚀';
-    segTone = 'celebratory and energetic. Acknowledge their impressive gains, highlight what strong performance means for their wealth, and encourage them to think about rebalancing or compounding their gains.';
-  } else if (gainNum >= 5) {
-    segment = 'positive';  segLabel = 'Positive';       segEmoji = '📈';
-    segTone = 'encouraging and confident. Recognise steady positive performance, note that consistent gains beat market volatility, and suggest staying the course.';
-  } else if (gainNum >= -5) {
-    segment = 'breakeven'; segLabel = 'Breakeven';      segEmoji = '➡️';
-    segTone = 'reassuring and grounded. Acknowledge they are holding steady in a volatile market, remind them that capital preservation is itself a win, and encourage patience.';
-  } else if (gainNum >= -20) {
-    segment = 'recovering'; segLabel = 'Recovering';    segEmoji = '⚠️';
-    segTone = 'empathetic and contextual. Acknowledge the temporary drawdown without dismissing it, provide market context for why this can happen, and reassure them that long-term DSE investors historically recover well.';
-  } else {
-    segment = 'pressure';  segLabel = 'Under Pressure'; segEmoji = '🔴';
-    segTone = 'careful, supportive and honest. Acknowledge the significant loss with empathy, avoid false optimism, suggest they review their portfolio composition, and remind them that Sokoview gives them the tools to stay informed and make better decisions.';
-  }
-
-  var systemPrompt = 'You are a warm, trusted DSE investment analyst writing a personalised monthly portfolio update for a Sokoview subscriber. Write exactly 3 sentences. Be ' + segTone + ' Always reference their specific numbers. Never use generic platitudes. Write as if you know this person personally.';
-
-  var userPrompt = 'Write a 3-sentence personalised monthly portfolio commentary for ' + p.firstName + '. Month: ' + mo + '. Segment: ' + segEmoji + ' ' + segLabel + '. Value: ' + (p.totalValue||'N/A') + '. Invested: ' + (p.invested||'N/A') + '. Gain/loss: ' + absGainFmt + '. Return: ' + (p.gainPct||'N/A') + '. Holdings: ' + (p.holdingsCount||'N/A') + ' stocks. Write 3 sentences now, no preamble.';
-
-  try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 220,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }]
-      })
-    });
-    const d = await r.json();
-    const insight = d.content?.[0]?.text?.trim()
-      || p.firstName + "'s portfolio stands at " + p.totalValue + " with a return of " + p.gainPct + " since inception across " + p.holdingsCount + " holdings.";
-
-    emails[p.email] = {
-      subject: 'Your Sokoview Portfolio Update — ' + mo,
-      html: m_buildPortfolioEmail(p, insight, mo, { segment, segLabel, segEmoji, absGainFmt })
-    };
-    document.getElementById('m-previewFrame').srcdoc = emails[p.email].html;
-  } catch(e) {
-    const insight = p.firstName + "'s portfolio stands at " + p.totalValue + " with a total return of " + p.gainPct + " since inception across " + p.holdingsCount + " active DSE holdings.";
-    emails[p.email] = {
-      subject: 'Your Sokoview Portfolio Update — ' + mo,
-      html: m_buildPortfolioEmail(p, insight, mo, { segment, segLabel, segEmoji, absGainFmt })
-    };
-    document.getElementById('m-previewFrame').srcdoc = emails[p.email].html;
-  }
-
-  document.getElementById('m-genStatus').style.display = 'none';
-  document.getElementById('m-previewWrap').style.opacity = '1';
-}
-
-
-async function m_regenerateCurrent() {
-  const p = portfolios[currentIdx];
-  if (!p) return;
-  delete emails[p.email];
-  await m_showEmailForIdx(currentIdx);
-}
-
-// ── EMAIL BUILDER ──
-function m_buildPortfolioEmail(p, insight, mo, seg) {
-  seg = seg || {};
-  const segEmoji = seg.segEmoji || '📊';
-  const segLabel = seg.segLabel || 'Portfolio Update';
-  const absGainFmt = seg.absGainFmt || '';
-  const isUp = p.gainPct && p.gainPct.includes('+');
-  const isDn = p.gainPct && p.gainPct.includes('-');
-  const gainClr = isUp ? '#16a34a' : isDn ? '#dc2626' : '#6b7280';
-  const gainBg  = isUp ? '#dcfce7' : isDn ? '#fee2e2' : '#f3f4f6';
-  const gainTxt = isUp ? 'Total Gain' : isDn ? 'Total Loss' : 'Return';
-
-  // Segment badge colours
-  const segColors = {
-    strong:    { bg:'#dcfce7', color:'#166534', border:'#86efac' },
-    positive:  { bg:'#dbeafe', color:'#1e40af', border:'#93c5fd' },
-    breakeven: { bg:'#f3f4f6', color:'#374151', border:'#d1d5db' },
-    recovering:{ bg:'#fef9c3', color:'#713f12', border:'#fde047' },
-    pressure:  { bg:'#fee2e2', color:'#991b1b', border:'#fca5a5' }
-  };
-  const sc = segColors[seg.segment] || segColors.breakeven;
-
+function buildEmail(m) {
+  m.marketCap     = m.marketCap  || m.totalMarketCap   || m.market_cap    || 'N/A';
+  m.turnover      = m.turnover   || m.weeklyTurnover   || m.marketTurnover|| 'N/A';
+  m.volume        = m.volume     || m.volumeTraded     || 'N/A';
+  m.dseiChangePct = m.dseiChangePct || m.dseiChange    || m.dailyChange   || 'N/A';
+  var tanzPct     = parseFloat(m.tanzanianPct || 0) || 77;
+  var forPct      = 100 - tanzPct;
+  var s        = m.sentiment || 'Neutral';
+  var sentClr  = s==='Bullish' ? '#16a34a' : s==='Bearish' ? '#dc2626' : '#b45309';
+  var sentBg   = s==='Bullish' ? '#dcfce7' : s==='Bearish' ? '#fee2e2' : '#fef9c3';
+  function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function clr(v){ v=String(v||''); return v.includes('+')?'color:#16a34a;font-weight:600':v.includes('-')?'color:#dc2626;font-weight:600':'color:#6b7280'; }
+  var tot  = (m.advancers||0)+(m.decliners||0)+(m.unchanged||0);
+  var ap   = tot ? Math.round((m.advancers||0)/tot*100) : 0;
+  var dp   = tot ? Math.round((m.decliners||0)/tot*100) : 0;
+  var up   = 100-ap-dp;
   var h = '';
   h += '<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>';
-  h += '<style>@media only screen and (max-width:600px){.wrap{padding:12px 8px!important}.header-td{padding:20px 16px!important}.kpi-table{display:block!important}.kpi-td{display:inline-block!important;width:48%!important;border-right:none!important;border-bottom:1px solid #f1f5f9!important}table{min-width:unset!important}td,th{padding:6px 8px!important;font-size:12px!important}}</style></head>';
+  h += '<style>@media only screen and (max-width:600px){.wrap{padding:12px 8px!important}.header-td{padding:20px 16px!important}.logo{font-size:20px!important}.kpi-table{display:block!important}.kpi-td{display:inline-block!important;width:48%!important;border-right:none!important;border-bottom:1px solid #f1f5f9!important;vertical-align:top}.kpi-val{font-size:15px!important}.sal-td{padding:16px!important}.sal-name{font-size:15px!important}.sal-body{font-size:13px!important}table{min-width:unset!important}td,th{padding:6px 8px!important;font-size:12px!important}.section-title{font-size:11px!important}.insight-box{padding:10px 12px!important}.footer-td{padding:14px 16px!important}}</style></head>';
   h += '<body style="margin:0;padding:0;background:#f0f4f8;font-family:Arial,Helvetica,sans-serif">';
   h += '<div class="wrap" style="max-width:600px;margin:0 auto;padding:20px 12px">';
-
-  // HEADER
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:12px 12px 0 0"><tr><td class="header-td" style="padding:26px 28px">';
-  h += '<div style="font-size:26px;font-weight:900;color:#f59e0b;letter-spacing:2px">SOKOVIEW</div>';
-  h += '<div style="font-size:12px;color:#94a3b8;margin-top:3px">Monthly Portfolio Performance &middot; ' + mo + '</div>';
-  h += '<div style="margin-top:16px"><a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 22px;border-radius:6px;text-decoration:none">View Live Portfolio &rarr;</a></div>';
+  h += '<div class="logo" style="font-size:26px;font-weight:900;color:#f59e0b;letter-spacing:2px">SOKOVIEW</div>';
+  h += '<div style="font-size:12px;color:#94a3b8;margin-top:3px">Dar es Salaam Stock Exchange &middot; Daily Market Briefing</div>';
+  h += '<div style="font-size:15px;color:#ffffff;margin-top:6px;font-weight:600">'+esc(m.date||'')+'</div>';
+  h += '<div style="font-size:11px;color:#64748b;margin-top:3px">Data prepared by Sokoview Analytics &middot; <a href="https://sokoview.co.tz" style="color:#64748b">sokoview.co.tz</a></div>';
+  h += '<div style="margin-top:16px"><a href="https://sokoview.co.tz" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 24px;border-radius:6px;text-decoration:none;letter-spacing:0.03em">View Full Market Dashboard &rarr;</a></div>';
   h += '</td></tr></table>';
-
-  // SALUTATION + SEGMENT BADGE
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0"><tr><td style="padding:22px 24px">';
-  h += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px">';
-  h += '<div style="font-size:16px;color:#111">Hi <strong>' + (p.firstName || '*|FNAME|*') + '</strong>,</div>';
-  h += '<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:' + sc.bg + ';color:' + sc.color + ';border:1px solid ' + sc.border + ';border-radius:20px;font-size:12px;font-weight:600">'
-    + segEmoji + ' ' + segLabel + '</div>';
-  h += '</div>';
-  h += '<div style="font-size:14px;color:#374151;line-height:1.8">' + insight + '</div>';
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0"><tr><td class="sal-td" style="padding:22px 24px">';
+  h += '<div class="sal-name" style="font-size:16px;color:#111111;margin-bottom:12px">Hi <strong>*|FNAME|*</strong>,</div>';
+  h += '<div class="sal-body" style="font-size:14px;color:#374151;line-height:1.8">'+esc(m.insight||'Here is your daily DSE market briefing.')+'</div>';
   h += '</td></tr></table>';
-
-  // KPI BOXES
-  h += '<table class="kpi-table" width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr>';
-  h += '<td class="kpi-td" style="padding:14px 8px 14px 16px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Portfolio value</div>';
-  h += '<div style="font-size:15px;font-weight:700;color:#111">' + (p.totalValue || '—') + '</div>';
-  h += '</td>';
-  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Invested</div>';
-  h += '<div style="font-size:15px;font-weight:700;color:#111">' + (p.invested || '—') + '</div>';
-  h += '</td>';
-  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">' + gainTxt + '</div>';
-  h += '<div style="font-size:15px;font-weight:700;padding:3px 8px;background:' + gainBg + ';color:' + gainClr + ';border-radius:20px;display:inline-block">' + (p.gainPct || '—') + '</div>';
-  h += '</td>';
-  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;vertical-align:top">';
-  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">In TZS</div>';
-  h += '<div style="font-size:14px;font-weight:700;color:' + gainClr + '">' + (absGainFmt || '—') + '</div>';
+  h += '<table class="kpi-table" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr>';
+  h += '<td class="kpi-td" style="padding:14px 8px 14px 16px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:6px">Sentiment</div><div style="font-size:13px;font-weight:700;background:'+sentBg+';color:'+sentClr+';padding:4px 12px;border-radius:20px;display:inline-block">'+esc(s)+'</div></td>';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">DSEI Index</div><div class="kpi-val" style="font-size:18px;font-weight:700;color:#111111">'+esc(m.dsei||'—')+'</div><div style="font-size:12px;font-weight:600;'+clr(m.dseiChangePct)+'">'+esc(m.dseiChangePct)+'</div></td>';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Market Cap</div><div style="font-size:16px;font-weight:700;color:#111111">'+esc(m.marketCap)+'</div></td>';
+  h += '<td class="kpi-td" style="padding:14px 8px;width:25%;vertical-align:top"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:4px">Turnover</div><div style="font-size:16px;font-weight:700;color:#111111">'+esc(m.turnover)+'</div><div style="font-size:11px;color:#6b7280">Vol: '+esc(m.volume)+'</div></td>';
+  h += '</tr></table>';
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:8px">Market Breadth</div>';
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:6px"><tr>';
+  h += '<td style="width:'+ap+'%;background:#22c55e;height:9px;border-radius:4px 0 0 4px"></td>';
+  h += '<td style="width:'+dp+'%;background:#ef4444;height:9px"></td>';
+  h += '<td style="width:'+up+'%;background:#e5e7eb;height:9px;border-radius:0 4px 4px 0"></td>';
+  h += '</tr></table>';
+  h += '<table width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px;color:#16a34a;font-weight:600">&#9650; '+(m.advancers||0)+' advancers</td><td style="font-size:12px;color:#dc2626;font-weight:600;text-align:center">&#9660; '+(m.decliners||0)+' decliners</td><td style="font-size:12px;color:#6b7280;text-align:right">&#8212; '+(m.unchanged||0)+' unchanged</td></tr></table>';
   h += '</td></tr></table>';
-
-  // HOLDINGS
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:14px 16px">';
-  h += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">';
-  h += '<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:3px">Active holdings</div>';
-  h += '<div style="font-size:20px;font-weight:700;color:#1a2744">' + (p.holdingsCount || '—') + ' <span style="font-size:13px;font-weight:400;color:#6b7280">stocks on the DSE</span></div></div>';
-  h += '<a href="https://sokoview.co.tz/dashboard/market" style="background:#f0f4ff;color:#1a2744;font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;text-decoration:none">View holdings &rarr;</a>';
-  h += '</div></td></tr></table>';
-
-  // INSIGHTS BOX
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px">';
-  h += '<div style="border-left:4px solid #f59e0b;padding:14px 16px;background:#fffbeb;border-radius:0 8px 8px 0">';
+  if (m.indices && m.indices.length) {
+    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
+    h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a2744;margin-bottom:8px">Market Indices</div>';
+    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f9fafb"><th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Index</th><th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Points</th><th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Daily</th><th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">1M</th><th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #e5e7eb">YTD</th></tr></thead><tbody>';
+    (m.indices||[]).forEach(function(r){h+='<tr><td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;font-weight:600;font-size:13px;color:#111111">'+esc(r.name)+'</td><td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;color:#374151">'+esc(r.points)+'</td><td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;'+clr(r.change)+'">'+esc(r.change)+'</td><td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;'+clr(r.m1)+'">'+esc(r.m1||'—')+'</td><td style="padding:7px 10px;border-bottom:1px solid #f3f4f6;text-align:right;font-size:13px;'+clr(r.ytd)+'">'+esc(r.ytd||'—')+'</td></tr>';});
+    h += '</tbody></table></div></td></tr></table>';
+  }
+  if (m.gainers && m.gainers.length) {
+    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
+    h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#16a34a;margin-bottom:8px">&#9650; Gainers</div>';
+    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#f0fdf4"><th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Ticker</th><th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Company</th><th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Price</th><th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">Daily %</th><th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#166534;text-transform:uppercase;border-bottom:1px solid #dcfce7">YTD</th></tr></thead><tbody>';
+    (m.gainers||[]).forEach(function(r){h+='<tr><td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;font-weight:700;font-size:13px;color:#111111">'+esc(r.ticker)+'</td><td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;font-size:13px;color:#374151">'+esc(r.name)+'</td><td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;text-align:right;font-size:13px;color:#374151">'+esc(r.price)+'</td><td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;text-align:right;font-size:13px;color:#16a34a;font-weight:700">'+esc(r.change)+'</td><td style="padding:7px 10px;border-bottom:1px solid #f0fdf4;text-align:right;font-size:13px;'+clr(r.ytd)+'">'+esc(r.ytd||'—')+'</td></tr>';});
+    h += '</tbody></table></div></td></tr></table>';
+  }
+  if (m.losers && m.losers.length) {
+    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
+    h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#dc2626;margin-bottom:8px">&#9660; Losers</div>';
+    h += '<div style="overflow-x:auto"><table width="100%" cellpadding="0" cellspacing="0"><thead><tr style="background:#fef2f2"><th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Ticker</th><th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Company</th><th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Price</th><th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">Daily %</th><th style="text-align:right;padding:7px 10px;font-size:10px;font-weight:700;color:#991b1b;text-transform:uppercase;border-bottom:1px solid #fee2e2">YTD</th></tr></thead><tbody>';
+    (m.losers||[]).forEach(function(r){h+='<tr><td style="padding:7px 10px;border-bottom:1px solid #fff1f2;font-weight:700;font-size:13px;color:#111111">'+esc(r.ticker)+'</td><td style="padding:7px 10px;border-bottom:1px solid #fff1f2;font-size:13px;color:#374151">'+esc(r.name)+'</td><td style="padding:7px 10px;border-bottom:1px solid #fff1f2;text-align:right;font-size:13px;color:#374151">'+esc(r.price)+'</td><td style="padding:7px 10px;border-bottom:1px solid #fff1f2;text-align:right;font-size:13px;color:#dc2626;font-weight:700">'+esc(r.change)+'</td><td style="padding:7px 10px;border-bottom:1px solid #fff1f2;text-align:right;font-size:13px;'+clr(r.ytd)+'">'+esc(r.ytd||'—')+'</td></tr>';});
+    h += '</tbody></table></div></td></tr></table>';
+  }
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px">';
+  h += '<div class="insight-box" style="border-left:4px solid #f59e0b;padding:14px 16px;background:#fffbeb;border-radius:0 8px 8px 0">';
   h += '<div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Sokoview Insights</div>';
-  h += '<div style="font-size:13px;color:#78350f;line-height:1.8">' + insight + '</div>';
+  h += '<div style="font-size:13px;color:#78350f;line-height:1.8">'+esc(m.insight||'')+'</div>';
   h += '</div></td></tr></table>';
-
-  // CTA
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:20px 24px;text-align:center">';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:14px">Ready to review and act on your portfolio?</div>';
-  h += '<a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#1a2744;color:#fff;font-size:14px;font-weight:700;padding:13px 32px;border-radius:8px;text-decoration:none">Open My Portfolio on Sokoview &rarr;</a>';
-  h += '</td></tr></table>';
-
-  // SIGN OFF
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px 24px">';
-  h += '<div style="font-size:14px;color:#374151;margin-bottom:4px">Happy investing,</div>';
-  h += '<div style="font-size:14px;font-weight:700;color:#1a2744">The Sokoview Analytics Team</div>';
-  h += '</td></tr></table>';
-
-  // FOOTER
-  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:0 0 12px 12px"><tr><td style="padding:18px 24px;text-align:center">';
+  if (m.highlights && m.highlights.length) {
+    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:14px 16px">';
+    h += '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a2744;margin-bottom:10px">Market Highlights</div>';
+    (m.highlights||[]).forEach(function(hl){h+='<div style="font-size:13px;color:#374151;padding:8px 12px;border-left:3px solid #1a2744;background:#f8fafc;margin-bottom:6px;border-radius:0 4px 4px 0">'+esc(hl)+'</div>';});
+    h += '</td></tr></table>';
+  }
+  if (m.tanzanianPct) {
+    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:12px 16px">';
+    h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;margin-bottom:8px">Investor Participation</div>';
+    h += '<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:6px"><tr><td style="width:'+tanzPct+'%;background:#1a2744;height:10px;border-radius:4px 0 0 4px"></td><td style="width:'+forPct+'%;background:#f59e0b;height:10px;border-radius:0 4px 4px 0"></td></tr></table>';
+    h += '<table width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-size:12px;color:#1a2744;font-weight:600">&#9632; Tanzanians '+tanzPct+'%</td><td style="font-size:12px;color:#b45309;font-weight:600;text-align:right">&#9632; Foreign '+forPct+'%</td></tr></table>';
+    h += '</td></tr></table>';
+  }
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:18px 24px"><div style="font-size:14px;color:#374151;margin-bottom:4px">Happy investing,</div><div style="font-size:14px;font-weight:700;color:#1a2744">The Sokoview Analytics Team</div></td></tr></table>';
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:0 0 12px 12px"><tr><td class="footer-td" style="padding:18px 24px;text-align:center">';
   h += '<div style="font-size:15px;font-weight:700;color:#f59e0b;margin-bottom:4px">SOKOVIEW</div>';
-  h += '<div style="margin:12px 0"><a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 24px;border-radius:6px;text-decoration:none">Track Your Portfolio &rarr;</a></div>';
-  h += '<div style="font-size:12px;color:#94a3b8"><a href="https://sokoview.co.tz" style="color:#94a3b8;text-decoration:none">sokoview.co.tz</a> &nbsp;&middot;&nbsp; Sokoview Analytics</div>';
-  h += '<div style="font-size:11px;color:#475569;margin-top:8px">You received this because you have a Sokoview account. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
+  h += '<div style="font-size:12px;color:#94a3b8"><a href="https://sokoview.co.tz" style="color:#94a3b8;text-decoration:none">sokoview.co.tz</a> &nbsp;&middot;&nbsp; Data prepared by Sokoview Analytics</div>';
+  h += '<div style="margin:16px 0"><a href="https://sokoview.co.tz" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:11px 28px;border-radius:6px;text-decoration:none;letter-spacing:0.03em">Track Your Portfolio on Sokoview &rarr;</a></div>';
+  h += '<div style="font-size:11px;color:#475569;margin-top:4px">You received this because you subscribed to Sokoview market updates. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
   h += '</td></tr></table>';
-
   h += '</div></body></html>';
   return h;
-}
-
-
-// ── SEND ──
-function m_goSend() {
-  const mo = monthLabel || m_MONTH;
-  var rvFrom=document.getElementById('m-rvFrom');if(rvFrom)rvFrom.textContent=document.getElementById('m-fromName').value;
-  var rvReply=document.getElementById('m-rvReply');if(rvReply)rvReply.textContent=document.getElementById('m-replyTo').value;
-  var rvSubj=document.getElementById('m-rvSubject');if(rvSubj)rvSubj.textContent='Your Sokoview Portfolio Update — '+mo;
-  var rvCnt=document.getElementById('m-rvCount');if(rvCnt)rvCnt.textContent=portfolios?portfolios.length:0;
-  var rvMo=document.getElementById('m-rvMonth');if(rvMo)rvMo.textContent=mo;
-  var badge=document.getElementById('m-sendModeBadge');
-  if(badge){badge.textContent=mode==='live'?'LIVE MODE':'SEGMENT TEST';badge.className='badge '+(mode==='live'?'b-red':'b-blue');}
-  var si=document.getElementById('m-segmentModeInfo');if(si)si.style.display=mode==='segment'?'block':'none';
-  var li=document.getElementById('m-liveModeInfo');if(li)li.style.display=mode==='live'?'block':'none';
-  var sid=document.getElementById('m-segmentIdDisplay');
-  if(sid){sid.textContent=((document.getElementById('m-segmentId')||{}).value||'not set').trim();}
-  document.getElementById('m-liveCount').textContent = portfolios ? portfolios.length : 0;
-  m_goS(4);
-}
-
-async function m_doSend(){
-  var mcI=m_mcInfo(),from=mcI.from,reply=mcI.reply,list=mcI.list;
-  var segId=((document.getElementById('m-segmentId')||{}).value||'').trim();
-  var mo=monthLabel||m_MONTH;
-  var key=((document.getElementById('m-anthroKey')||{}).value||'').trim();
-  if(!list)                          {m_showMsg('m-sendErr','Enter your Mailchimp Audience ID in step 1.');return;}
-  if(!from||!reply)                  {m_showMsg('m-sendErr','Enter From name and Reply-to email in step 1.');return;}
-  if(mode==='segment'&&!segId)       {m_showMsg('m-sendErr','Enter your tester segment ID in step 1.');return;}
-  if(!portfolios||!portfolios.length){m_showMsg('m-sendErr','No portfolios loaded. Go back to step 2.');return;}
-  var sendBtn=document.getElementById('m-sendBtn');
-  var mcBtn=document.getElementById('m-testMcBtn');
-  if(sendBtn)sendBtn.disabled=true;
-  if(mcBtn)  mcBtn.disabled=true;
-  document.getElementById('m-sendErr').style.display='none';
-  document.getElementById('m-sendOk').style.display='none';
-  document.getElementById('m-sendStatusRow').style.display='flex';
-  document.getElementById('m-sendProgressWrap').style.display='block';
-  function sp(pct,msg){var b=document.getElementById('m-sendProgress');var t=document.getElementById('m-sendMsg');if(b)b.style.width=pct+'%';if(t)t.textContent=msg;}
-  function cleanup(){
-    document.getElementById('m-sendStatusRow').style.display='none';
-    document.getElementById('m-sendProgressWrap').style.display='none';
-    if(sendBtn)sendBtn.disabled=false;
-    if(mcBtn)  mcBtn.disabled=false;
-    var det=document.getElementById('m-sendDetail');if(det)det.textContent='';
-  }
-  function mcErrMsg(j,s){var m=(j&&(j.detail||j.error||j.title))||('HTTP '+s);if(String(s)==='403')m+=' Check your API key.';if(m.includes('verified'))m+=' Verify reply-to email in Mailchimp Account settings.';return m;}
-  function showOK(title,msg){
-    cleanup();
-    var sc=document.getElementById('m-sendCard');if(sc)sc.style.display='none';
-    var sb=document.getElementById('m-successBox');if(sb)sb.style.display='block';
-    var bp=document.getElementById('m-backToPreview');if(bp)bp.style.display='none';
-    var st=document.getElementById('m-successTitle');if(st)st.textContent=title;
-    var sm=document.getElementById('m-successMsg');if(sm)sm.textContent=msg;
-    if(mode==='live'){var fb=sb&&sb.querySelector('button');if(fb)fb.style.display='none';}
-  }
-  try{
-    var total=portfolios.length;
-    sp(0,'Step 1/4 - Generating insights for '+total+' portfolios...');
-    var iMap={},sMap={};
-    for(var i=0;i<total;i++){
-      var p=portfolios[i];
-      var gn=parseFloat((p.gainPct||'0').replace(/[^-0-9.]/g,''))||0;
-      sMap[p.email]=m_classifySegment(gn,p);
-      iMap[p.email]=await m_generateInsight(p,mo,key);
-      sp(Math.round((i+1)/total*25),'Insights: '+(i+1)+'/'+total);
-    }
-    sp(26,'Step 2/4 - Setting up merge fields...');
-    var mfr=await m_mcCall('ensureMergeFields',{listId:list});
-    if(mfr.status!==200) throw new Error('Merge field setup failed: '+mcErrMsg(mfr.json,mfr.status));
-    sp(28,'Step 3/4 - Pushing data to subscribers...');
-    var notFound=0;
-    for(var i=0;i<total;i++){
-      var p=portfolios[i],seg=sMap[p.email];
-      var tv=parseFloat((p.totalValue||'0').replace(/[^0-9.]/g,''))||0;
-      var iv=parseFloat((p.invested||'0').replace(/[^0-9.]/g,''))||0;
-      var ag=tv-iv,agFmt=(ag>=0?'+':'')+' TZS '+Math.abs(Math.round(ag)).toLocaleString();
-      try{
-        var ur=await m_mcCall('updateMember',{listId:list,email:p.email,mergeFields:{
-          PORTVAL:p.totalValue||'',INVESTED:p.invested||'',GAINPCT:p.gainPct||'',
-          ABSGAIN:agFmt,HOLDINGS:p.holdingsCount||'',
-          INSIGHT:iMap[p.email]||'',SEGLBL:seg.segLabel||'',SEGEMO:seg.segEmoji||''
-        }});
-        if(ur.status===404)notFound++;
-      }catch(e){notFound++;}
-      sp(28+Math.round((i+1)/total*40),'Pushing: '+(i+1)+'/'+total+(notFound?' ('+notFound+' not in audience)':''));
-      if(i<total-1) await new Promise(function(r){setTimeout(r,100);});
-    }
-    sp(70,'Step 4/4 - Creating campaign...');
-    var recipients={list_id:list};
-    if(mode==='segment') recipients.segment_opts={saved_segment_id:parseInt(segId)};
-    var cr=await m_mcCall('createCampaign',{payload:{
-      type:'regular',recipients:recipients,
-      settings:{subject_line:'Your Sokoview Portfolio Update - '+mo,preview_text:'Your personalised monthly portfolio performance is ready',from_name:from,reply_to:reply,title:(mode==='segment'?'SEGMENT TEST':'LIVE')+' - '+mo}
-    }});
-    if(!cr.json.id) throw new Error('Campaign creation failed: '+mcErrMsg(cr.json,cr.status));
-    sp(82,'Uploading content...');
-    await m_mcCall('setContent',{campaignId:cr.json.id,content:{html:m_buildCampaignTemplate(mo)}});
-    sp(92,'Sending...');
-    var sr=await m_mcCall('sendCampaign',{campaignId:cr.json.id});
-    sp(100,'Done!');
-    if(sr.status===204){
-      showOK(
-        mode==='segment'?'Segment test sent!':total+' emails sent!',
-        mode==='segment'
-          ?'Campaign delivered to segment #'+segId+'. Each member sees their own data via merge tags.'+(notFound?' Note: '+notFound+' not in Mailchimp audience.':'')
-          :'One campaign sent - each of '+total+' subscribers sees their own portfolio data.'+(notFound?' Note: '+notFound+' not in Mailchimp audience.':'')
-      );
-    }else{
-      throw new Error('Send failed: '+mcErrMsg(sr.json,sr.status));
-    }
-  }catch(e){
-    m_showMsg('m-sendErr',e.message||'Unknown error - open F12 for details.');
-  }finally{
-    cleanup();
-  }
-}
-function m_classifySegment(gainNum,p){
-  var pa=function(v){return parseFloat((v||'0').replace(/[^0-9.]/g,''))||0;};
-  var ag=pa(p.totalValue)-pa(p.invested),af=(ag>=0?'+':'')+' TZS '+Math.abs(Math.round(ag)).toLocaleString();
-  var seg,lbl,emo,tone;
-  if(gainNum>=20)     {seg='strong';    lbl='Strong Growth';   emo='🚀';tone='celebratory. Celebrate their gains.';}
-  else if(gainNum>=5) {seg='positive';  lbl='Positive';        emo='📈';tone='encouraging. Acknowledge steady gains.';}
-  else if(gainNum>=-5){seg='breakeven'; lbl='Breakeven';       emo='➡️';tone='reassuring. Acknowledge capital preservation.';}
-  else if(gainNum>=-20){seg='recovering';lbl='Recovering';     emo='⚠️';tone='empathetic. Acknowledge the drawdown with context.';}
-  else                {seg='pressure';  lbl='Under Pressure';  emo='🔴';tone='careful and supportive. Acknowledge the loss honestly.';}
-  return {segment:seg,segLabel:lbl,segEmoji:emo,segTone:tone,absGainFmt:af};
-}
-async function m_generateInsight(p,mo,key){
-  var seg=m_classifySegment(parseFloat((p.gainPct||'0').replace(/[^-0-9.]/g,''))||0,p);
-  var fb=p.firstName+"'s portfolio stands at "+p.totalValue+" with a return of "+p.gainPct+" since inception across "+p.holdingsCount+" holdings.";
-  if(!key) return fb;
-  try{
-    var r=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:160,
-        system:'DSE investment analyst. Write exactly 3 warm sentences personalised to this subscriber. Be '+seg.segTone+' Reference specific numbers. No preamble.',
-        messages:[{role:'user',content:'Update for '+p.firstName+'. Month: '+mo+'. Return: '+p.gainPct+' ('+seg.segEmoji+' '+seg.segLabel+'). Value: '+p.totalValue+'. Invested: '+p.invested+'. Gain: '+seg.absGainFmt+'. Holdings: '+p.holdingsCount+'.'}]
-      })
-    });
-    var d=await r.json();
-    return(d.content&&d.content[0]&&d.content[0].text&&d.content[0].text.trim())||fb;
-  }catch(e){return fb;}
-}
-function m_buildCampaignTemplate(mo){
-  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>';
-  h+='<style>@media only screen and (max-width:600px){.w{padding:12px 8px!important}.kt{display:block!important}.kc{display:inline-block!important;width:48%!important;border-right:none!important;border-bottom:1px solid #f1f5f9!important}}</style></head>';
-  h+='<body style="margin:0;padding:0;background:#f0f4f8;font-family:Arial,Helvetica,sans-serif"><div class="w" style="max-width:600px;margin:0 auto;padding:20px 12px">';
-  h+='<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:12px 12px 0 0"><tr><td style="padding:26px 28px">';
-  h+='<div style="font-size:26px;font-weight:900;color:#f59e0b;letter-spacing:2px">SOKOVIEW</div>';
-  h+='<div style="font-size:12px;color:#94a3b8;margin-top:3px">Monthly Portfolio Performance &middot; '+mo+'</div>';
-  h+='<div style="margin-top:14px"><a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 22px;border-radius:6px;text-decoration:none">View Live Portfolio &rarr;</a></div>';
-  h+='</td></tr></table>';
-  h+='<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0"><tr><td style="padding:22px 24px">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
-  h+='<div style="font-size:16px;color:#111">Hi <strong>*|FNAME|*</strong>,</div>';
-  h+='<div style="padding:4px 12px;background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;border-radius:20px;font-size:12px;font-weight:600">*|SEGEMO|* *|SEGLBL|*</div>';
-  h+='</div><div style="font-size:14px;color:#374151;line-height:1.8">*|INSIGHT|*</div></td></tr></table>';
-  h+='<table class="kt" width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr>';
-  h+='<td class="kc" style="padding:14px 8px 14px 16px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:4px">Portfolio value</div><div style="font-size:15px;font-weight:700;color:#111">*|PORTVAL|*</div></td>';
-  h+='<td class="kc" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:4px">Invested</div><div style="font-size:15px;font-weight:700;color:#111">*|INVESTED|*</div></td>';
-  h+='<td class="kc" style="padding:14px 8px;width:25%;border-right:1px solid #f1f5f9;vertical-align:top"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:4px">Return</div><div style="font-size:15px;font-weight:700;color:#111">*|GAINPCT|*</div></td>';
-  h+='<td class="kc" style="padding:14px 8px;width:25%;vertical-align:top"><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:4px">TZS Gain/Loss</div><div style="font-size:14px;font-weight:700;color:#111">*|ABSGAIN|*</div></td>';
-  h+='</tr></table>';
-  h+='<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:14px 16px">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">';
-  h+='<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:3px">Active holdings</div><div style="font-size:20px;font-weight:700;color:#1a2744">*|HOLDINGS|* <span style="font-size:13px;font-weight:400;color:#6b7280">stocks on DSE</span></div></div>';
-  h+='<a href="https://sokoview.co.tz/dashboard/market" style="background:#f0f4ff;color:#1a2744;font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;text-decoration:none">View holdings &rarr;</a></div></td></tr></table>';
-  h+='<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px">';
-  h+='<div style="border-left:4px solid #f59e0b;padding:14px 16px;background:#fffbeb;border-radius:0 8px 8px 0">';
-  h+='<div style="font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;margin-bottom:8px">Sokoview Insights</div>';
-  h+='<div style="font-size:13px;color:#78350f;line-height:1.8">*|INSIGHT|*</div></div></td></tr></table>';
-  h+='<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:20px 24px;text-align:center">';
-  h+='<div style="font-size:14px;color:#374151;margin-bottom:14px">Ready to review your portfolio?</div>';
-  h+='<a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#1a2744;color:#fff;font-size:14px;font-weight:700;padding:13px 32px;border-radius:8px;text-decoration:none">Open My Portfolio on Sokoview &rarr;</a></td></tr></table>';
-  h+='<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px 24px">';
-  h+='<div style="font-size:14px;color:#374151;margin-bottom:4px">Happy investing,</div><div style="font-size:14px;font-weight:700;color:#1a2744">The Sokoview Analytics Team</div></td></tr></table>';
-  h+='<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:0 0 12px 12px"><tr><td style="padding:18px 24px;text-align:center">';
-  h+='<div style="font-size:15px;font-weight:700;color:#f59e0b;margin-bottom:4px">SOKOVIEW</div>';
-  h+='<div style="margin:10px 0"><a href="https://sokoview.co.tz/dashboard/market" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 24px;border-radius:6px;text-decoration:none">Track Your Portfolio &rarr;</a></div>';
-  h+='<div style="font-size:12px;color:#94a3b8"><a href="https://sokoview.co.tz" style="color:#94a3b8;text-decoration:none">sokoview.co.tz</a> &middot; Sokoview Analytics</div>';
-  h+='<div style="font-size:11px;color:#475569;margin-top:8px">You received this because you have a Sokoview account. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
-  h+='</td></tr></table></div></body></html>';
-  return h;
-}
-
-function m_testMailchimp(){
-  var key = (document.getElementById('m-mcKey')||{}).value || '';
-  var list = (document.getElementById('m-mcList')||{}).value || '';
-  var resultEl = document.getElementById('m-mcTestResult');
-  var spinner  = document.getElementById('m-mcSpinner');
-  var btn      = document.getElementById('m-testMcBtn');
-  if(!key){ if(resultEl){resultEl.style.display='block';resultEl.style.background='#fef2f2';resultEl.style.color='#991b1b';resultEl.textContent='Enter your Mailchimp API key first.';} return; }
-  if(btn) btn.disabled=true;
-  if(spinner) spinner.style.display='inline-block';
-  if(resultEl) resultEl.style.display='none';
-  m_mcCall('ping',{}).then(function(r){
-    if(btn) btn.disabled=false;
-    if(spinner) spinner.style.display='none';
-    if(!resultEl) return;
-    resultEl.style.display='block';
-    if(r.ok || r.status===200){
-      resultEl.style.background='#f0fdf4';resultEl.style.color='#166534';
-      resultEl.textContent='✓ Mailchimp connected!'+(list?' Audience ID looks good.':' Add your Audience ID above.');
-    } else {
-      resultEl.style.background='#fef2f2';resultEl.style.color='#991b1b';
-      resultEl.textContent='✗ Connection failed ('+r.status+'): '+(r.json&&r.json.detail)||'Check your API key.';
-    }
-  }).catch(function(e){
-    if(btn) btn.disabled=false;
-    if(spinner) spinner.style.display='none';
-    if(resultEl){resultEl.style.display='block';resultEl.style.background='#fef2f2';resultEl.style.color='#991b1b';resultEl.textContent='Error: '+e.message;}
-  });
-}
-
-function m_resetSend() {
-  document.getElementById('m-sendCard').style.display = 'block';
-  document.getElementById('m-successBox').style.display = 'none';
-  document.getElementById('m-backToPreview').style.display = 'inline-flex';
-  m_goS(3);
-}
-
-function m_showMsg(id, msg) { const e = document.getElementById(id); if(e){e.style.display='block';e.textContent=msg;} }
-function m_showOk(id, msg) { const e = document.getElementById(id); if(e){e.style.display='block';e.textContent=msg;} }
-
-
-window.addEventListener('load',function(){
-  var l=document.getElementById('m-bookmarkletLink');
-  if(l) l.href=m_buildBookmarklet();
-});
-
-function m_getConsoleScript(){
-  var month=new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
-  var s='(function(){\n';
-  s+='/* CONFIG: add tester emails to filter specific portfolios only */\n';
-  s+='var TESTER_EMAILS=[];\n';
-  s+='/* Example: var TESTER_EMAILS=["email1@example.com","email2@example.com"]; */\n';
-  s+='if(document.getElementById("skv-collector")){document.getElementById("skv-collector").remove();}\n';
-  s+='var d=document.createElement("div");\n';
-  s+='d.id="skv-collector";\n';
-  s+='d.style="position:fixed;top:20px;right:20px;z-index:999999;background:#1a2744;color:#fff;border-radius:12px;padding:1.25rem 1.5rem;width:300px;font-family:system-ui,sans-serif;font-size:13px;box-shadow:0 8px 32px rgba(0,0,0,.4)";\n';
-  s+='var fl=TESTER_EMAILS.length>0?" ("+TESTER_EMAILS.length+" filtered)":" (all)";\n';
-  s+='var h=document.createElement("div");\n';
-  s+='h.innerHTML="<b style=\'color:#f59e0b;font-size:15px;display:block;margin-bottom:6px\'>\\uD83D\\uDCCA Sokoview Collector</b>"\n';
-  s+='  +"<div id=\'skv-status\' style=\'font-size:12px;color:#94a3b8;margin-bottom:8px\'>Scope: "+fl+"</div>"\n';
-  s+='  +"<div style=\'height:4px;background:#334155;border-radius:2px;margin-bottom:8px\'><div id=\'skv-bar\' style=\'height:100%;background:#f59e0b;width:0%;transition:width .4s\'></div></div>"\n';
-  s+='  +"<button id=\'skv-btn\' style=\'background:#f59e0b;color:#1a2744;border:none;padding:9px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;margin-bottom:6px\'>Collect portfolios</button>"\n';
-  s+='  +"<button id=\'skv-dl\' style=\'background:#22c55e;color:#fff;border:none;padding:9px;border-radius:7px;font-weight:700;cursor:pointer;font-size:13px;width:100%;display:none\'>\\u2B07 Download JSON</button>"\n';
-  s+='  +"<button id=\'skv-x\' style=\'background:none;color:#64748b;border:none;cursor:pointer;font-size:11px;margin-top:6px;width:100%\'>Close</button>";\n';
-  s+='d.appendChild(h);document.body.appendChild(d);\n';
-  s+='document.getElementById("skv-x").onclick=function(){d.remove();};\n';
-  s+='window._skvData=[];\n';
-  s+='function sleep(ms){return new Promise(function(r){setTimeout(r,ms);})}\n';
-  s+='function extract(){\n';
-  s+='  var rows=document.querySelectorAll("table tbody tr"),items=[],fl=TESTER_EMAILS.map(function(e){return e.toLowerCase().trim();});\n';
-  s+='  rows.forEach(function(row){\n';
-  s+='    var n=row.querySelector("td:first-child");if(!n)return;\n';
-  s+='    var t=n.innerText.trim().split("\\n").map(function(l){return l.trim();}).filter(Boolean);\n';
-  s+='    var name=t[0]||"",email=t[1]||"";\n';
-  s+='    if(!email||!email.includes("@"))return;\n';
-  s+='    if(fl.length>0&&!fl.includes(email.toLowerCase()))return;\n';
-  s+='    var np=name.split(/\\s+/),cells=row.querySelectorAll("td");\n';
-  s+='    var lnk=row.querySelector(\'a[href*="/portfolios/"]\');\n';
-  s+='    var pid=lnk?lnk.href.split("/portfolios/")[1]||"":"";\n';
-  s+='    items.push({firstName:np[0]||"",lastName:np.slice(1).join(" ")||"",email:email.toLowerCase().trim(),totalValue:cells[1]?cells[1].innerText.trim():"",invested:cells[2]?cells[2].innerText.trim():"",gainPct:cells[3]?cells[3].innerText.trim():"",holdingsCount:cells[4]?cells[4].innerText.trim():"",portfolioId:pid});\n';
-  s+='  });\n';
-  s+='  return items;\n';
-  s+='}\n';
-  s+='function getPage(){var m=document.body.innerText.match(/Page\\s+(\\d+)\\s+of\\s+(\\d+)/);return m?{cur:parseInt(m[1]),total:parseInt(m[2])}:{cur:1,total:1};}\n';
-  s+='function clickNext(){var els=Array.from(document.querySelectorAll("a,button,li"));var nb=els.find(function(el){return el.innerText.trim()==="Next"&&!el.disabled&&!el.classList.contains("disabled");});if(nb){nb.click();return true;}return false;}\n';
-  s+='async function collect(){\n';
-  s+='  document.getElementById("skv-btn").disabled=true;\n';
-  s+='  var st=document.getElementById("skv-status"),bar=document.getElementById("skv-bar");\n';
-  s+='  var pg=getPage(),total=pg.total,cur=pg.cur;\n';
-  s+='  window._skvData=extract();\n';
-  s+='  st.textContent="Page 1/"+total+" \\u2014 "+window._skvData.length+" found";\n';
-  s+='  for(var i=0;i<total+2;i++){\n';
-  s+='    if(!clickNext())break;\n';
-  s+='    var waited=0,newCur=cur;\n';
-  s+='    while(newCur===cur&&waited<4000){await sleep(400);waited+=400;newCur=getPage().cur;}\n';
-  s+='    if(newCur===cur)break;cur=newCur;\n';
-  s+='    var rows=extract(),seen=new Set(window._skvData.map(function(u){return u.email;}));\n';
-  s+='    rows.filter(function(u){return !seen.has(u.email);}).forEach(function(u){window._skvData.push(u);});\n';
-  s+='    bar.style.width=Math.round((cur/total)*100)+"%";\n';
-  s+='    st.textContent="Page "+cur+"/"+total+" \\u2014 "+window._skvData.length+" found";\n';
-  s+='    if(TESTER_EMAILS.length>0&&window._skvData.length>=TESTER_EMAILS.length)break;\n';
-  s+='  }\n';
-  s+='  bar.style.width="100%";\n';
-  s+='  st.innerHTML="<span style=\'color:#4ade80\'>\\u2713 "+window._skvData.length+" portfolios collected</span>";\n';
-  s+='  var dl=document.getElementById("skv-dl");dl.style.display="block";\n';
-  s+='  dl.onclick=function(){\n';
-  s+='    var json=JSON.stringify({collectedAt:new Date().toISOString(),month:"'+month+'",portfolios:window._skvData},null,2);\n';
-  s+='    var blob=new Blob([json],{type:"application/json"});\n';
-  s+='    var url=URL.createObjectURL(blob);\n';
-  s+='    var a=document.createElement("a");a.href=url;a.download="sokoview-portfolios.json";\n';
-  s+='    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);\n';
-  s+='  };\n';
-  s+='}\n';
-  s+='document.getElementById("skv-btn").onclick=collect;\n';
-  s+='})();';
-  return s;
-}
-
-function m_copyScript(){
-  const code = m_getConsoleScript();
-  const btn = document.getElementById('m-copyBtn');
-  const confirm = document.getElementById('m-copyConfirm');
-  function onCopied(){
-    if(btn){ btn.textContent='✓ Copied! Now open DevTools on sokoview admin'; btn.style.background='#16a34a'; }
-    if(confirm) confirm.style.display='block';
-    setTimeout(function(){
-      if(btn){ btn.textContent='📋 Copy collection script'; btn.style.background=''; }
-      if(confirm) confirm.style.display='none';
-    }, 4000);
-  }
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(code).then(onCopied).catch(function(){
-      var ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';
-      document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);onCopied();
-    });
-  } else {
-    var ta=document.createElement('textarea');ta.value=code;ta.style.position='fixed';ta.style.left='-9999px';
-    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);onCopied();
-  }
 }
 </script>
 </body>
