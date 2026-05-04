@@ -52,6 +52,10 @@ exports.handler = async (event) => {
       case 'getCampaignStatus':
         return send(await go(`${base}/campaigns/${data.campaignId}`));
 
+      // List all saved segments for an audience
+      case 'getSegments':
+        return send(await go(`${base}/lists/${data.listId}/segments?count=100&type=saved`));
+
       default:
         return { statusCode:400, headers:cors, body:JSON.stringify({error:'Unknown action: '+action}) };
     }
