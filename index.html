@@ -115,8 +115,9 @@
       <div class="hdr-sub">Email Suite &middot; Mailchimp</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="switchTab('daily')" id="tab-daily" style="background:#f59e0b;color:#1a2744;border:none;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer">📈 Daily Market</button>
+      <button onclick="switchTab('daily')" id="tab-daily" style="background:#f59e0b;color:#1a2744;border:none;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer">📈 Weekly</button>
       <button onclick="switchTab('stoppers')" id="tab-stoppers" style="background:rgba(255,255,255,0.15);color:#fff;border:none;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer">🔔 Stoppers</button>
+      <button onclick="switchTab('monthly')" id="tab-monthly" style="background:rgba(255,255,255,0.15);color:#fff;border:none;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer">📊 Monthly</button>
     </div>
   </div>
 
@@ -525,6 +526,134 @@
       <div style="margin-top:10px"><a href="#" onclick="sp_goS(2);return false" style="font-size:12px;color:var(--muted)">&larr; Back to preview</a></div>
     </div>
   </div><!-- /pane-stoppers -->
+
+
+  <!-- ══ MONTHLY PANE ══ -->
+  <div id="pane-monthly" style="display:none">
+
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#1a2744">📊 Monthly Market Review</div>
+        <div style="font-size:12px;color:#6b7280;margin-top:2px">Claude writes the monthly DSE review — no PDF upload needed. Sends to your full audience.</div>
+      </div>
+      <span style="background:#dbeafe;color:#1e40af;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px">Full Audience</span>
+    </div>
+
+    <div class="steps">
+      <div class="step active" id="mr-d1" onclick="mr_goS(1)"><div class="step-n" id="mr-sl1">1</div>Settings</div>
+      <div class="step" id="mr-d2" onclick="mr_goS(2)"><div class="step-n" id="mr-sl2">2</div>Preview</div>
+      <div class="step" id="mr-d3" onclick="mr_goS(3)"><div class="step-n" id="mr-sl3">3</div>Send</div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div id="mr-s1">
+      <div class="card">
+        <div class="card-title">API Keys</div>
+        <label>Anthropic API Key</label>
+        <input type="password" id="mr-anthroKey" placeholder="sk-ant-api03-..."/>
+        <div class="hint"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> &rarr; API Keys</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Mailchimp</div>
+        <label>Mailchimp API Key</label>
+        <input type="password" id="mr-mcKey" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1"/>
+        <div class="hint">Mailchimp &rarr; Account &rarr; Extras &rarr; API keys</div>
+        <label>Audience / List ID</label>
+        <input type="text" id="mr-mcList" placeholder="e.g. a1b2c3d4e5"/>
+        <div class="hint">Mailchimp &rarr; Audience &rarr; Settings &rarr; "Audience ID"</div>
+        <div class="grid2" style="margin-top:10px">
+          <div><label>From Name</label><input type="text" id="mr-fromName" value="Sokoview Analytics"/></div>
+          <div><label>Verified Reply-to Email</label><input type="email" id="mr-replyTo" placeholder="you@yourdomain.com"/><div class="hint">Must be verified in Mailchimp</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Review Period</div>
+        <label>Month &amp; Year</label>
+        <input type="text" id="mr-month" placeholder="e.g. May 2026"/>
+        <div class="hint">Claude will reference this period in the review</div>
+        <label style="margin-top:10px">Any specific highlights to mention? (optional)</label>
+        <input type="text" id="mr-highlights" placeholder="e.g. CRDB surged 12%, market cap hit record, foreign inflows up"/>
+        <div class="hint">Leave blank and Claude will write a general monthly DSE review</div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="mr_generate()" style="margin-top:4px">&#10024; Generate monthly review &rarr;</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div id="mr-s2" style="display:none">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:#1a2744">Monthly Review Preview</div>
+            <div style="font-size:12px;color:#6b7280;margin-top:2px" id="mr-previewMeta">—</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="mr_generate()">&#8635; Regenerate</button>
+        </div>
+        <div class="status-row" id="mr-genStatus">
+          <div class="spinner"></div>
+          <div style="font-size:13px;color:#1a2744" id="mr-genMsg">Writing monthly review with Claude...</div>
+        </div>
+        <div style="margin-bottom:10px">
+          <label>Subject line</label>
+          <input type="text" id="mr-subject" placeholder="Subject will appear here after generation"/>
+        </div>
+        <iframe id="mr-previewFrame" title="Monthly review preview" style="width:100%;height:560px;border:1px solid var(--border);border-radius:8px"></iframe>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="mr_goS(3)">Continue &rarr; Send</button>
+      <div style="margin-top:8px"><a href="#" onclick="mr_goS(1);return false" style="font-size:12px;color:var(--muted)">&larr; Back</a></div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="mr-s3" style="display:none">
+      <div class="card" id="mr-sendCard">
+        <div class="card-title">Ready to Send</div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+          <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:7px 0;color:var(--muted);font-size:12px">From</td><td style="padding:7px 0;text-align:right;font-weight:600;font-size:13px" id="mr-rvFrom">—</td></tr>
+          <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:7px 0;color:var(--muted);font-size:12px">Subject</td><td style="padding:7px 0;text-align:right;font-weight:500;font-size:12px;color:var(--muted)" id="mr-rvSubject">—</td></tr>
+          <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:7px 0;color:var(--muted);font-size:12px">Period</td><td style="padding:7px 0;text-align:right;font-weight:600;font-size:13px" id="mr-rvPeriod">—</td></tr>
+          <tr><td style="padding:7px 0;color:var(--muted);font-size:12px">Recipients</td><td style="padding:7px 0;text-align:right;font-weight:600;font-size:13px">Full audience</td></tr>
+        </table>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline" id="mr-testBtn" onclick="mr_testMailchimp()" style="flex:1">Test Mailchimp</button>
+          <button class="btn btn-primary" id="mr-sendBtn" onclick="mr_doSend()" style="flex:2">Send Monthly Review &rarr;</button>
+        </div>
+        <div id="mr-mcTestResult" style="display:none;margin-top:8px;font-size:12px;padding:8px 10px;border-radius:6px"></div>
+        <div class="status-row" id="mr-sendStatus" style="margin-top:8px">
+          <div class="spinner"></div>
+          <div style="font-size:13px;color:#1a2744" id="mr-sendMsg">Sending...</div>
+        </div>
+        <div id="mr-sendErr" style="display:none;color:var(--red);font-size:12px;margin-top:6px"></div>
+      </div>
+
+      <div class="success-box" id="mr-successBox">
+        <div class="icon">🎉</div>
+        <h3>Monthly review sent!</h3>
+        <p id="mr-successDetail">Your monthly DSE review is on its way to your full audience.</p>
+        <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-outline btn-sm" onclick="mr_fetchStats()">&#8635; Load stats</button>
+          <button class="btn btn-outline btn-sm" onclick="mr_reset()">Send another &rarr;</button>
+        </div>
+      </div>
+
+      <div class="stats-panel" id="mr-statsPanel">
+        <h3>&#128202; Campaign Performance <span class="stat-status" id="mr-statStatus">—</span><span class="refresh-link" onclick="mr_fetchStats()" style="margin-left:auto">&#8635; Refresh</span></h3>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="s-lbl">Emails sent</div><div class="s-val" id="mr-statSent">—</div><div class="s-sub">total delivered</div></div>
+          <div class="stat-card"><div class="s-lbl">Open rate</div><div class="s-val" id="mr-statOpen">—</div><div class="s-sub"><span id="mr-statOpenN">—</span> opens</div></div>
+          <div class="stat-card"><div class="s-lbl">Click rate</div><div class="s-val" id="mr-statClick">—</div><div class="s-sub"><span id="mr-statClickN">—</span> clicks</div></div>
+        </div>
+        <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+          <div class="stat-card"><div class="s-lbl">Bounced</div><div class="s-val" style="font-size:18px" id="mr-statBounce">—</div></div>
+          <div class="stat-card"><div class="s-lbl">Unsubscribed</div><div class="s-val" style="font-size:18px" id="mr-statUnsub">—</div></div>
+          <div class="stat-card"><div class="s-lbl">Unique opens</div><div class="s-val" style="font-size:18px" id="mr-statUniqOpen">—</div></div>
+          <div class="stat-card"><div class="s-lbl">Unique clicks</div><div class="s-val" style="font-size:18px" id="mr-statUniqClick">—</div></div>
+        </div>
+        <div class="stats-footer"><div id="mr-statSentAt" style="color:var(--muted);font-size:12px">—</div><div style="font-size:11px;color:#9ca3af">Stats update ~30 min after send</div></div>
+      </div>
+
+      <div style="margin-top:10px"><a href="#" onclick="mr_goS(2);return false" style="font-size:12px;color:var(--muted)">&larr; Back to preview</a></div>
+    </div>
+
+  </div><!-- /pane-monthly -->
 
 </div><!-- /shell -->
 
@@ -1016,17 +1145,15 @@ function buildEmail(m) {
 // TAB SWITCHING
 // ══════════════════════════════════════════════════════════════════════════════
 function switchTab(tab) {
-  document.getElementById('pane-daily').style.display    = tab === 'daily'    ? 'block' : 'none';
-  document.getElementById('pane-stoppers').style.display = tab === 'stoppers' ? 'block' : 'none';
-  const daily = document.getElementById('tab-daily');
-  const stop  = document.getElementById('tab-stoppers');
-  if (tab === 'daily') {
-    daily.style.background = '#f59e0b'; daily.style.color = '#1a2744';
-    stop.style.background  = 'rgba(255,255,255,0.15)'; stop.style.color = '#fff';
-  } else {
-    stop.style.background  = '#f59e0b'; stop.style.color = '#1a2744';
-    daily.style.background = 'rgba(255,255,255,0.15)'; daily.style.color = '#fff';
-  }
+  ['daily','stoppers','monthly'].forEach(function(t) {
+    var pane = document.getElementById('pane-' + t);
+    var btn  = document.getElementById('tab-' + t);
+    if (pane) pane.style.display = t === tab ? 'block' : 'none';
+    if (btn) {
+      btn.style.background = t === tab ? '#f59e0b' : 'rgba(255,255,255,0.15)';
+      btn.style.color      = t === tab ? '#1a2744' : '#fff';
+    }
+  });
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1401,6 +1528,316 @@ function sp_reset() {
   document.getElementById('sp-successBox').style.display = 'none';
   document.getElementById('sp-statsPanel').style.display = 'none';
   sp_goS(1);
+}
+
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MONTHLY REVIEWS
+// ══════════════════════════════════════════════════════════════════════════════
+let mr_emailHtml = '', mr_subject = '', mr_lastCampaignId = '';
+
+function mr_goS(n) {
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('mr-s' + i).style.display = i === n ? 'block' : 'none';
+    const dot = document.getElementById('mr-d' + i);
+    const lbl = document.getElementById('mr-sl' + i);
+    dot.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    if (lbl) {
+      if (i < n) lbl.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+      else lbl.textContent = i;
+    }
+  }
+  if (n === 3) mr_populateReview();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function mr_mcInfo() {
+  return {
+    key:   document.getElementById('mr-mcKey').value.trim(),
+    list:  document.getElementById('mr-mcList').value.trim(),
+    from:  document.getElementById('mr-fromName').value.trim(),
+    reply: document.getElementById('mr-replyTo').value.trim()
+  };
+}
+
+async function mr_mcCall(action, data) {
+  const r = await fetch('/.netlify/functions/mc', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mcKey: mr_mcInfo().key, action, data: data || {} })
+  });
+  let json = {}; try { json = await r.json(); } catch {}
+  return { status: r.status, ok: r.ok, json };
+}
+
+// ── Generate ─────────────────────────────────────────────────────────────────
+function mr_buildPrompt(month, highlights) {
+  var schema = '{"subject":"<65 chars>","preheader":"<90 chars>","headline":"punchy headline","overview":"2-3 sentence market overview","highlights":[{"title":"title","body":"1-2 sentences"},{"title":"title","body":"1-2 sentences"},{"title":"title","body":"1-2 sentences"}],"outlook":"2 forward-looking sentences","cta":"button text"}';
+  var base = 'Write a monthly DSE market review email for ' + month + '. ';
+  base += highlights ? 'Key highlights to include: ' + highlights + '. ' : 'Write a general monthly review for the Dar es Salaam Stock Exchange. ';
+  base += 'Return ONLY valid JSON matching this schema: ' + schema;
+  return base;
+}
+
+async function mr_generate() {
+  const key        = document.getElementById('mr-anthroKey').value.trim();
+  const month      = document.getElementById('mr-month').value.trim() || new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  const highlights = document.getElementById('mr-highlights').value.trim();
+  if (!key) { alert('Enter your Anthropic API key in step 1 first.'); return; }
+
+  mr_goS(2);
+  document.getElementById('mr-genStatus').style.display = 'flex';
+  document.getElementById('mr-genMsg').textContent = 'Writing monthly review with Claude...';
+  document.getElementById('mr-previewFrame').srcdoc = '';
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1400,
+        system: 'You are a senior DSE market analyst writing a monthly newsletter for Sokoview Analytics subscribers — Tanzanian retail investors. Write warm, clear, insightful copy. No jargon. Return only valid JSON.',
+        messages: [{
+          role: 'user',
+          content: 'Write a monthly DSE market review for ' + month + '. ' + (highlights ? 'Highlights: ' + highlights + '. ' : '') + 'Return ONLY JSON: {"subject":"<65chars>","preheader":"<90chars>","headline":"punchy headline","overview":"2-3 sentence summary","highlights":[{"title":"t","body":"1-2 sentences"},{"title":"t","body":"1-2 sentences"},{"title":"t","body":"1-2 sentences"}],"outlook":"2 forward-looking sentences","cta":"button text"}'
+        }]
+      })
+    });
+    if (!r.ok) throw new Error('Anthropic error ' + r.status + ': check your API key');
+    const d = await r.json();
+    const raw = d.content?.find(b => b.type === 'text')?.text || '{}';
+    const copy = JSON.parse(raw.replace(/```json|```/g,'').trim());
+
+    mr_subject = copy.subject || 'Sokoview Monthly Market Review — ' + month;
+    document.getElementById('mr-subject').value = mr_subject;
+    document.getElementById('mr-previewMeta').textContent = month + ' · ' + (copy.preheader || '');
+    document.getElementById('mr-genStatus').style.display = 'none';
+
+    mr_emailHtml = mr_buildEmail(copy, month);
+    document.getElementById('mr-previewFrame').srcdoc = mr_emailHtml;
+
+  } catch(e) {
+    document.getElementById('mr-genStatus').style.display = 'none';
+    document.getElementById('mr-previewFrame').srcdoc = '<p style="padding:2rem;font-family:sans-serif;color:#dc2626;font-size:14px">Error: ' + e.message + '</p>';
+  }
+}
+
+// ── Build email HTML ──────────────────────────────────────────────────────────
+function mr_buildEmail(copy, month) {
+  function esc(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  const highlights = copy.highlights || [
+    {title:'Market Overview', body:'The DSE continued to reflect the broader East African economic trends this month.'},
+    {title:'Notable Movers',  body:'Several blue-chip stocks saw significant activity from both local and foreign investors.'},
+    {title:'Sector Watch',    body:'Banking and telecoms remained the most actively traded sectors on the exchange.'}
+  ];
+
+  let h = '';
+  h += '<!DOCTYPE html><html><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>';
+  h += '<style>@media only screen and (max-width:600px){.wrap{padding:12px 8px!important}.hd{padding:22px 18px!important}.bd{padding:20px 16px!important}}</style>';
+  h += '</head><body style="margin:0;padding:0;background:#f0f4f8;font-family:Arial,Helvetica,sans-serif">';
+  h += '<div class="wrap" style="max-width:600px;margin:0 auto;padding:20px 12px">';
+
+  // Header
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:12px 12px 0 0"><tr><td class="hd" style="padding:28px 28px 22px">';
+  h += '<div style="font-size:26px;font-weight:900;color:#f59e0b;letter-spacing:2px">SOKOVIEW</div>';
+  h += '<div style="font-size:12px;color:#94a3b8;margin-top:3px">Dar es Salaam Stock Exchange &middot; Monthly Market Review</div>';
+  h += '<div style="font-size:17px;font-weight:700;color:#fff;margin-top:8px">' + esc(month) + '</div>';
+  h += '</td></tr></table>';
+
+  // Salutation + headline + overview
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0"><tr><td class="bd" style="padding:26px 28px">';
+  h += '<div style="font-size:16px;color:#111;margin-bottom:14px">Hi <strong>*|FNAME|*</strong>,</div>';
+  h += '<div style="font-size:22px;font-weight:800;color:#1a2744;margin-bottom:14px;line-height:1.3">' + esc(copy.headline || 'Your Monthly DSE Market Review') + '</div>';
+  h += '<div style="font-size:14px;color:#374151;line-height:1.9">' + esc(copy.overview || '') + '</div>';
+  h += '</td></tr></table>';
+
+  // Highlights
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:6px 28px 20px">';
+  h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;padding:14px 0 12px">Monthly highlights</div>';
+  highlights.forEach(function(hl, idx) {
+    const colors = ['#1a2744','#0369a1','#166534'];
+    const bgs    = ['#f0f4ff','#f0f9ff','#f0fdf4'];
+    const c = colors[idx % colors.length], bg = bgs[idx % bgs.length];
+    h += '<div style="border-left:4px solid ' + c + ';background:' + bg + ';border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:10px">';
+    h += '<div style="font-size:13px;font-weight:700;color:' + c + ';margin-bottom:4px">' + esc(hl.title) + '</div>';
+    h += '<div style="font-size:13px;color:#374151;line-height:1.7">' + esc(hl.body) + '</div>';
+    h += '</div>';
+  });
+  h += '</td></tr></table>';
+
+  // Outlook
+  if (copy.outlook) {
+    h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fffbeb;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #fde68a"><tr><td style="padding:16px 28px">';
+    h += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#92400e;margin-bottom:8px">&#128302; Looking ahead</div>';
+    h += '<div style="font-size:13px;color:#78350f;line-height:1.8">' + esc(copy.outlook) + '</div>';
+    h += '</td></tr></table>';
+  }
+
+  // CTA
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:22px 28px;text-align:center">';
+  h += '<div style="font-size:13px;color:#6b7280;margin-bottom:14px">Track your portfolio performance in real time</div>';
+  h += '<a href="https://sokoview.co.tz/dashboard" style="display:inline-block;background:#1a2744;color:#fff;font-size:14px;font-weight:700;padding:14px 36px;border-radius:8px;text-decoration:none">' + esc(copy.cta || 'View My Portfolio on Sokoview →') + '</a>';
+  h += '</td></tr></table>';
+
+  // Sign-off
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;border-top:1px solid #f1f5f9"><tr><td style="padding:16px 28px">';
+  h += '<div style="font-size:14px;color:#374151;margin-bottom:4px">Happy investing,</div>';
+  h += '<div style="font-size:14px;font-weight:700;color:#1a2744">The Sokoview Analytics Team</div>';
+  h += '</td></tr></table>';
+
+  // Footer
+  h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#1a2744;border-radius:0 0 12px 12px"><tr><td style="padding:18px 24px;text-align:center">';
+  h += '<div style="font-size:15px;font-weight:700;color:#f59e0b;margin-bottom:4px">SOKOVIEW</div>';
+  h += '<div style="font-size:12px;color:#94a3b8"><a href="https://sokoview.co.tz" style="color:#94a3b8;text-decoration:none">sokoview.co.tz</a> &middot; DSE Portfolio Analytics</div>';
+  h += '<div style="margin:12px 0"><a href="https://sokoview.co.tz/dashboard" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 28px;border-radius:6px;text-decoration:none">Open Sokoview &rarr;</a></div>';
+  h += '<div style="font-size:11px;color:#475569;margin-top:4px">You received this because you subscribed to Sokoview updates. &nbsp;<a href="*|UNSUB|*" style="color:#475569">Unsubscribe</a></div>';
+  h += '</td></tr></table></div></body></html>';
+  return h;
+}
+
+// ── Review + Send ─────────────────────────────────────────────────────────────
+function mr_populateReview() {
+  const i = mr_mcInfo();
+  const month = document.getElementById('mr-month').value.trim() || new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  document.getElementById('mr-rvFrom').textContent    = i.from  || '—';
+  document.getElementById('mr-rvSubject').textContent = document.getElementById('mr-subject').value || mr_subject || '—';
+  document.getElementById('mr-rvPeriod').textContent  = month;
+}
+
+async function mr_testMailchimp() {
+  const i = mr_mcInfo();
+  const res = document.getElementById('mr-mcTestResult');
+  if (!i.key) { res.style.display='block'; res.style.background='#fef2f2'; res.style.color='#991b1b'; res.textContent='Enter your Mailchimp API key first.'; return; }
+  document.getElementById('mr-testBtn').disabled = true;
+  res.style.display = 'none';
+  document.getElementById('mr-sendStatus').style.display = 'flex';
+  document.getElementById('mr-sendMsg').textContent = 'Checking connection...';
+  try {
+    const ping = await mr_mcCall('ping');
+    if (!ping.ok && ping.status !== 200) throw new Error('Invalid API key (' + ping.status + ')');
+    let detail = '✓ Mailchimp connected!';
+    if (i.list) {
+      const lr = await mr_mcCall('getList', { listId: i.list });
+      if (!lr.ok) throw new Error('Audience error ' + lr.status + ': ' + (lr.json.detail || lr.json.title));
+      detail = '✓ Connected! Audience: "' + (lr.json.name || i.list) + '" · ' + (lr.json.stats?.member_count || '?') + ' subscribers.';
+    }
+    document.getElementById('mr-sendStatus').style.display = 'none';
+    document.getElementById('mr-testBtn').disabled = false;
+    res.style.display='block'; res.style.background='#f0fdf4'; res.style.color='#166534'; res.textContent=detail;
+  } catch(e) {
+    document.getElementById('mr-sendStatus').style.display = 'none';
+    document.getElementById('mr-testBtn').disabled = false;
+    res.style.display='block'; res.style.background='#fef2f2'; res.style.color='#991b1b'; res.textContent=e.message;
+  }
+}
+
+async function mr_doSend() {
+  const i = mr_mcInfo();
+  const subject = document.getElementById('mr-subject').value.trim() || mr_subject;
+  const month   = document.getElementById('mr-month').value.trim() || new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  if (!i.key || !i.list) { document.getElementById('mr-sendErr').style.display='block'; document.getElementById('mr-sendErr').textContent='Enter Mailchimp API key and Audience ID in step 1.'; return; }
+  if (!i.reply)          { document.getElementById('mr-sendErr').style.display='block'; document.getElementById('mr-sendErr').textContent='Enter a verified reply-to email in step 1.'; return; }
+  if (!mr_emailHtml)     { document.getElementById('mr-sendErr').style.display='block'; document.getElementById('mr-sendErr').textContent='No email generated. Go back and generate the review first.'; return; }
+
+  document.getElementById('mr-sendBtn').disabled = true;
+  document.getElementById('mr-testBtn').disabled = true;
+  document.getElementById('mr-sendErr').style.display = 'none';
+  document.getElementById('mr-sendStatus').style.display = 'flex';
+
+  const done = () => {
+    document.getElementById('mr-sendStatus').style.display = 'none';
+    document.getElementById('mr-sendBtn').disabled = false;
+    document.getElementById('mr-testBtn').disabled = false;
+  };
+
+  try {
+    document.getElementById('mr-sendMsg').textContent = 'Creating campaign...';
+    const cr = await mr_mcCall('createCampaign', { payload: {
+      type: 'regular',
+      recipients: { list_id: i.list },
+      settings: {
+        subject_line: subject,
+        preview_text: 'Your monthly DSE market review from Sokoview Analytics',
+        from_name: i.from,
+        reply_to: i.reply,
+        title: 'Monthly Review — ' + month
+      }
+    }});
+    if (!cr.json.id) throw new Error('Campaign creation failed (' + cr.status + '): ' + (cr.json.detail || cr.json.title || JSON.stringify(cr.json)));
+    mr_lastCampaignId = cr.json.id;
+
+    document.getElementById('mr-sendMsg').textContent = 'Uploading content...';
+    const up = await mr_mcCall('setContent', { campaignId: cr.json.id, content: { html: mr_emailHtml } });
+    if (!up.ok) throw new Error('Content upload failed: ' + (up.json.detail || up.json.title));
+
+    document.getElementById('mr-sendMsg').textContent = 'Sending to full audience...';
+    const sr = await mr_mcCall('sendCampaign', { campaignId: cr.json.id });
+    if (sr.status === 204) {
+      done();
+      document.getElementById('mr-sendCard').style.display   = 'none';
+      document.getElementById('mr-successBox').style.display = 'block';
+      document.getElementById('mr-successDetail').textContent = 'Monthly review for ' + month + ' sent to your full audience. Campaign ID: ' + cr.json.id;
+      setTimeout(mr_fetchStats, 10000);
+    } else {
+      throw new Error('Send failed (' + sr.status + '): ' + (sr.json.detail || sr.json.title || JSON.stringify(sr.json)));
+    }
+  } catch(e) {
+    done();
+    document.getElementById('mr-sendErr').style.display = 'block';
+    document.getElementById('mr-sendErr').textContent = e.message;
+  }
+}
+
+async function mr_fetchStats() {
+  if (!mr_lastCampaignId) { alert('No campaign ID. Send first.'); return; }
+  const panel = document.getElementById('mr-statsPanel');
+  panel.style.display = 'block';
+  document.getElementById('mr-statStatus').textContent = 'Loading...';
+  document.getElementById('mr-statStatus').className   = 'stat-status stat-sending';
+  try {
+    const r   = await mr_mcCall('getCampaignReport', { campaignId: mr_lastCampaignId });
+    const rep = r.json;
+    const fmt = n => n != null ? Number(n).toLocaleString() : '—';
+    const pct = n => n != null ? (Number(n)*100).toFixed(1)+'%' : '—';
+    document.getElementById('mr-statStatus').textContent    = 'Sent';
+    document.getElementById('mr-statStatus').className      = 'stat-status stat-sent';
+    document.getElementById('mr-statSent').textContent      = fmt(rep.emails_sent);
+    document.getElementById('mr-statOpen').textContent      = pct(rep.open_rate);
+    document.getElementById('mr-statOpenN').textContent     = fmt(rep.opens?.opens_total)+' total';
+    document.getElementById('mr-statClick').textContent     = pct(rep.click_rate);
+    document.getElementById('mr-statClickN').textContent    = fmt(rep.clicks?.clicks_total)+' total';
+    document.getElementById('mr-statBounce').textContent    = fmt((rep.bounces?.hard_bounces||0)+(rep.bounces?.soft_bounces||0));
+    document.getElementById('mr-statUnsub').textContent     = fmt(rep.unsubscribed);
+    document.getElementById('mr-statUniqOpen').textContent  = fmt(rep.opens?.unique_opens);
+    document.getElementById('mr-statUniqClick').textContent = fmt(rep.clicks?.unique_clicks);
+    const sentAt = rep.send_time ? new Date(rep.send_time).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}) : '—';
+    document.getElementById('mr-statSentAt').textContent = 'Sent: ' + sentAt;
+  } catch(e) {
+    document.getElementById('mr-statStatus').textContent = 'Error';
+    document.getElementById('mr-statStatus').className   = 'stat-status stat-err';
+    document.getElementById('mr-statSentAt').textContent = 'Could not load stats: ' + e.message;
+  }
+}
+
+function mr_reset() {
+  mr_emailHtml = ''; mr_subject = ''; mr_lastCampaignId = '';
+  document.getElementById('mr-sendBtn').disabled = false;
+  document.getElementById('mr-testBtn').disabled = false;
+  document.getElementById('mr-sendStatus').style.display  = 'none';
+  document.getElementById('mr-sendErr').style.display     = 'none';
+  document.getElementById('mr-mcTestResult').style.display= 'none';
+  document.getElementById('mr-sendCard').style.display    = 'block';
+  document.getElementById('mr-successBox').style.display  = 'none';
+  document.getElementById('mr-statsPanel').style.display  = 'none';
+  mr_goS(1);
 }
 
 </script>
