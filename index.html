@@ -118,6 +118,7 @@
       <button onclick="switchTab('daily')" id="tab-daily" style="background:#f59e0b;color:#1a2744;border:none;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer">📈 Weekly</button>
       <button onclick="switchTab('stoppers')" id="tab-stoppers" style="background:rgba(255,255,255,0.15);color:#fff;border:none;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer">🔔 Stoppers</button>
       <button onclick="switchTab('monthly')" id="tab-monthly" style="background:rgba(255,255,255,0.15);color:#fff;border:none;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer">📊 Monthly</button>
+      <button onclick="switchTab('maintenance')" id="tab-maintenance" style="background:rgba(255,255,255,0.15);color:#fff;border:none;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer">🛠️ Maintenance</button>
     </div>
   </div>
 
@@ -669,6 +670,99 @@
 
   </div><!-- /pane-monthly -->
 
+  <div id="pane-maintenance" style="display:none">
+    <div style="max-width:700px;margin:0 auto;padding:24px 0">
+
+      <!-- Header -->
+      <div style="margin-bottom:28px">
+        <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:6px">🛠️ Maintenance Email</div>
+        <div style="font-size:13px;color:#9ab8a6">Send a maintenance notice to the full Sokoview Mailchimp audience.</div>
+      </div>
+
+      <!-- Settings -->
+      <div style="background:#142019;border:1px solid rgba(45,194,116,0.15);border-radius:12px;padding:22px;margin-bottom:18px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin-bottom:16px">Mailchimp Settings</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div>
+            <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">API Key</label>
+            <input id="mt-mcKey" type="password" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">List / Audience ID</label>
+            <input id="mt-mcList" type="text" placeholder="e.g. ef7e189238" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">From Name</label>
+            <input id="mt-fromName" type="text" value="Sokoview" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">Reply-To</label>
+            <input id="mt-replyTo" type="email" value="fred@sokoview.co.tz" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Maintenance Details -->
+      <div style="background:#142019;border:1px solid rgba(45,194,116,0.15);border-radius:12px;padding:22px;margin-bottom:18px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin-bottom:16px">Maintenance Details</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div>
+            <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">Maintenance Start</label>
+            <input id="mt-start" type="text" value="Saturday, 14 June 2026, 11:00 PM EAT" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">Expected Duration</label>
+            <input id="mt-duration" type="text" value="Approximately 2 hours" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">Email Subject Line</label>
+          <input id="mt-subject" type="text" value="Sokoview will be briefly offline for scheduled maintenance" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div style="background:#142019;border:1px solid rgba(45,194,116,0.15);border-radius:12px;padding:22px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274">Email Preview</div>
+          <button onclick="mt_updatePreview()" style="background:rgba(45,194,116,0.1);border:1px solid rgba(45,194,116,0.25);color:#2DC274;border-radius:6px;padding:5px 14px;font-size:12px;cursor:pointer">↻ Refresh</button>
+        </div>
+        <iframe id="mt-previewFrame" style="width:100%;height:420px;border:1px solid rgba(45,194,116,0.1);border-radius:8px;background:#fff"></iframe>
+      </div>
+
+      <!-- Send Card -->
+      <div style="background:#142019;border:1px solid rgba(45,194,116,0.15);border-radius:12px;padding:22px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin-bottom:16px">Send to Audience</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;font-size:12px">
+          <div style="background:#0d1f17;border-radius:8px;padding:10px 14px">
+            <div style="color:#7d9e8a;margin-bottom:3px">Subject</div>
+            <div id="mt-rvSubj" style="color:#fff;font-weight:600"></div>
+          </div>
+          <div style="background:#0d1f17;border-radius:8px;padding:10px 14px">
+            <div style="color:#7d9e8a;margin-bottom:3px">From</div>
+            <div id="mt-rvFrom" style="color:#fff;font-weight:600"></div>
+          </div>
+          <div style="background:#0d1f17;border-radius:8px;padding:10px 14px">
+            <div style="color:#7d9e8a;margin-bottom:3px">Reply-To</div>
+            <div id="mt-rvReply" style="color:#fff;font-weight:600"></div>
+          </div>
+          <div style="background:#0d1f17;border-radius:8px;padding:10px 14px">
+            <div style="color:#7d9e8a;margin-bottom:3px">Audience List ID</div>
+            <div id="mt-rvList" style="color:#fff;font-weight:600"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:14px">
+          <button onclick="mt_testConn()" style="flex:1;background:rgba(45,194,116,0.1);border:1px solid rgba(45,194,116,0.3);color:#2DC274;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer">🔌 Test Connection</button>
+          <button onclick="mt_doSend()" id="mt-sendBtn" style="flex:1;background:#f59e0b;color:#1a2744;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer">🚀 Send Maintenance Email</button>
+        </div>
+
+        <div id="mt-status" style="font-size:12px;color:#9ab8a6;min-height:18px"></div>
+        <div id="mt-err" style="display:none;background:rgba(240,107,107,0.1);border:1px solid rgba(240,107,107,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:#f06b6b;margin-top:10px"></div>
+        <div id="mt-ok" style="display:none;background:rgba(45,194,116,0.08);border:1px solid rgba(45,194,116,0.25);border-radius:8px;padding:14px;font-size:13px;color:#2DC274;margin-top:10px;text-align:center"></div>
+      </div>
+    </div>
+  </div><!-- /pane-maintenance -->
 
 </div><!-- /shell -->
 
@@ -1084,7 +1178,7 @@ function buildEmail(m) {
   h += '<div style="font-size:12px;color:#94a3b8;margin-top:3px">Dar es Salaam Stock Exchange &middot; Daily Market Briefing</div>';
   h += '<div style="font-size:15px;color:#ffffff;margin-top:6px;font-weight:600">'+esc(m.date||'')+'</div>';
   h += '<div style="font-size:11px;color:#64748b;margin-top:3px">Data prepared by Sokoview Analytics &middot; <a href="https://sokoview.co.tz" style="color:#64748b">sokoview.co.tz</a></div>';
-  h += '<div style="margin-top:16px"><a href="https://sokoview.co.tz" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 24px;border-radius:6px;text-decoration:none;letter-spacing:0.03em">View Full Market Dashboard &rarr;</a></div>';
+  h += '<div style="margin-top:16px"><a href="https://skvlanding.netlify.app" style="display:inline-block;background:#f59e0b;color:#1a2744;font-size:13px;font-weight:700;padding:10px 24px;border-radius:6px;text-decoration:none;letter-spacing:0.03em">View Full Market Dashboard &rarr;</a></div>';
   h += '</td></tr></table>';
   h += '<table width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0"><tr><td class="sal-td" style="padding:22px 24px">';
   h += '<div class="sal-name" style="font-size:16px;color:#111111;margin-bottom:12px">Hi <strong>*|FNAME|*</strong>,</div>';
@@ -1160,7 +1254,7 @@ function buildEmail(m) {
 // TAB SWITCHING
 // ══════════════════════════════════════════════════════════════════════════════
 function switchTab(tab) {
-  ['daily','stoppers','monthly'].forEach(function(t) {
+  ['daily','stoppers','monthly','maintenance'].forEach(function(t) {
     var pane = document.getElementById('pane-' + t);
     var btn  = document.getElementById('tab-' + t);
     if (pane) pane.style.display = t === tab ? 'block' : 'none';
@@ -1997,6 +2091,268 @@ function mr_reset() {
   document.getElementById('mr-statsPanel').style.display='none';
   mr_goS(1);
 }
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MAINTENANCE TAB
+// ══════════════════════════════════════════════════════════════════════════════
+
+function mt_info() {
+  return {
+    key:    document.getElementById('mt-mcKey').value.trim(),
+    list:   document.getElementById('mt-mcList').value.trim(),
+    from:   document.getElementById('mt-fromName').value.trim() || 'Sokoview',
+    reply:  document.getElementById('mt-replyTo').value.trim() || 'fred@sokoview.co.tz',
+    start:  document.getElementById('mt-start').value.trim(),
+    duration: document.getElementById('mt-duration').value.trim(),
+    subject: document.getElementById('mt-subject').value.trim()
+  };
+}
+
+async function mt_mcCall(action, data) {
+  const key = mt_info().key;
+  const r = await fetch('/.netlify/functions/mc', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mcKey: key, action, data: data || {} })
+  });
+  return { status: r.status, ok: r.ok, json: await r.json().catch(() => ({})) };
+}
+
+function mt_buildEmail(startTxt, durationTxt) {
+  return `<title>Sokoview — Scheduled Maintenance</title>
+
+<style>
+  body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
+  table,td{mso-table-lspace:0pt;mso-table-rspace:0pt}
+  img{-ms-interpolation-mode:bicubic;border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
+  body{height:100%!important;margin:0!important;padding:0!important;width:100%!important}
+  @media only screen and (max-width:620px){
+    .wrapper{width:100%!important;max-width:100%!important}
+    .mob-pad{padding-left:24px!important;padding-right:24px!important}
+    .h1{font-size:26px!important;line-height:34px!important}
+  }
+  @media (prefers-color-scheme:dark){
+    .dbg{background-color:#0d1117!important}
+    .dcard{background-color:#161b24!important}
+    .dtxt{color:#e6edf3!important}
+    .dmut{color:#7d8fa3!important}
+    .dfoot{background-color:#1c2333!important}
+  }
+</style>
+
+<div style="display:none;font-size:1px;color:#f4faf7;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">Sokoview will be briefly unavailable for scheduled maintenance. Here's what to expect. 🛠️</div>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f4faf7;" class="dbg">
+<tbody><tr><td align="center" style="padding:32px 16px;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="wrapper" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(13,31,23,.1);">
+
+  <!-- HEADER -->
+  <tbody><tr><td style="background-color:#0d1f17;padding:24px 40px;" class="mob-pad">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"><tbody><tr>
+      <td><table role="presentation" cellspacing="0" cellpadding="0" border="0"><tbody><tr>
+        <td style="background-color:#2DC274;border-radius:8px;width:36px;height:36px;text-align:center;vertical-align:middle;font-family:Arial,sans-serif;font-size:18px;font-weight:700;color:#0d1f17;line-height:36px;">S</td></td>
+        <td style="padding-left:10px;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.03em;">soko<span style="color:#2DC274;">view</span></td>
+      </tr></tbody></table></td>
+      <td align="right" style="font-family:Arial,sans-serif;font-size:11px;color:#7d8fa3;text-transform:uppercase;letter-spacing:0.08em;">System Notice</td>
+    </tr></tbody></table>
+  </td></tr>
+
+  <!-- HERO -->
+  <tr><td style="background:linear-gradient(160deg,#0d1f17 0%,#162b1e 60%,#1e3a28 100%);padding:48px 40px 44px;" class="mob-pad">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tbody><tr>
+      <td style="background-color:rgba(45,194,116,0.12);border-radius:8px;width:48px;height:48px;text-align:center;vertical-align:middle;font-size:22px;line-height:48px;">🛠️</td>
+    </tr></tbody></table>
+    <p style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin:18px 0 14px 0;">Scheduled Maintenance</p>
+    <h1 class="h1" style="font-family:Arial,Helvetica,sans-serif;font-size:32px;font-weight:700;line-height:42px;color:#e6edf3;margin:0 0 16px 0;letter-spacing:-0.03em;">
+      We're making Sokoview <span style="color:#2DC274;">better.</span>
+    </h1>
+    <p style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#7d8fa3;margin:0;">
+      Hi *|FNAME|*, we'll be performing scheduled maintenance to improve speed, reliability, and bring you new features. Here's what you need to know.
+    </p>
+  </td></tr>
+
+  <!-- MAINTENANCE WINDOW -->
+  <tr><td style="background-color:#ffffff;padding:40px 40px 8px;" class="mob-pad dcard">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f0f7f3;border:1px solid #d6ede1;border-radius:12px;"><tbody><tr><td style="padding:24px 28px;">
+      <p style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin:0 0 12px 0;">Maintenance Window</p>
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"><tbody><tr>
+        <td width="50%" valign="top">
+          <p style="font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#4a7060;margin:0 0 4px 0;text-transform:uppercase;letter-spacing:0.06em;" class="dmut">Starts</p>
+          <p style="font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;color:#0d1f17;margin:0;" class="dtxt">${startTxt}</p>
+        </td>
+        <td width="50%" valign="top">
+          <p style="font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#4a7060;margin:0 0 4px 0;text-transform:uppercase;letter-spacing:0.06em;" class="dmut">Expected Duration</p>
+          <p style="font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;color:#0d1f17;margin:0;" class="dtxt">${durationTxt}</p>
+        </td>
+      </tr></tbody></table>
+    </td></tr></tbody></table>
+  </td></tr>
+
+  <!-- WHAT TO EXPECT -->
+  <tr><td style="background-color:#ffffff;padding:32px 40px 32px;" class="mob-pad dcard">
+    <p style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin:0 0 6px 0;">During this time</p>
+    <h2 style="font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;color:#0d1f17;margin:0 0 24px 0;letter-spacing:-0.02em;" class="dtxt">What to expect</h2>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:18px;"><tbody><tr>
+      <td width="40" valign="top"><table role="presentation" cellspacing="0" cellpadding="0" border="0"><tbody><tr>
+        <td style="background-color:#e6f9ee;border-radius:10px;width:36px;height:36px;text-align:center;line-height:36px;font-size:16px;">⏸️</td>
+      </tr></tbody></table></td>
+      <td style="padding-left:14px;" valign="top">
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#0d1f17;margin:2px 0 4px 0;" class="dtxt">Temporary Downtime</p>
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#4a7060;margin:0;" class="dmut">The dashboard, portfolio tracker, and live market data will be briefly unavailable during the maintenance window.</p>
+      </td>
+    </tr></tbody></table>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom:18px;"><tbody><tr>
+      <td width="40" valign="top"><table role="presentation" cellspacing="0" cellpadding="0" border="0"><tbody><tr>
+        <td style="background-color:#e6f9ee;border-radius:10px;width:36px;height:36px;text-align:center;line-height:36px;font-size:16px;">📬</td>
+      </tr></tbody></table></td>
+      <td style="padding-left:14px;" valign="top">
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#0d1f17;margin:2px 0 4px 0;" class="dtxt">Daily Briefings Continue</p>
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#4a7060;margin:0;" class="dmut">Your daily DSE market emails will keep arriving as normal — only the website and dashboard are affected.</p>
+      </td>
+    </tr></tbody></table>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"><tbody><tr>
+      <td width="40" valign="top"><table role="presentation" cellspacing="0" cellpadding="0" border="0"><tbody><tr>
+        <td style="background-color:#e6f9ee;border-radius:10px;width:36px;height:36px;text-align:center;line-height:36px;font-size:16px;">✅</td>
+      </tr></tbody></table></td>
+      <td style="padding-left:14px;" valign="top">
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#0d1f17;margin:2px 0 4px 0;" class="dtxt">No Action Needed</p>
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#4a7060;margin:0;" class="dmut">Your account, portfolio data, and settings are safe. Everything will be back to normal automatically once maintenance is complete.</p>
+      </td>
+    </tr></tbody></table>
+  </td></tr>
+
+  <!-- CLOSING CTA -->
+  <tr><td style="background-color:#ffffff;padding:8px 40px 40px;text-align:center;" class="mob-pad dcard">
+    <p style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:21px;color:#4a7060;margin:0 0 22px 0;" class="dmut">
+      Thanks for your patience as we work to make Sokoview faster and more reliable.<br>Questions? Just reply to this email.
+    </p>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;"><tbody><tr>
+      <td style="border-radius:8px;border:2px solid #2DC274;">
+        <a href="https://sokoview.co.tz" target="_blank" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#2DC274;text-decoration:none;padding:11px 26px;border-radius:6px;letter-spacing:-0.01em;">
+          Visit Sokoview →
+        </a>
+      </td>
+    </tr></tbody></table>
+  </td></tr>
+
+  <!-- FOOTER -->
+  <tr><td style="background-color:#f0efeb;padding:24px 40px 8px;border-top:1px solid #e4e2da;" class="mob-pad dfoot">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"><tbody><tr>
+      <td>
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8aab9a;margin:0;">
+          <strong style="color:#4a7060;">Sokoview</strong> &nbsp;·&nbsp; Tanzania's DSE Market Intelligence<br>
+          Dar es Salaam, Tanzania
+        </p>
+      </td>
+      <td align="right" valign="top">
+        <a href="*|UNSUB|*" style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8aab9a;text-decoration:underline;">Unsubscribe</a>
+      </td>
+    </tr></tbody></table>
+    <p style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:17px;color:#8aab9a;margin:14px 0 0;">
+      You're receiving this because you're a registered Sokoview user.
+      We'll never share your email. &nbsp;
+      <a href="https://sokoview.co.tz/privacy" style="color:#8aab9a;text-decoration:underline;">Privacy Policy</a><br>
+      *|LIST:ADDRESSLINE|*
+    </p>
+  </td></tr>
+  <tr><td style="background-color:#f0efeb;height:24px;" class="dfoot"></td></tr>
+
+</tbody></table>
+</td></tr>
+</tbody></table>`;
+}
+
+function mt_updatePreview() {
+  const i = mt_info();
+  const html = mt_buildEmail(i.start || '*|MAINT_START|*', i.duration || '*|MAINT_DURATION|*');
+  const frame = document.getElementById('mt-previewFrame');
+  frame.srcdoc = html;
+  document.getElementById('mt-rvSubj').textContent  = i.subject  || '—';
+  document.getElementById('mt-rvFrom').textContent  = i.from     || '—';
+  document.getElementById('mt-rvReply').textContent = i.reply    || '—';
+  document.getElementById('mt-rvList').textContent  = i.list     || '—';
+}
+
+async function mt_testConn() {
+  const st = document.getElementById('mt-status');
+  const er = document.getElementById('mt-err');
+  er.style.display = 'none';
+  st.textContent = 'Testing connection...';
+  try {
+    const r = await mt_mcCall('ping');
+    if (r.ok || r.json.health_status === 'Everything's Chimpy!') {
+      st.textContent = '✅ Connected to Mailchimp successfully.';
+    } else {
+      er.textContent = 'Connection failed: ' + (r.json.detail || r.json.title || JSON.stringify(r.json));
+      er.style.display = 'block'; st.textContent = '';
+    }
+  } catch(e) {
+    er.textContent = 'Error: ' + e.message; er.style.display = 'block'; st.textContent = '';
+  }
+}
+
+async function mt_doSend() {
+  const i = mt_info();
+  const st  = document.getElementById('mt-status');
+  const err = document.getElementById('mt-err');
+  const ok  = document.getElementById('mt-ok');
+  const btn = document.getElementById('mt-sendBtn');
+  err.style.display = 'none'; ok.style.display = 'none';
+
+  if (!i.key)  { err.textContent = 'Please enter your Mailchimp API key.'; err.style.display='block'; return; }
+  if (!i.list) { err.textContent = 'Please enter your Mailchimp Audience List ID.'; err.style.display='block'; return; }
+  if (!i.start || !i.duration) { err.textContent = 'Please fill in the maintenance start time and duration.'; err.style.display='block'; return; }
+
+  btn.disabled = true; btn.textContent = 'Sending...';
+  const emailHtml = mt_buildEmail(i.start, i.duration);
+
+  try {
+    // 1 — create campaign
+    st.textContent = 'Creating campaign...';
+    const cr = await mt_mcCall('createCampaign', { payload: {
+      type: 'regular',
+      recipients: { list_id: i.list },
+      settings: {
+        subject_line: i.subject,
+        preview_text: 'Sokoview will be briefly offline. Here\'s what to expect.',
+        from_name: i.from,
+        reply_to: i.reply,
+        title: 'Sokoview Maintenance Notice — ' + i.start
+      }
+    }});
+    if (!cr.json.id) throw new Error('Campaign creation failed: ' + (cr.json.detail || cr.json.title || JSON.stringify(cr.json)));
+
+    // 2 — set content
+    st.textContent = 'Uploading email content...';
+    const up = await mt_mcCall('setContent', { campaignId: cr.json.id, content: { html: emailHtml } });
+    if (!up.ok) throw new Error('Content upload failed: ' + (up.json.detail || up.json.title || JSON.stringify(up.json)));
+
+    // 3 — send
+    st.textContent = 'Sending to audience...';
+    const sr = await mt_mcCall('sendCampaign', { campaignId: cr.json.id });
+    if (sr.status === 204) {
+      ok.innerHTML = '🎉 Maintenance email sent successfully to your Sokoview audience!<br><span style="font-size:11px;opacity:0.7">Campaign ID: ' + cr.json.id + '</span>';
+      ok.style.display = 'block';
+      st.textContent = '';
+    } else {
+      throw new Error('Send failed (' + sr.status + '): ' + (sr.json.detail || sr.json.title || JSON.stringify(sr.json)));
+    }
+  } catch(e) {
+    err.textContent = e.message; err.style.display = 'block'; st.textContent = '';
+  } finally {
+    btn.disabled = false; btn.textContent = '🚀 Send Maintenance Email';
+  }
+}
+
+// Auto-update preview on input changes
+['mt-start','mt-duration','mt-subject'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) el.addEventListener('input', mt_updatePreview);
+});
 
 </script>
 </body>
