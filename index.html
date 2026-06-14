@@ -679,31 +679,23 @@
         <div style="font-size:13px;color:#9ab8a6">Send a maintenance notice to the full Sokoview Mailchimp audience.</div>
       </div>
 
-      <!-- Settings -->
-      <div style="background:#142019;border:1px solid rgba(45,194,116,0.15);border-radius:12px;padding:22px;margin-bottom:18px">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin-bottom:16px">Mailchimp Settings</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          <div>
-            <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">API Key</label>
-            <input id="mt-mcKey" type="password" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
-          </div>
-          <div>
-            <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">List / Audience ID</label>
-            <input id="mt-mcList" type="text" placeholder="e.g. ef7e189238" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
-          </div>
-          <div>
-            <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">From Name</label>
-            <input id="mt-fromName" type="text" value="Sokoview" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
-          </div>
-          <div>
-            <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">Reply-To</label>
-            <input id="mt-replyTo" type="email" value="fred@sokoview.co.tz" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
-          </div>
+      <!-- Shared settings notice -->
+      <div style="background:rgba(45,194,116,0.06);border:1px solid rgba(45,194,116,0.2);border-radius:12px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:16px">🔗</span>
+        <span style="font-size:13px;color:#9ab8a6;">Using API key, List ID, From Name and Reply-To from the <strong style="color:#2DC274;">Daily tab settings</strong>. Enter them there if not already set.</span>
+      </div>
+
+      <!-- Message Type Toggle -->
+      <div style="background:#142019;border:1px solid rgba(45,194,116,0.15);border-radius:12px;padding:18px;margin-bottom:18px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin-bottom:14px">Message Type</div>
+        <div style="display:flex;gap:10px">
+          <button id="mt-btn-scheduled" onclick="mt_setMode('scheduled')" style="flex:1;padding:10px;border-radius:8px;border:2px solid #2DC274;background:rgba(45,194,116,0.15);color:#2DC274;font-size:13px;font-weight:700;cursor:pointer">🛠️ Scheduled Maintenance</button>
+          <button id="mt-btn-resumed" onclick="mt_setMode('resumed')" style="flex:1;padding:10px;border-radius:8px;border:2px solid rgba(45,194,116,0.2);background:transparent;color:#7d9e8a;font-size:13px;font-weight:700;cursor:pointer">✅ Service Resumed</button>
         </div>
       </div>
 
-      <!-- Maintenance Details -->
-      <div style="background:#142019;border:1px solid rgba(45,194,116,0.15);border-radius:12px;padding:22px;margin-bottom:18px">
+      <!-- Maintenance Details (shown for scheduled mode) -->
+      <div id="mt-fields-scheduled" style="background:#142019;border:1px solid rgba(45,194,116,0.15);border-radius:12px;padding:22px;margin-bottom:18px">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin-bottom:16px">Maintenance Details</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
           <div>
@@ -718,6 +710,19 @@
         <div>
           <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">Email Subject Line</label>
           <input id="mt-subject" type="text" value="Sokoview will be briefly offline for scheduled maintenance" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
+        </div>
+      </div>
+
+      <!-- Service Resumed Details (shown for resumed mode) -->
+      <div id="mt-fields-resumed" style="display:none;background:#142019;border:1px solid rgba(45,194,116,0.15);border-radius:12px;padding:22px;margin-bottom:18px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin-bottom:16px">Service Resumed Details</div>
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">Downtime Duration (how long we were down)</label>
+          <input id="mt-downtime" type="text" value="approximately 2 hours" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;color:#9ab8a6;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">Email Subject Line</label>
+          <input id="mt-subject-resumed" type="text" value="Sokoview is back online — all systems normal" style="width:100%;background:#0d1f17;border:1px solid rgba(45,194,116,0.2);border-radius:8px;color:#fff;padding:9px 12px;font-size:13px"/>
         </div>
       </div>
 
@@ -2097,15 +2102,168 @@ function mr_reset() {
 // MAINTENANCE TAB
 // ══════════════════════════════════════════════════════════════════════════════
 
+
+// ── MAINTENANCE MODE ─────────────────────────────────────────────────────
+var mt_mode = 'scheduled'; // 'scheduled' | 'resumed'
+
+function mt_setMode(mode) {
+  mt_mode = mode;
+  document.getElementById('mt-fields-scheduled').style.display = mode === 'scheduled' ? 'block' : 'none';
+  document.getElementById('mt-fields-resumed').style.display   = mode === 'resumed'   ? 'block' : 'none';
+  // Toggle button styles
+  var sBg = mode === 'scheduled' ? 'rgba(45,194,116,0.15)' : 'transparent';
+  var rBg = mode === 'resumed'   ? 'rgba(45,194,116,0.15)' : 'transparent';
+  var sBd = mode === 'scheduled' ? '2px solid #2DC274' : '2px solid rgba(45,194,116,0.2)';
+  var rBd = mode === 'resumed'   ? '2px solid #2DC274' : '2px solid rgba(45,194,116,0.2)';
+  var sCl = mode === 'scheduled' ? '#2DC274' : '#7d9e8a';
+  var rCl = mode === 'resumed'   ? '#2DC274' : '#7d9e8a';
+  var sb = document.getElementById('mt-btn-scheduled');
+  var rb = document.getElementById('mt-btn-resumed');
+  if (sb) { sb.style.background = sBg; sb.style.border = sBd; sb.style.color = sCl; }
+  if (rb) { rb.style.background = rBg; rb.style.border = rBd; rb.style.color = rCl; }
+  mt_updatePreview();
+}
+
+function mt_buildResumedEmail(downtimeTxt) {
+  return `<title>Sokoview — We're Back Online</title>
+
+<style>
+  body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
+  table,td{mso-table-lspace:0pt;mso-table-rspace:0pt}
+  img{-ms-interpolation-mode:bicubic;border:0;height:auto;line-height:100%;outline:none;text-decoration:none}
+  body{height:100%!important;margin:0!important;padding:0!important;width:100%!important}
+  @media only screen and (max-width:620px){
+    .wrapper{width:100%!important;max-width:100%!important}
+    .mob-pad{padding-left:24px!important;padding-right:24px!important}
+    .h1{font-size:26px!important;line-height:34px!important}
+  }
+  @media (prefers-color-scheme:dark){
+    .dbg{background-color:#0d1117!important}
+    .dcard{background-color:#161b24!important}
+    .dtxt{color:#e6edf3!important}
+    .dmut{color:#7d8fa3!important}
+    .dfoot{background-color:#1c2333!important}
+  }
+</style>
+
+<div style="display:none;font-size:1px;color:#f4faf7;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">Sokoview is back online — everything is running normally. Welcome back! ✅</div>
+
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f4faf7;" class="dbg">
+<tbody><tr><td align="center" style="padding:32px 16px;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" class="wrapper" style="background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(13,31,23,.1);">
+
+  <!-- HEADER -->
+  <tbody><tr><td style="background-color:#0d1f17;padding:24px 40px;" class="mob-pad">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"><tbody><tr>
+      <td><table role="presentation" cellspacing="0" cellpadding="0" border="0"><tbody><tr>
+        <td style="background-color:#2DC274;border-radius:8px;width:32px;height:32px;text-align:center;vertical-align:middle;font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:#0d1f17;line-height:32px;">S</td>
+        <td style="padding-left:10px;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.03em;">soko<span style="color:#2DC274;">view</span></td>
+      </tr></tbody></table></td>
+      <td align="right" style="font-family:Arial,sans-serif;font-size:11px;color:#7d8fa3;text-transform:uppercase;letter-spacing:0.08em;">Service Update</td>
+    </tr></tbody></table>
+  </td></tr>
+
+  <!-- HERO -->
+  <tr><td style="background:linear-gradient(160deg,#0d1f17 0%,#0d2e1a 60%,#0f3d1f 100%);padding:48px 40px 44px;" class="mob-pad">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0"><tbody><tr>
+      <td style="background-color:rgba(45,194,116,0.15);border-radius:8px;width:48px;height:48px;text-align:center;vertical-align:middle;font-size:24px;line-height:48px;">✅</td>
+    </tr></tbody></table>
+    <p style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin:18px 0 14px 0;">All Systems Normal</p>
+    <h1 class="h1" style="font-family:Arial,Helvetica,sans-serif;font-size:32px;font-weight:700;line-height:42px;color:#e6edf3;margin:0 0 16px 0;letter-spacing:-0.03em;">
+      We're back <span style="color:#2DC274;">online.</span>
+    </h1>
+    <p style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#7d8fa3;margin:0;">
+      Hi *|FNAME|*, the scheduled maintenance is complete. Sokoview is fully operational — thank you for your patience during the brief downtime of ${downtimeTxt}.
+    </p>
+  </td></tr>
+
+  <!-- STATUS CARD -->
+  <tr><td style="background-color:#ffffff;padding:40px 40px 8px;" class="mob-pad dcard">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f0f7f3;border:1px solid #d6ede1;border-radius:12px;"><tbody><tr><td style="padding:24px 28px;">
+      <p style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#2DC274;margin:0 0 16px 0;">System Status</p>
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"><tbody>
+        <tr>
+          <td style="padding:6px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#4a7060;" class="dmut">Dashboard &amp; Portfolio Tracker</td>
+          <td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;color:#1a9e58;">● Online</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#4a7060;" class="dmut">Daily Market Emails</td>
+          <td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;color:#1a9e58;">● Running</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#4a7060;" class="dmut">Live Market Data</td>
+          <td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;color:#1a9e58;">● Active</td>
+        </tr>
+        <tr>
+          <td style="padding:6px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#4a7060;" class="dmut">Corporate Actions &amp; News</td>
+          <td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;color:#1a9e58;">● Active</td>
+        </tr>
+      </tbody></table>
+    </td></tr></tbody></table>
+  </td></tr>
+
+  <!-- BODY -->
+  <tr><td style="background-color:#ffffff;padding:32px 40px 32px;" class="mob-pad dcard">
+    <p style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#4a7060;margin:0 0 16px 0;" class="dmut">
+      All your portfolio data, market briefings, and settings are intact — nothing was lost during the maintenance window.
+    </p>
+    <p style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#4a7060;margin:0;" class="dmut">
+      Questions? Simply reply to this email and we'll get back to you.
+    </p>
+  </td></tr>
+
+  <!-- CTA -->
+  <tr><td style="background-color:#ffffff;padding:8px 40px 40px;text-align:center;" class="mob-pad dcard">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;"><tbody><tr>
+      <td style="border-radius:8px;background-color:#2DC274;">
+        <a href="https://sokoview.co.tz" target="_blank" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#0d1f17;text-decoration:none;padding:13px 28px;border-radius:8px;letter-spacing:-0.01em;">
+          Back to Sokoview →
+        </a>
+      </td>
+    </tr></tbody></table>
+  </td></tr>
+
+  <!-- FOOTER -->
+  <tr><td style="background-color:#f0efeb;padding:24px 40px 8px;border-top:1px solid #e4e2da;" class="mob-pad dfoot">
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"><tbody><tr>
+      <td>
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#8aab9a;margin:0;">
+          <strong style="color:#4a7060;">Sokoview</strong> &nbsp;·&nbsp; Tanzania's DSE Market Intelligence<br>
+          Dar es Salaam, Tanzania
+        </p>
+      </td>
+      <td align="right" valign="top">
+        <a href="*|UNSUB|*" style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#8aab9a;text-decoration:underline;">Unsubscribe</a>
+      </td>
+    </tr></tbody></table>
+    <p style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:17px;color:#8aab9a;margin:14px 0 0;">
+      You're receiving this because you're a registered Sokoview user.
+      We'll never share your email. &nbsp;
+      <a href="https://sokoview.co.tz/privacy" style="color:#8aab9a;text-decoration:underline;">Privacy Policy</a><br>
+      *|LIST:ADDRESSLINE|*
+    </p>
+  </td></tr>
+  <tr><td style="background-color:#f0efeb;height:24px;" class="dfoot"></td></tr>
+
+</tbody></table>
+</td></tr>
+</tbody></table>`;
+}
+
 function mt_info() {
+  var isResumed = mt_mode === 'resumed';
   return {
-    key:    document.getElementById('mt-mcKey').value.trim(),
-    list:   document.getElementById('mt-mcList').value.trim(),
-    from:   document.getElementById('mt-fromName').value.trim() || 'Sokoview',
-    reply:  document.getElementById('mt-replyTo').value.trim() || 'fred@sokoview.co.tz',
-    start:  document.getElementById('mt-start').value.trim(),
-    duration: document.getElementById('mt-duration').value.trim(),
-    subject: document.getElementById('mt-subject').value.trim()
+    key:      (document.getElementById('mcKey')     || {value:''}).value.trim(),
+    list:     (document.getElementById('mcList')    || {value:''}).value.trim(),
+    from:     (document.getElementById('fromName')  || {value:'Sokoview'}).value.trim() || 'Sokoview',
+    reply:    (document.getElementById('replyTo')   || {value:'fred@sokoview.co.tz'}).value.trim() || 'fred@sokoview.co.tz',
+    start:    (document.getElementById('mt-start')    || {value:''}).value.trim(),
+    duration: (document.getElementById('mt-duration') || {value:''}).value.trim(),
+    downtime: (document.getElementById('mt-downtime') || {value:''}).value.trim(),
+    subject:  isResumed
+      ? (document.getElementById('mt-subject-resumed') || {value:'Sokoview is back online — all systems normal'}).value.trim()
+      : (document.getElementById('mt-subject')          || {value:'Sokoview will be briefly offline for scheduled maintenance'}).value.trim(),
+    mode: mt_mode
   };
 }
 
@@ -2268,9 +2426,11 @@ function mt_buildEmail(startTxt, durationTxt) {
 
 function mt_updatePreview() {
   const i = mt_info();
-  const html = mt_buildEmail(i.start || '*|MAINT_START|*', i.duration || '*|MAINT_DURATION|*');
+  const emailHtml = i.mode === 'resumed'
+    ? mt_buildResumedEmail(i.downtime || 'approximately 2 hours')
+    : mt_buildEmail(i.start || '*|MAINT_START|*', i.duration || '*|MAINT_DURATION|*');
   const frame = document.getElementById('mt-previewFrame');
-  frame.srcdoc = html;
+  frame.srcdoc = emailHtml;
   document.getElementById('mt-rvSubj').textContent  = i.subject  || '—';
   document.getElementById('mt-rvFrom').textContent  = i.from     || '—';
   document.getElementById('mt-rvReply').textContent = i.reply    || '—';
@@ -2308,7 +2468,9 @@ async function mt_doSend() {
   if (!i.start || !i.duration) { err.textContent = 'Please fill in the maintenance start time and duration.'; err.style.display='block'; return; }
 
   btn.disabled = true; btn.textContent = 'Sending...';
-  const emailHtml = mt_buildEmail(i.start, i.duration);
+  const emailHtml = i.mode === 'resumed'
+    ? mt_buildResumedEmail(i.downtime || 'approximately 2 hours')
+    : mt_buildEmail(i.start, i.duration);
 
   try {
     // 1 — create campaign
@@ -2349,7 +2511,7 @@ async function mt_doSend() {
 }
 
 // Auto-update preview on input changes
-['mt-start','mt-duration','mt-subject'].forEach(function(id) {
+['mt-start','mt-duration','mt-subject','mt-downtime','mt-subject-resumed'].forEach(function(id) {
   var el = document.getElementById(id);
   if (el) el.addEventListener('input', mt_updatePreview);
 });
