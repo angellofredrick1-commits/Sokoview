@@ -2284,7 +2284,7 @@ async function mt_testConn() {
   st.textContent = 'Testing connection...';
   try {
     const r = await mt_mcCall('ping');
-    if (r.ok || r.json.health_status === 'Everything's Chimpy!') {
+    if (r.ok || r.json.health_status === "Everything's Chimpy!") {
       st.textContent = '✅ Connected to Mailchimp successfully.';
     } else {
       er.textContent = 'Connection failed: ' + (r.json.detail || r.json.title || JSON.stringify(r.json));
